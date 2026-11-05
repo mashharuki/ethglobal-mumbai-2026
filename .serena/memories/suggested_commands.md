@@ -1,14 +1,13 @@
 # Suggested commands
 
-Root scripts (all via Turborepo): `pnpm build`, `pnpm dev`, `pnpm check-types`, `pnpm lint`, `pnpm test`, `pnpm format` (Biome).
-- Single package: `pnpm turbo run <task> --filter=<pkg>`
-- `pnpm install`
-- `pnpm dlx @biomejs/biome check --write .` — lint + format + organize imports
-- `pnpm dlx knip` — unused files/exports/deps
-- `pnpm dlx jscpd .` — duplication report
-- `pnpm -r <script>` / `pnpm --filter <pkg> <script>` — run across / within workspaces
+Root (all via Turborepo): `pnpm dev`, `pnpm build`, `pnpm check-types`, `pnpm lint`, `pnpm test`.
+- One package: `pnpm turbo run <task> --filter=<frontend|backend|shared|api-specs>` or `pnpm --filter <pkg> <script>`
+- Format/lint (Biome): `pnpm format` (= `biome check --write .`); CI-equivalent: `pnpm exec biome ci .`
+- Dead code / duplication: `pnpm exec knip`, `pnpm exec jscpd .`
+- Backend: `pnpm --filter backend dev` (wrangler dev), `pnpm --filter backend cf-typegen`, dry build `pnpm --filter backend exec wrangler deploy --dry-run --outdir=dist`
+- Submodule: `git submodule update --init --recursive` after clone; work inside it with `git -C ETH-Global-Mumbai-2026-P ...`
 
 Darwin notes:
-- BSD `sed`: in-place edit needs `sed -i '' ...`.
-- Prefer `git -C <path>` over `cd` (shared CWD across parallel Bash calls).
-- `rm -rf`, `curl`, `wget`, `git push --force`, `git reset --hard` are denied in `.claude/settings.json`.
+- BSD `sed`: `sed -i '' ...`; no GNU `timeout`.
+- Prefer `git -C <path>` over `cd` (CWD shared across parallel Bash calls).
+- Denied in `.claude/settings.json`: `rm -rf`, `curl`, `wget`, `git push --force`, `git reset --hard`, reading `.env*` (incl. `.env.example`).
