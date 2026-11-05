@@ -1,0 +1,25 @@
+{
+  "minTokens": 30,
+  "minLines": 3,
+  "format": [
+    "javascript",
+    "typescript",
+    "tsx",
+    "jsx",
+    "python",
+    "json",
+    "markup",
+    "css",
+    "yaml"
+  ],
+  "ignore": [
+    "**/node_modules/**",
+    "**/dist/**",
+    "**/*.min.js",
+    "**/src/api/generated/**"
+  ],
+  "reporters": ["console", "json"],
+  "output": "report",
+  "threshold": 5,
+  "blame": false
+}

@@ -1,0 +1,21 @@
+{
+  "$schema": "https://unpkg.com/knip@6/schema.json",
+  "ignoreBinaries": ["uv"],
+  "ignoreExportsUsedInFile": true,
+  "workspaces": {
+    ".": {},
+    "apps/frontend": {
+      "ignoreIssues": {
+        "src/api/generated/**": ["exports", "types"]
+      }
+    },
+    "apps/regatta-web": {
+      "entry": ["src/App.tsx", "src/**/*.test.ts"]
+    },
+    "apps/cdk": {
+      "entry": ["bin/regatta-probe.ts", "bin/regatta.ts", "test/**/*.test.ts"],
+      "ignoreDependencies": ["ts-node"]
+    },
+    "packages/*": {}
+  }
+}
