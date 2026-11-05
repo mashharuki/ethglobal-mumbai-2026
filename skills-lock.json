@@ -1,6 +1,24 @@
 {
   "version": 1,
   "skills": {
+    "hardhat": {
+      "source": "nomicfoundation/hardhat-skills",
+      "sourceType": "github",
+      "skillPath": "skills/hardhat/SKILL.md",
+      "computedHash": "ff6c34c639a869f66a14901c840b86ae2999470c7f42cc96586d7e99147dc5e8"
+    },
+    "hardhat-toolbox-mocha-ethers": {
+      "source": "nomicfoundation/hardhat-skills",
+      "sourceType": "github",
+      "skillPath": "skills/hardhat-toolbox-mocha-ethers/SKILL.md",
+      "computedHash": "c52dbc20380c14ac3bda6155194315a35178033368aa856981f53818cf3bacb5"
+    },
+    "hardhat-toolbox-viem": {
+      "source": "nomicfoundation/hardhat-skills",
+      "sourceType": "github",
+      "skillPath": "skills/hardhat-toolbox-viem/SKILL.md",
+      "computedHash": "55a5d37c89e5694e75712d3b54c1667f192ecd053aadec67b485453207f533be"
+    },
     "lism-css-guide": {
       "source": "lism-css/core",
       "sourceType": "github",
@@ -18,6 +36,18 @@
       "sourceType": "github",
       "skillPath": "skills/lism-mockup-guide/SKILL.md",
       "computedHash": "ef1361275b3fbe9255818f12348f9f02c628bb17fdca3cb499c2310bce06dd74"
+    },
+    "migrate-foundry-to-hardhat": {
+      "source": "nomicfoundation/hardhat-skills",
+      "sourceType": "github",
+      "skillPath": "skills/migrate-foundry-to-hardhat/SKILL.md",
+      "computedHash": "033338c3443e71dc6a525f358d1f92888a04cb960bc50ae017372315475061ea"
+    },
+    "migrate-hardhat2-to-hardhat3": {
+      "source": "nomicfoundation/hardhat-skills",
+      "sourceType": "github",
+      "skillPath": "skills/migrate-hardhat2-to-hardhat3/SKILL.md",
+      "computedHash": "dfc9d61da600cfaa0ef7842905d84ae7d15c37537679828916f0db2da457f7a2"
     },
     "turborepo": {
       "source": "vercel/turborepo",
