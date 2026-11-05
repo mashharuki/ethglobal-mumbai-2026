@@ -253,6 +253,9 @@ importers:
       '@nomicfoundation/hardhat-node-test-runner':
         specifier: ^3.1.2
         version: 3.1.2(hardhat@3.21.2)
+      '@nomicfoundation/hardhat-slang':
+        specifier: 0.1.0-alpha.1
+        version: 0.1.0-alpha.1(hardhat@3.21.2)
       '@nomicfoundation/hardhat-toolbox-viem':
         specifier: ^5.0.7
         version: 5.0.7(78c401230af01364f373b8759bba0032)
@@ -1491,6 +1494,11 @@ packages:
     resolution: {integrity: sha512-QMlvCRR9D0UbBak/C1skela1hjfXjiRp2FOilk+y6DW6InN7/kJfwf92q6WqrINEgoIkJuyHqUIodemqLs0hbg==}
     peerDependencies:
       hardhat: ^3.12.0
+
+  '@nomicfoundation/hardhat-slang@0.1.0-alpha.1':
+    resolution: {integrity: sha512-ntl2TmN04SjCAv561KUMKHV1tGl4XRqqgZa3cktfFB/NVrKoQvcahcqGNx3tnRCH3AuAtYYK2Rsxd5SnfslLzg==}
+    peerDependencies:
+      hardhat: ^3.21.1
 
   '@nomicfoundation/hardhat-toolbox-viem@5.0.7':
     resolution: {integrity: sha512-aHF77tTYmBIbuxY99KKBPx4cLWdcQvvar1PpzWJyrDgC+P6rA7Edi1GpvvPcwO/HdfZXuACQ74zSS2PnmJu3mA==}
@@ -5140,6 +5148,14 @@ snapshots:
     dependencies:
       '@nomicfoundation/hardhat-errors': 3.1.4
       '@nomicfoundation/hardhat-node-test-reporter': 3.1.1
+      '@nomicfoundation/hardhat-utils': 5.1.1
+      '@nomicfoundation/hardhat-zod-utils': 3.0.8(zod@3.25.76)
+      hardhat: 3.21.2
+      zod: 3.25.76
+
+  '@nomicfoundation/hardhat-slang@0.1.0-alpha.1(hardhat@3.21.2)':
+    dependencies:
+      '@nomicfoundation/hardhat-errors': 3.1.4
       '@nomicfoundation/hardhat-utils': 5.1.1
       '@nomicfoundation/hardhat-zod-utils': 3.0.8(zod@3.25.76)
       hardhat: 3.21.2

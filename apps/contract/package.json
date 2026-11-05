@@ -5,9 +5,9 @@
   "description": "Hardhat 3 project (Node test runner + viem)",
   "type": "module",
   "scripts": {
-    "build": "hardhat build",
-    "test": "hardhat test",
-    "check-types": "hardhat build && tsc --noEmit",
+    "build": "hardhat build --build-profile slang",
+    "test": "hardhat test --build-profile slang",
+    "check-types": "hardhat build --build-profile slang && tsc --noEmit",
     "format:sol": "prettier --write --no-error-on-unmatched-pattern \"contracts/**/*.sol\" \"test/**/*.sol\"",
     "format:sol:check": "prettier --check --no-error-on-unmatched-pattern \"contracts/**/*.sol\" \"test/**/*.sol\""
   },
@@ -17,6 +17,7 @@
     "@nomicfoundation/hardhat-keystore": "^3.1.2",
     "@nomicfoundation/hardhat-network-helpers": "^3.0.12",
     "@nomicfoundation/hardhat-node-test-runner": "^3.1.2",
+    "@nomicfoundation/hardhat-slang": "0.1.0-alpha.1",
     "@nomicfoundation/hardhat-toolbox-viem": "^5.0.7",
     "@nomicfoundation/hardhat-verify": "^3.1.4",
     "@nomicfoundation/hardhat-viem": "^3.1.0",
