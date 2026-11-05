@@ -5,14 +5,18 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "format": "pnpm dlx biome format --write .",
-    "check": "pnpm dlx biome check --write .",
-    "knip": "knip",
-    "jscpd": "jscpd --config .jscpd.json apps packages",
-    "backend": "pnpm --filter backend",
-    "frontend": "pnpm --filter frontend"
+    "build": "turbo run build",
+    "dev": "turbo run dev",
+    "check-types": "turbo run check-types",
+    "lint": "turbo run lint",
+    "test": "turbo run test",
+    "format": "biome check --write ."
   },
-  "keywords": ["web3", "blockchain", "ai"],
+  "keywords": [
+    "web3",
+    "blockchain",
+    "ai"
+  ],
   "author": "mashharuki",
   "license": "ISC",
   "devEngines": {
@@ -23,5 +27,8 @@
     }
   },
   "packageManager": "pnpm@11.24.0",
-  "type": "module"
+  "type": "module",
+  "devDependencies": {
+    "turbo": "^2.11.10"
+  }
 }
