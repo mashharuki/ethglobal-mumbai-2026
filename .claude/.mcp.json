@@ -2,7 +2,7 @@
   "mcpServers": {
     "context7": {
       "type": "stdio",
-      "command": "npx",
+      "command": "pnpm dlx",
       "args": ["-y", "@upstash/context7-mcp@latest"]
     },
     "serena": {
@@ -17,6 +17,11 @@
       "type": "stdio",
       "command": "codegraph",
       "args": ["serve", "--mcp"]
+    },
+    "lism-css": {
+      "type": "stdio",
+      "command": "pnpm dlx",
+      "args": ["-y", "@lism-css/mcp"]
     }
   }
 }
