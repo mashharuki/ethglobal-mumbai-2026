@@ -1,13 +1,19 @@
 {
   "name": "ethglobal-mumbai-2026",
   "version": "1.0.0",
+  "private": "true",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "format": "pnpm dlx biome format --write .",
+    "check": "pnpm dlx biome check --write .",
+    "knip": "knip",
+    "jscpd": "jscpd --config .jscpd.json apps packages",
+    "backend": "pnpm --filter backend",
+    "frontend": "pnpm --filter frontend"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": ["web3", "blockchain", "ai"],
+  "author": "mashharuki",
   "license": "ISC",
   "devEngines": {
     "packageManager": {
