@@ -9,7 +9,8 @@
     "test": "hardhat test --build-profile slang",
     "check-types": "hardhat build --build-profile slang && tsc --noEmit",
     "format:sol": "prettier --write --no-error-on-unmatched-pattern \"contracts/**/*.sol\" \"test/**/*.sol\"",
-    "format:sol:check": "prettier --check --no-error-on-unmatched-pattern \"contracts/**/*.sol\" \"test/**/*.sol\""
+    "format:sol:check": "prettier --check --no-error-on-unmatched-pattern \"contracts/**/*.sol\" \"test/**/*.sol\"",
+    "deploy:Counter": "hardhat ignition deploy ignition/modules/Counter.ts"
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-ignition": "^3.1.9",

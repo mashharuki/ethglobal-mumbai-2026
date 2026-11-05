@@ -82,6 +82,8 @@ Report failures with the actual output. Never claim success without running the 
 - Monorepo and turbo: the `turborepo` skill. Read `node_modules/turbo/docs/README.md` (matches the installed version) before changing `turbo.json`.
 - Code navigation: Serena (project memories in `.serena/memories/`; start with `core`) and codegraph MCP.
 - Library docs: Context7 MCP. Don't rely on memory for fast-moving APIs (Vite 8, TS 7, Hono, wrangler).
+- **Solidity / onchain work** (`apps/contract`): before writing Solidity or shipping anything onchain, load the relevant `ethskills:*` skill (e.g. `ethskills:security`, `ethskills:testing`, `ethskills:audit`, `ethskills:standards`, `ethskills:gas`) via the Skill tool. It's already installed as a project skill — don't fetch `https://ethskills.com/SKILL.md` over the network, use the Skill tool instead.
+- **ENS integration**: no packaged skill exists for ENS yet. Before writing any ENS name-resolution code, fetch `https://docs.ens.domains/llms.txt` (WebFetch) to get current contract addresses and resolver APIs — don't rely on memory, they change across ENS versions.
 
 ## Known gotchas
 

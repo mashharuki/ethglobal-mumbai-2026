@@ -172,8 +172,17 @@
     "type": "command",
     "command": "bun x ccusage statusline"
   },
+  "extraKnownMarketplaces": {
+    "ethskills": {
+      "source": {
+        "source": "github",
+        "repo": "austintgriffith/ethskills"
+      }
+    }
+  },
   "enabledPlugins": {
     "example-skills@anthropic-agent-skills": true,
-    "cloudflare@cloudflare": true
+    "cloudflare@cloudflare": true,
+    "ethskills@ethskills": true
   }
 }
