@@ -1,0 +1,33 @@
+{
+  "name": "contract",
+  "private": true,
+  "version": "0.0.1",
+  "description": "Hardhat 3 project (Node test runner + viem)",
+  "type": "module",
+  "scripts": {
+    "build": "hardhat build",
+    "test": "hardhat test",
+    "check-types": "hardhat build && tsc --noEmit",
+    "format:sol": "prettier --write --no-error-on-unmatched-pattern \"contracts/**/*.sol\" \"test/**/*.sol\"",
+    "format:sol:check": "prettier --check --no-error-on-unmatched-pattern \"contracts/**/*.sol\" \"test/**/*.sol\""
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-ignition": "^3.1.9",
+    "@nomicfoundation/hardhat-ignition-viem": "^3.1.6",
+    "@nomicfoundation/hardhat-keystore": "^3.1.2",
+    "@nomicfoundation/hardhat-network-helpers": "^3.0.12",
+    "@nomicfoundation/hardhat-node-test-runner": "^3.1.2",
+    "@nomicfoundation/hardhat-toolbox-viem": "^5.0.7",
+    "@nomicfoundation/hardhat-verify": "^3.1.4",
+    "@nomicfoundation/hardhat-viem": "^3.1.0",
+    "@nomicfoundation/hardhat-viem-assertions": "^3.1.5",
+    "@nomicfoundation/ignition-core": "^3.1.11",
+    "@types/node": "^24.19.2",
+    "forge-std": "github:foundry-rs/forge-std#v1.17.0",
+    "hardhat": "^3.21.2",
+    "prettier": "^3.9.10",
+    "prettier-plugin-solidity": "^2.4.1",
+    "typescript": "~6.0.3",
+    "viem": "^2.57.16"
+  }
+}
