@@ -1,6 +1,7 @@
 # Suggested commands
 
-No project scripts defined yet (root `test` script is the npm placeholder). Use tools directly:
+Root scripts (all via Turborepo): `pnpm build`, `pnpm dev`, `pnpm check-types`, `pnpm lint`, `pnpm test`, `pnpm format` (Biome).
+- Single package: `pnpm turbo run <task> --filter=<pkg>`
 - `pnpm install`
 - `pnpm dlx @biomejs/biome check --write .` — lint + format + organize imports
 - `pnpm dlx knip` — unused files/exports/deps

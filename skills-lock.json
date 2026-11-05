@@ -1,6 +1,24 @@
 {
   "version": 1,
   "skills": {
+    "lism-css-guide": {
+      "source": "lism-css/core",
+      "sourceType": "github",
+      "skillPath": "skills/lism-css-guide/SKILL.md",
+      "computedHash": "8f9019a3de1d95fa57e71a43b6cd93938e6e0f6295a30c4167db56aaf987025b"
+    },
+    "lism-css-refactor": {
+      "source": "lism-css/core",
+      "sourceType": "github",
+      "skillPath": "skills/lism-css-refactor/SKILL.md",
+      "computedHash": "e3897f12d78f9ff9573c143e0ce5897339b89dfacb4cdb4d0ec33385b8618af3"
+    },
+    "lism-mockup-guide": {
+      "source": "lism-css/core",
+      "sourceType": "github",
+      "skillPath": "skills/lism-mockup-guide/SKILL.md",
+      "computedHash": "ef1361275b3fbe9255818f12348f9f02c628bb17fdca3cb499c2310bce06dd74"
+    },
     "turborepo": {
       "source": "vercel/turborepo",
       "sourceType": "github",

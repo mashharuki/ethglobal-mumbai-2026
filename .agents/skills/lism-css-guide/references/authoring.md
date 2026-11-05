@@ -1,0 +1,234 @@
+# 実装プランの作り方（C0–C8詳細・出力フォーマット）
+
+Lism CSSで新規UI・セクション・コンポーネントを書く前に作る「実装プラン」の詳細編。実装フロー・資料確認トリガー・判定記号（✅/🔁/⏸と注記）は`SKILL.md`が正本で、ここではC0–C8の詳細とプランの出力フォーマットだけを扱う。
+
+## 資料確認
+
+### 初期確認（C0前に実行）
+
+新規UI/コンポーネント/セクション、またはスクショ/Figma等のデザイン再現では、C0に入る前に対象へ明らかに関係する最小限の詳細ファイルを実際に開く。
+
+実装プランの先頭に「初期確認した資料」を必ず出す。
+
+```md
+初期確認した資料: primitives/l--stack.md, primitives/l--columns.md, tokens.md
+```
+
+空のまま、または「必要なら参照」とだけ書いて実装に入らない。既存コード確認だけで足りる軽微な修正では、その旨を書く。
+
+### 資料確認の記録
+
+読んだ資料は「初期確認」「実装中」を区別して資料確認ログ（「出力フォーマット」参照）に記録する。
+
+## C0–C8 実装前チェック詳細
+
+各Cは「列挙/照合・判定/決め方/参照先/よい例・避けたい例」の観点で判断する。
+
+### C0: 入力整理
+
+- **列挙**: 対象（ページ/セクション/部品）、粒度、フレームワーク（React/Astro/素のHTML）、既存制約（命名・レイヤー・公開クラス・CMS・外部JS・E2E）、デザイン入力の種類（画像のみ/詳細なデザインデータ/既存実装の途中作業）、不明点。
+- **照合・判定**: baseの値が読めない、状態の有無、反復数、再現度の方針など不明点は⏸。デザイン画像の書き出し倍率・想定キャンバス幅（スケール前提）は、明示するだけでなく**検証して確定する**: 画像の実寸を確認し（コマンドが使える環境では`sips`・`identify`等で実測、使えない環境では行送り・ボタン高さなど複数箇所の整合チェック）、判定根拠を実装プランに記載する。デザイン内の全寸法がこのスケール前提をもとに計算されるため、未検証のままではトークン差分表全体が無効になる。
+- **決め方**: 既存コードの命名・レイヤー・実装パターンを先に確認してから方針を置く。
+- **参照先**: なし。デザイン入力と既存コードが情報源。
+- **よい例・避けたい例**: OK=「何を/どの粒度で/再利用するか」を先に宣言。罠=デザインpxからいきなり書き始める。
+
+### C1: 構造・セマンティクス選定
+
+- **列挙**: 縦並び/横並び/カラム/メディア枠/幅制御/オーバーレイ/全体リンクなどの構造、要素、heading level、landmark。
+- **照合・判定**: 標準Primitiveで組める→✅。カラム系など迷う→🔁。`@lism-css/ui`で済む→✅または🔁。使うPrimitive詳細を未読なら🔁のまま実装しない。
+- **決め方**: `SKILL.md`の「目的別実装ガイド」で候補を先に確認し、Layout Primitive→Trait→Atomic→UIコンポーネントの順に選ぶ。`<div>`+Property ClassやCSSで押し切らない。この判断を書かずに実装しない。
+- **参照先**: `SKILL.md`の「目的別実装ガイド」、`primitive-class.md`、`primitives/l--*.md`、`trait-class.md`、`components-core.md`、`components-ui.md`、`antipatterns-layout.md#レイアウト選択ミス`。
+- **よい例・避けたい例**: OK=`<Columns cols={3}>`、`<Frame ar="16/9">`、Astroなら`import { Stack, Columns, Frame } from 'lism-css/astro'`。罠=素の`<div>`だらけ、`<div -d:grid gtc=...>`、手組みメディア枠、最外殻Wrapper。
+
+### C2: 再利用・コンポーネント境界
+
+- **列挙**: 同じ部品が3箇所以上になりそうか、値差分・slot構造があるか。
+- **照合・判定**: 3+反復見込みかつ同じ意味のUI部品として安定→`✅新規`（コンポーネント化して着手）。1〜2回・局所・一時的重複→✅そのまま。Props設計が必要→⏸。
+- **決め方**: CSSの`c--`新設でなくReact/Astroコンポーネント抽出を優先。`className`/`style`/`data-*`/ARIA/イベントハンドラの受け渡しを最初から設計する。
+- **参照先**: `components-core.md`、`components-ui.md`、`css-rules.md#custom-classc--`、`property-class.md`、本ファイルの「出力フォーマット」。
+- **よい例・避けたい例**: OK=反復するTagをTagコンポーネント化。罠=Property Classの組み合わせをコピペ展開。
+
+### C3: 命名設計
+
+- **列挙**: 新設する`b--`/`c--`のクラス名とBlock/Element/Modifier構造、独自CSSを置くLayer。
+- **照合・判定**: プレフィックス後の名前が規約に合う→✅。ハイフンや`__`がある→🔁。CSSで参照しないElement（`c--name_elem`）を付けている→🔁（外す）。ベーススタイルを CSS 側で管理する共通基礎部品→`✅新規`（`b--`）。それ以外のカスタムクラス→`✅新規`（`c--`）。公開API・CMS・外部JS・E2E依存→⏸。独自CSSがLayer外になる→🔁。
+- **決め方**: 記法とBlock名の付け方は`naming.md`、`b--`/`c--`の分類（`b--`は3条件をすべて満たす時だけ）と置くLayerは`css-rules.md`に従う。
+- **参照先**: `naming.md`、`css-rules.md#block-classb--`、`css-rules.md#custom-classc--`、`css-rules.md#独自クラスの選び方2分類`、`antipatterns-layout.md#クラス名の命名ミス`、`antipatterns-layout.md#css-の無い-element-クラスを付ける`。
+- **よい例・避けたい例**: OK=`c--featureCard`、`c--featureCard_body`、既存命名がアンダースコア寄せなら`c--feature_card`。罠=`c--feature-card`、`c--hero__inner`（正しくは`c--hero_inner`）、`c--feature-card__body`（正しくは`c--featureCard_body`）、CSSで参照しない`c--featureCard_title`（外す）。
+
+### C4: 状態・バリエーション設計
+
+- **列挙**: active/open/disabled/currentなどの状態、solid/outlineなどの見た目違い。
+- **照合・判定**: 状態→`✅新規`（`data-*`/ARIA）。見た目違い→`✅新規`（C3で決めたBlockと同じプレフィックスのModifier。`c--`なら`c--name--variant`、`b--`なら`b--name--variant`）。Blockと異なるプレフィックスのModifierになっている→🔁。正規Traitが当たる→✅。
+- **決め方**: 状態は属性セレクタ、バリエーションはBEM Modifier。ModifierのプレフィックスはC3で決めたBlockに合わせ、`c--`と`b--`を混在させない。`is--`を状態/バリエーションに流用しない。
+- **参照先**: `trait-class.md`、`trait-class/is--*.md`、`antipatterns-layout.md#is---の誤用状態バリエーション`、`css-rules.md#custom-classc--`、`css-rules.md#block-classb--`。
+- **よい例・避けたい例**: OK=`data-is-active`+`[data-is-active]`、`c--pricing--featured`、`b--btn--outline`。罠=`is--active`、`is--solid`、`b--btn`に対する`c--btn--outline`（Blockと違うプレフィックス）。
+
+### C5: 値・トークン照合
+
+- **列挙**: spacing/color/fz/radius/shadow/size/lh/ltsなど、使う予定の値をすべて列挙。
+- **照合・判定**: 「照合の手順」の3に従う（完全一致→✅／typo等の明確な置換→🔁にして`tokens.md`で確認後✅／近似丸め・任意色・ブランド色→⏸／許可リスト該当→`✅例外`）。
+- **決め方**: トークン値を流用。⏸は本ファイルの「デザインデータ取り込みフロー」に従い、トークン候補と差分表を出して確認まで書かない。CSSへ書く前に、Lism Props/Property Classで表せる値かも同時に確認する。インストール済みの`lism-css`がある環境では、実CSS（`main.css`）やコンポーネント実装でトークン・クラスの実在を確認してから採用するとtypoを防げる。
+- **参照先**: `tokens.md`、`property-class.md`、`antipatterns.md#token-typo存在しない値`、`antipatterns.md#px--固定値の直書き`。
+- **よい例・避けたい例**: OK=`-fz:xs -p:10 -bgc:base-2 -bdrs:10`。罠=`padding:13px`、`bgc="secondary"`。
+
+### C6: レスポンシブ方針
+
+- **列挙**: 各値のbaseと切替BP（sm/md/lg）、container queryかmedia queryか、container運用なら祖先`isContainer`の有無、固定Grid化していないか。
+- **照合・判定**: 標準BP・必要な祖先あり→✅。xs誤用→🔁。`$is_container_query:0`等でmedia query運用が確認できる場合は`isContainer`必須にしない→✅。固定列をレスポンシブ化するなど挙動変更→⏸。
+- **決め方**: 標準BPへ寄せる。同じ値の繰り返しは省略する。等幅カラムはまず`Columns cols={[1, null, 3]}`などPrimitiveのレスポンシブAPIで表せるか確認し、できない場合だけ`@container`/`@media`を自分で書く。
+- **参照先**: `responsive.md`、`trait-class/is--container.md`、`property-class.md`、`primitive-class.md#カラムレイアウト-primitive-の使い分けガイド`。
+- **よい例・避けたい例**: OK=`p={{ base: '20', md: '30' }}`+祖先`isContainer`、`<Columns cols={[1, null, 3]}>`。罠=`gtc="repeat(3,1fr)"`固定、カード列数のためだけに`@container`直書き、container祖先なし。
+
+### C7: CSSに書くもの/Propsに移すもの
+
+- **列挙**: CSSへ書く予定の各宣言を「Property Class/Propsへ移す宣言」と「CSSにしか書けない宣言」に分ける。`c--*`のCSSに残る宣言を実装プランに明記する。
+- **照合・判定**: `c--*`のクラスで1つの要素にだけ効く見た目の指定→✅マークアップへ。擬似クラス・擬似要素・状態切替・子孫セレクタ→✅CSSへ残す。C3で`b--`と決めた部品のベーススタイル→✅`@layer lism-block`へ残す（トークン使用。BP切替・hover・例外調整はProperty Class）。下表の宣言が`.c--*` CSSに残る→🔁未通過。
+- **決め方**: `-{prop}:{value}`またはLism Propsへ移す。本体クラス`c--name`はCSSが空でも何のパーツかを示す名前として残す。ElementはCSSで参照しなくなったら外す。
+- **参照先**: `property-class.md`、`css-rules.md#custom-classc--`、`antipatterns.md#property-class-で書けるのに-css-で書く`。
+- **移行表**:
+
+| CSSでの記述 | Lism Props/Property Class |
+| --- | --- |
+| `padding: var(--s40)` | `p="40"` / `-p:40` |
+| `padding-inline: var(--s50)` | `px="50"` / `-px:50` |
+| `gap: var(--s30)` | `g="30"` / `-g:30` |
+| `border-radius: var(--bdrs--20)` | `bdrs="20"` / `-bdrs:20` |
+| `font-size: var(--fz--s)` | `fz="s"` / `-fz:s` |
+| `font-weight: var(--fw--bold)` | `fw="bold"` / `-fw:bold` |
+| `color: var(--text-2)` | `c="text-2"` / `-c:text-2` |
+| `background-color: var(--base-2)` | `bgc="base-2"` / `-bgc:base-2` |
+| `display: flex` | `Flex`/`Cluster`/`Stack`/`l--flex` |
+| `flex-direction: column` | `Stack`/`l--stack` |
+
+- **よい例・避けたい例**: OK=`<span class="c--tag -fz:xs -p:10 -bgc:base-2 -bdrs:10">`。罠=単一要素の宣言を全部`.c--tag{}`に書く。
+
+### C8: 既定値の確認
+
+- **列挙**: 使うPrimitiveが既に持つ既定CSSを確認し、同値をProps/Property Classで重ねていないか。セマンティックコンポーネント（`Text`/`Inline`/`Group`等）にデフォルト要素と同じ`as`を付けていないか。
+- **照合・判定**: 既定と同値→足さない。既定と違う意図的上書き→✅。ガイドに未整備のPrimitive既定→今後の整備対象にする。
+- **決め方**: `primitives/l--*.md`の「既定の挙動」を見る。念のための`ai="center"`/`ov="hidden"`/直下img`w/h/object-fit`を足さない。
+- **参照先**: `primitives/l--cluster.md`、`primitives/l--frame.md`、`primitive-class.md`、`components-core.md#セマンティックコンポーネント`。
+- **よい例・避けたい例**: OK=`<Cluster g="15">`、`<Frame ar="16/9"><img /></Frame>`。罠=`<Cluster fxw="wrap" ai="center">`、Frame直下imgに`-w:100%`や`object-fit`、`<Text as="p">`。
+
+## 出力フォーマット
+
+実装前チェックの成果物を実装プランと呼ぶ。各行に判定記号を付ける。値照合付きレベルでは`.lism/plan.md`へ保存する（規約は[`verification.md`](./verification.md)）。
+
+### 軽量レベル
+
+例（3〜5行）:
+
+```md
+- ✅ 構造: 既存`Stack`内へ1項目追加。Primitive変更なし。
+- ✅ トークン: 既存パターンに合わせ`p="20"`/`fz="s"`を使用。
+- 🔁 hover: `property-class/hov.md`を参照し`hov={{ bgc: 'base-2' }}`で実装。
+```
+
+### 通常/値照合付きレベル
+
+#### 資料確認ログ
+
+SKILL.md以外に実際に開いたファイルや外部サイトのページurlを、「初期確認」と「実装中」に分けて列挙する。
+
+例:
+| タイミング | 種類 | 確認した資料 | 用途 |
+| --- | --- | --- | --- |
+| 初期確認 | 📄 | `primitives/l--columns.md` | カード一覧を`Columns`で組む判断 |
+| 実装中 | 📄 | `tokens.md` | デザイン値とトークン照合（トークン丸めトリガー） |
+| 実装中 | URL | `https://lism-css.com/docs/naming.md` | `c--*`命名トリガー |
+
+各行を実装プランの判断項目（特に🔁）と対応させる。
+
+#### 🔁判断行
+
+未読の判断項目そのものに🔁と読む資料を紐づける。資料を読んだら同じ行を✅または⏸へ更新する。
+
+| 判断項目 | 採用案 | 読む資料 | 判定 |
+| --- | --- | --- | --- |
+| カード一覧 | `Columns cols={[1, null, 3]}` | `primitives/l--columns.md` | 🔁 |
+| hover指定 | `hov={{ bgc: 'base-2' }}` | `property-class/hov.md` | 🔁 |
+
+#### 構造表
+
+| 対象領域 | 採用Primitive・コンポーネント | 理由 | 参照先 | 判定 |
+| --- | --- | --- | --- | --- |
+| 例: カード一覧 | `Columns` | 等幅3列で、BP切替に向く | `primitive-class.md` | ✅ |
+
+#### トークン表
+
+値照合付きでは`デザイン値`と`差分`列を必須にする。
+
+| 用途 | デザイン値 | 採用トークン | 差分 | 判定 |
+| --- | --- | --- | --- | --- |
+| 余白 | `24px` | `p="30"`候補 | +6px | ⏸ |
+| 背景 | — | `bgc="base-2"` | — | ✅ |
+
+#### レスポンシブ表
+
+| 対象 | base | sm | md | lg | container祖先 | 注意 |
+| --- | --- | --- | --- | --- | --- | --- |
+| カード列数 | 1 | 2 | 3 | — | あり | `cols={[1,2,3]}` |
+
+#### 構成表（命名・CSSとPropsの分担・状態・既定値）
+
+| c--\*名 | Props・Property Classで書く | CSSに残す | 状態・バリエーション | 既定で足りる（指定しない） |
+| --- | --- | --- | --- | --- |
+| `c--featureCard` | `p="20" bgc="base" bdrs="20"` | `::before`装飾 | `c--featureCard--featured` | `Frame ov`、直下img fit |
+
+#### 確認事項表（⏸）
+
+| 項目 | 要確認理由 | 候補 |
+| --- | --- | --- |
+| `padding:24px` | 近いトークンへの丸めで見た目差が出る | A=`p="30"`へ丸め/B=カスタムトークン化・基準値上書き/C=px直書き（例外） |
+
+### デザインデータ取り込みフロー
+
+#### 入力種別と既定動作
+
+デザイン値の扱いは、入力の種類とプロジェクトの段階で決まる。「正確に再現して」等の指示があってもこの分岐が既定動作。
+
+この表は⏸確認を省略する許可ではない。既定動作は、確認時に第一候補として出す案と、確認が取れない時に`✅前提`として選ぶ選択肢（`SKILL.md`「判定記号」の⏸の項）を定める。
+
+| 入力 | 既定動作 |
+| --- | --- |
+| PNG等の画像・曖昧なレイアウト指示のみ | トークン照合し、最寄りトークンへ丸める。実測pxをそのまま書かない |
+| 詳細なデザインデータ（JSON・デザイントークン等）にpx値・色値が明示されている | 「どこまで丸め、どこを具体値にするか」を実装前に一括ですり合わせる（下記「値マッピングの初期すり合わせ」） |
+| 既存プロジェクトの途中作業 | 現状の実装パターンに従う。迷う値だけ確認事項（⏸）にする |
+
+#### 照合の手順
+
+1. **候補抽出**: デザイン値（px/色/比率など）ごとに最寄りトークンを1〜2個挙げる。
+2. **差分表**: `用途/デザイン値/候補トークン/差分/判定`で表にする。
+3. **判定**:
+   - 完全一致→✅そのまま採用。
+   - typo・既存規約上明確な置換（`secondary`→`base-2`など）→`tokens.md`で正規トークンを確認して置換し、✅にする（ユーザー確認は不要）。
+   - 近似丸め・任意色・ブランド色・密度/再現度の判断→⏸。A=最寄りトークンに丸める/B=カスタムトークン化または基準値（`--s-unit`等）の上書き/C=px直書き（例外）を提示する。この選択肢の定義はここが正本。
+   - `antipatterns.md`の「直書きしてよい例外」に該当→`✅例外`（条件は`SKILL.md`「判定記号」）。
+4. **カスタムトークン化の条件**: 同値が複数箇所で再利用される、またはデザインシステム上の意味を持つ場合は候補にする。1回限りの局所値は丸めか例外で済ませる。
+5. **デザインデータが無い場合**: 差分表は省略し、既存トークンから意味が近い値を選ぶ。新規数値が必要な時だけ⏸にする。
+
+`--s-unit`などの基準値をプロジェクトが上書きしているとpxの完全一致判定が変わる。値照合付きでは上書きの有無を先に確認する。
+
+実測pxを包括的に例外化するNG例は[`antipatterns.md`](../antipatterns.md#px--固定値の直書き)の「実測pxの包括例外化」。
+
+#### 値マッピングの初期すり合わせ
+
+デザインシステムが未確立のプロジェクトで初期実装を任された場合は、値ごとに⏸を出すのではなく、実装前にマッピング方針を一括ですり合わせる。トークン差分表と確認事項表をこの一括確認の提出物として使う。
+
+- スペース・サイズ・タイポグラフィ: どの範囲を最寄りトークンへ丸め、どこを具体値（px直書き・カスタムトークン）にするかの境界。
+- カラー: デザイン内の各色をどのセマンティックカラー（`--brand`/`--accent`/`--base`/`--base-2`/`--text`/`--text-2`等）へ割り当てるか。
+- デザイン画像しか無い場合は、書き出し倍率・想定キャンバス幅の前提もここで確認する。倍率はC0の実測・整合チェックで確定してから提示する。
+
+確認が取れない場合の進め方は`SKILL.md`「判定記号」の⏸の項。
+
+### 提出前セルフチェックへの接続
+
+`SKILL.md`「提出前セルフチェック」で実装プランと実装を照合した時の分類例:
+
+| 計画項目 | 実装結果 | 分類 | 対応 |
+| --- | --- | --- | --- |
+| ✅ `Frame ar="16/9"` | 実装済み | OK | なし |
+| ✅ `p="20"` | `p="30"`に変更 | 計画変更 | 理由を記録 |
+| ⏸ `24px`丸め | 未確認のまま実装 | 要確認 | 実装を止め確認 |
+| ✅ `data-is-active` | CSSだけ`is--active`のまま | 実装漏れ | CSS/JS/testを同時修正 |
