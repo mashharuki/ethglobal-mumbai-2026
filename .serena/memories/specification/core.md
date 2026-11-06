@@ -2,11 +2,12 @@
 
 - Existing proposal: `specs/001-private-dating/`. Entry `spec.md`; functional requirements are owned by `frontend.md`, `backend.md`, `smart-contract.md`, so reading only the entry spec misses requirements.
 - Proposed scope: private-profile concurrent matching; stablecoin deposit, mutual settlement and expiry refund; optional paired simulation. These are documented intentions, not operational guarantees.
-- `planning-input.md` records planning input. Design: `plan.md`, `research.md`, `data-model.md`, `contracts/{service,matching,settlement}.md`. `quickstart.md` distinguishes scaffold from target.
+- `planning-input.md` records planning input. Design: `plan.md`, `research.md`, `data-model.md`, `contracts/{participation,service,matching,settlement}.md`. `quickstart.md` distinguishes scaffold from target.
+- Adopted sequence: ENS role separation + independent credential verification → mutual-preference private matching → bounded N-user scheduling. Credential verification is separate from paid product registration and room access; do not restore a dependency on ZK/deposits for the first ENS demo. New reputation/slashing/revenue changes remain proposals; existing refund rights are preserved. Exact gates and tasks live in plan/tasks, not this memory.
 - `tasks.md` tracks implementation. `checklists/requirements.md` tracks specification quality; checked requirements do not prove working code or success-criteria measurements.
 - Overall specification remains Draft; `.specify/memory/constitution.md` is unratified. Confirming prize targets does not approve the whole feature or establish eligibility.
 - `prize-targets.md` is the authoritative prize matrix: EF-CROPS (Web/ZK), ENS-V2 (API), ARKIV-APP (Arkiv/API) are confirmed targets. EF-RPC is an additional conditional entry within the EF partner slot. Official conditions, product demo gates and final decisions are distinct.
-- Prize evidence tasks: T032 Arkiv, T034 ENS, T035 EF, T036 final per-prize decision. Existing T001–T033 IDs are preserved. Specification-quality checkboxes do not mean live integrations or submission are complete.
+- Prize evidence tasks: T032 Arkiv, T034 ENS (first technical gate), T035 EF, T036 final per-prize decision. Existing T001–T036 IDs are preserved; additions extend the list. Specification-quality checkboxes do not mean live integrations or submission are complete.
 - Cryptographic matching across independent clients and private atomic settlement/recovery are feasibility gates in the plan. Do not equate mocks or registration proofs with complete private matching/settlement.
 - HTTP design Markdown has not yet been populated into `packages/api-specs/openapi.yaml`. Shared implementation belongs in `packages/shared`.
 - Python submodule's simulation plan is separate; no integration may be inferred from its presence. See `mem:python_runtime/core`.

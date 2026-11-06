@@ -2,6 +2,8 @@
 
 **2026-11-06 / アイデアと目標設計。二者照合・秘匿精算は未検証。**
 
+ブース訪問後、**ENSの権限分離・独立検証 → 希望条件付き二者照合 → 多人数候補選択**を採用した。[更新Plan](../specs/001-private-dating/plan.md)・[検討の根拠](mentor-feedback-proposal.md)を参照。以下の動画・画像は拡張前の概要で、独立検証と多人数選択はまだ描いていない。
+
 ## 最初に見せる32秒
 
 [![Animated concept overview in English](assets/private-dating-overview.gif)](overview.html)
@@ -18,9 +20,9 @@
 
 ## 最初の30秒
 
-> We’re exploring a dating app where people can discover shared interests without publishing their profiles. Each browser keeps its own secrets, and we aim to use zero-knowledge proofs to check whether interests overlap. ENS provides pseudonymous names, Arkiv stores public registration records, and a Sepolia contract handles deposits and refunds. We’d like feedback on the user value and the smallest convincing demo.
+> We’re exploring private dating with participation credentials that different clients can verify through ENS. Users can update their connection keys, but cannot rewrite issuer-controlled credentials. Private matching checks mutual preferences and shared interests without publishing profiles. We will first demonstrate independent credential verification, then two-person matching, then bounded candidate selection for more users.
 
-> プロフィールを公開せず、共通の趣味がある相手を見つけるマッチングアプリを考えています。秘密はそれぞれの端末に置き、ZKで趣味が重なるかだけ確認する設計です。ENSは仮名、Arkivは公開登録、Sepoliaのコントラクトは預託と返却を担当します。この価値が利用者に響くか、最小限のデモをどこまでに絞るべきか、意見をいただきたいです。
+> ENSを通じて別のクライアントでも参加資格を確認できる、非公開プロフィールのマッチングを考えています。本人は接続用の鍵を更新できますが、発行者が管理する資格は書き換えられません。秘密計算で双方の希望と共通趣味の条件を確認します。まず資格の独立検証、次に二者照合、その後に多人数の候補選択を実証する計画です。
 
 ## フィードバックをもらう3点
 
