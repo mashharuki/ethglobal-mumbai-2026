@@ -1,13 +1,13 @@
 # Implementation Plan: プロフィールを公開せずに出会う
 
-**Git branch** `create_spec`　**Feature** `001-private-dating`　**Date** 2026-11-06  
+**Git branch** `feat/001-arkiv-aibot-alignment`　**Feature** `001-private-dating`　**Date** 2026-11-06  
 **入力** [統合仕様（Draft）](spec.md)・[技術指定](planning-input.md)・[正式応募目標と公式条件](prize-targets.md)
 
 ## Summary
 
 採用した実証順序は、**A：ENS権限分離と独立クライアント → B：希望条件を含む二者照合 → C：多人数候補選択**。Aでは資格だけを検証し、入金やプロフィール証明を待たない。Bでは合成の登録済み入力を独立2端末へ置き、希望条件と趣味をまとめた真偽だけを実証明で検証する。CでN人の待機列と各人K人の割当上限を結合する。
 
-製品の検索には参加資格・現行登録・確定預託が必要で、マッチ成立には双方承諾と両預託の拘束が必要。資格デモの成功を検索・資金の完成と扱わない。入金＋7日の期限、未拘束の即時取消、相手・API停止中の期限返却を維持する。根拠通知・異議・期限付き停止/回復を採用し、マッチ預託は元本返却専用へ変更する。旧90/10配分・運営の罰金収入は廃止し、新しい金銭没収や保証金は実装対象に含めない。World ModelのP2はA/B/Cと提出不足の解消後に扱う。
+製品の検索には参加資格・現行登録・確定預託が必要で、マッチ成立には双方承諾と両預託の拘束が必要。資格デモの成功を検索・資金の完成と扱わない。入金＋7日の期限、未拘束の即時取消、相手・API停止中の期限返却を維持する。根拠通知・異議・期限付き停止/回復を採用し、マッチ預託は元本返却専用へ変更する。旧90/10配分・運営の罰金収入は廃止し、新しい金銭没収や保証金は実装対象に含めない。P2は実装済みAIBotの任意Persona会話を採用し、親結合をA/B/Cと提出不足の解消後に扱う。単体デモの準備は独立して進められる。
 
 担当者は[フロントエンド仕様](frontend.md)、[バックエンド仕様](backend.md)、[スマートコントラクト仕様](smart-contract.md)から着手する。各領域の受入例とUS1〜3、SC-001〜007を照合する。仕様全体はDraftであり、今回は優先順とその最小の実証範囲を採用した。
 
@@ -21,7 +21,7 @@
 
 段階Cのスケジューラ試験は合成リースで独立に行えるが、本番の検索許可を省略しない。K=3・同時上限1は初期試験設定であり、任意人数への性能保証ではない。肌の色・生活リズムは今回追加しない。資格発行者の信頼、希望からの属性推測、全件探索を保証しない制約をデモに添える。
 
-セットアップ・契約準備と資金の取消/期限返却（T005・T010・T021）は別担当で並行可能。A/B/Cを通すために新しい没収やWorld Modelを先に実装する依存は作らない。資金をユーザー導線へ出す前にはT021・T024の検証を必須とする。
+セットアップ・契約準備と資金の取消/期限返却（T005・T010・T021）は別担当で並行可能。A/B/Cを通すために新しい没収やAIBot統合を先に実装する依存は作らない。T043の説明/UI簡素化は横断で進め、T044のSwarmは追加条件を満たせる場合だけ進める。資金をユーザー導線へ出す前にはT021・T024の検証を必須とする。
 
 応募目標はEF-CROPS・ENS-V2・ARKIV-APPの3件に固定する。主担当は順にWeb/ZK、API、Arkiv（API領域）。T032・T034・T035で証拠を揃え、T031・T033の提出物と合わせてT036で個別判定する。P2の拡張より、この3目標の実演・提出不足の解消を優先する。
 
@@ -32,7 +32,7 @@
 | フロントエンド | 既存React 19・Vite 8・TypeScript・lism CSS・PWA。Kohakuでウォレット接続、Anon RPCでアプリの読取。秘密値は端末に保持、PWAキャッシュは静的ファイルのみ | プロフィール公開範囲と預託条件を署名前に示す。検索、招待、手番、対面提示、返却可能額を確認できる |
 | ZK | Noirで属性・希望mask・許可趣味と派生ベクトルを登録版へ拘束する。固定長非零内積案は実験で、NoirJS・Barretenbergの対応版も実測する | [二者照合契約](contracts/matching.md)の正負例を2端末で再現。条件別の中間結果を返さず、時間・通信量を記録 |
 | ENS資格 | Sepoliaの専用Resolver、発行者限定の資格参照、本人の限定キー、Arkiv署名付き公開資格。Webと独立読取ツール | [参加資格契約](contracts/participation.md)に従い、信頼する階層・ABI/アドレス・権限・発行世代・現行版を検証 |
-| バックエンド | 既存Hono・Workers・Wrangler。Zodで境界検証。検索リースを直列化し、共同セッションは部屋ごとのDurable Object。公開登録はArkiv、権限はENSv2で確認 | [サービス契約](contracts/service.md)に従い、再送・切断・モデル障害から復帰。モデルには識別子や登録値を渡さない |
+| バックエンド | 既存Hono・Workers・Wrangler。Zodで境界検証。検索リースを直列化し、AIBotへの本人引継ぎ・マッチ照会・申請を提供する。公開登録はArkiv、権限はENSv2で確認 | [サービス契約](contracts/service.md)に従い、再送・切断・モデル障害から復帰。照合秘密をモデルへ渡さず、別同意のPersona・会話だけAIBotが処理する |
 | コントラクト | 既存Hardhat 3・Solidity・viem。テストはローカル、外部ネットワークの目標はEthereum Sepolia。公開するのは資金の出入りと検証に必要な値 | [精算契約](contracts/settlement.md)の保存則・期限返却・公開情報の検査を通す。Circle公式テストUSDC・EURCの入金だけを認め、同名の別アドレスを拒否する |
 | 共通 | Node 24・pnpm 11・Turborepo。API定義はOpenAPI、共有型と生成クライアントを利用。Biome、oxlint、Vitest、既存のHardhatテスト、knip・jscpdを利用範囲に合わせる | SC-001〜007の測定と再現手順を記録。受入人数・時間目標は[仕様書](spec.md)の数値を使用 |
 
@@ -40,7 +40,7 @@
 
 ## Constitution Check
 
-Phase 0開始前に確認した憲章は未批准テンプレート。適用する制約はAGENTS.mdと統合仕様に記録された決定に従う。応募目標は確定したが、仕様全体はDraftとして扱う。Phase 1後も、API正本は既存パッケージの一箇所、共有型はshared、Pythonの変更は別リポジトリの手順に従う構成とした。設計で新たに必要になる依存（Noir実行系、Zod、生成器など）は実装前に理由・代案とともに承認を得る。CI変更、サブモジュール作業、外部デプロイ、pushも個別の許可対象。Solidityの実装前にはethskills、ENSの実装前には最新の公式索引を確認する。
+Phase 0開始前に確認した憲章は未批准テンプレート。適用する制約はAGENTS.mdと統合仕様に記録された決定に従う。応募目標は確定したが、仕様全体はDraftとして扱う。Phase 1後も、API正本は既存パッケージの一箇所、共有型はshared、AIBotの変更は別リポジトリの手順に従う構成とした。設計で新たに必要になる依存（Noir実行系、Zod、生成器など）は実装前に理由・代案とともに承認を得る。CI変更、サブモジュール作業、外部デプロイ、pushも個別の許可対象。Solidityの実装前にはethskills、ENSの実装前には最新の公式索引を確認する。
 
 ## Project Structure
 
@@ -49,14 +49,14 @@ Phase 0開始前に確認した憲章は未批准テンプレート。適用す�
 | 場所 | 計画で割り当てた責務 |
 | --- | --- |
 | apps/frontend | PWA、署名の確認、端末内の秘密・証明、相性確認、共同セッション |
-| apps/backend | 認証・公開登録・暗号文配送・部屋の順序制御・モデル接続 |
+| apps/backend | 認証・公開登録・暗号文配送・AIBotへの本人/マッチ/申請API |
 | apps/contract | 新規の預託・精算と資金用証明の検証。既存Counterはスターター |
 | circuits/（新設予定） | Noir回路、公開入力の順序、検証鍵の版、成功・失敗fixture。pnpm workspaceの追加は不要 |
 | packages/api-specs/openapi.yaml、packages/shared | 機械可読HTTP契約と共有型。実装時は契約確定→クライアント生成→両アプリ接続の順 |
 | scripts/verify-participation.ts（新設予定） | Web/BFFに依存しない別の資格検証実装。schema・fixtureのみ共有し、ENS/Arkivを自分で読む |
-| ETH-Global-Mumbai-2026-P/ | Python側を必要とする場合の外部依存。チーム担当者と接続契約・利用可否を確認してから接続 |
+| ethglobal-mumbai-2026-AIBot/ | Next.jsの独立アプリ。Persona承認・保存・自由会話を既存実装から再利用。[親との接続契約](contracts/simulation.md)と同意境界をT025〜T029で結合 |
 
-Phase 0の比較は[research.md](research.md)、Phase 1の保存・状態遷移は[data-model.md](data-model.md)、担当間の境界は[参加資格](contracts/participation.md)・[資格審査](contracts/participation-review.md)・[サービス](contracts/service.md)・[照合](contracts/matching.md)・[精算](contracts/settlement.md)、試験手順は[quickstart.md](quickstart.md)を参照する。既存憲章は未批准のままで、新依存・デプロイ・pushの承認を本改訂で代替しない。
+Phase 0の比較は[research.md](research.md)、Phase 1の保存・状態遷移は[data-model.md](data-model.md)、担当間の境界は[参加資格](contracts/participation.md)・[資格審査](contracts/participation-review.md)・[サービス](contracts/service.md)・[照合](contracts/matching.md)・[精算](contracts/settlement.md)・[AIBot](contracts/simulation.md)・[条件付きSwarm](contracts/swarm-assets.md)、試験手順は[quickstart.md](quickstart.md)を参照する。既存憲章は未批准のままで、新依存・デプロイ・pushの承認を本改訂で代替しない。
 
 ## 提出から逆算した実証順序
 

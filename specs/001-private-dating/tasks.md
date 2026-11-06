@@ -84,18 +84,18 @@
 
 **独立試験**：成立済みペアの部屋資格で2ターン遊ぶ。二人が選んだ行動が次の場面に反映され、再送・切断では手番が増えない。生成停止中も退出・対面意思の選択ができる（FR-006〜008、SC-003）。
 
-- [ ] T025 [P] [US3] API担当：`apps/backend/src/rooms/room.ts` に部屋資格・参加同意・手番・revision・actionId・双方の対面意思を実装する。第三者・手番違いを拒否し、二人目の応答を一度だけ生成待ちへ進める。
-- [ ] T026 [P] [US3] モデル担当：`apps/backend/src/model/generate-scene.ts` にWorld Modelとの境界を実装する。入力を共有テーマ・場面・選択履歴に限定し、2〜4選択肢を検証する。実接続と開発fixtureを表示上も識別可能にする。Python側の変更が必要ならサブモジュール作業前に確認する。
-- [ ] T027 [P] [US3] Web担当：`apps/frontend/src/pages/Simulation.tsx` に任意参加、手番待ち、選択、再接続、離脱、双方の対面希望一致をfixtureで実装する。一方の希望だけでは相手に通知しない。
-- [ ] T028 [US3] 結合担当：T025〜T027後、`apps/backend/src/rooms/routes.ts` と `apps/frontend/src/rooms/session.ts` に両預託の拘束確定後に発行された部屋資格による入室、生成世代の照合、失敗時の再試行を接続する。PWAのサービスワーカーが部屋・プロフィールをキャッシュしないことを確認する。
-- [ ] T029 [US3] 検証担当：`specs/001-private-dating/evidence/simulation.md` に5組での所要時間、二つの選択と次場面の対応、再送・退出・生成遅延・部外者拒否の結果を記録する。SC-003の達成人数を明示する。
+- [ ] T025 [P] [US3] API担当：T006・T013・T016後、`apps/backend/src/simulation/access.ts` に成立マッチとsubject/相手Persona/現行同意/ブロック/期限の対応を実装する。[AIBot契約](contracts/simulation.md)のGET match用認可を担い、架空の成立fixtureでは先行試験可。会話状態やPersonaを親へ複製しない。
+- [ ] T026 [P] [US3] API・AIBot担当：`packages/api-specs/openapi.yaml` と `packages/shared/src/simulation/contract.ts` に[既存Adapter](../../ethglobal-mumbai-2026-AIBot/docs/MATCHING_ADAPTER.md)との本人引継ぎ・マッチ照会・冪等申請を定義する。HMAC形式/期限/audience、サービス認証、同意撤回、失敗時、別Originを固定する。単体の実装・作者試験は `evidence/aibot-inspection.md` を参照。サブモジュール変更が必要なら担当者と承認を得て行う。
+- [ ] T027 [P] [US3] Web担当：T026後、`apps/frontend/src/pages/Simulation.tsx` に任意参加・AI送信の別同意・AIBotへの遷移・戻り・期限切れ/再開始の案内を実装する。校正/会話UIはAIBotを再利用。実AI/定型デモと架空/実マッチを別表示し、未接続の導線を製品完成と表示しない。
+- [ ] T028 [US3] 結合担当：T025〜T027後、`apps/backend/src/simulation/routes.ts` と `apps/frontend/src/simulation/session.ts` に本人assertion、サービス認証付きマッチ照会、冪等デート申請、別Originの安全な引継ぎを接続する。AIBotの各操作で同意/ブロックを再確認し、親の部屋DOは追加しない。秘密・assertion・Persona・会話をPWAキャッシュや公開ログへ残さない。
+- [ ] T029 [US3] 検証担当：T028後、`specs/001-private-dating/evidence/simulation.md` にSC-003の初見5人、3シーン9ターン、Retry、撤回・ブロック・失効・別主体、モデル停止・再起動、申請再送の結果を記録する。対象AIBot/親コミット、作者の既存試験と自分たちの結合試験、実AI/定型デモ/架空マッチを分離する。両リポジトリの正しいgitlinkで再現できることも確認する。
 
 ## Phase 6 — 統合・提出準備
 
 - [ ] T030 [P] 品質担当：`specs/001-private-dating/quickstart.md` の手順を第三者環境で再現し、Biome、frontend lint/build、Workers dry-run、Hardhat format/build/test、Noirの正負例と実証明を確認する。既存エラーと新規失敗を区別し、実測結果を `specs/001-private-dating/evidence/verification.md` に残す。
 - [ ] T031 [P] 提出担当：`README.md` に起動手順、見出し`CROPS`と各項目、トラッカーの検査、公開ライセンス、ライブデモ、3目標を記す。Classic / From Scratchの新作範囲と再利用スターター、コミット履歴、AI支援箇所とチームの貢献、仕様・プロンプト・計画への参照を確認する。賞別証拠の最終リンクとArkiv書込アドレス・クエリはT036で反映する。
 - [ ] T032 [P] Arkiv担当：T014・T015後、ARKIV-APPの実書込→索引反映→第三者の公開登録画面での実読取、更新・失効を実演し、`specs/001-private-dating/evidence/arkiv.md` にチェーン、書込ウォレット、取引／エンティティキー、再現クエリと画面の対応を残す。`arkiv/schema.md`、`arkiv/friction.md`、`arkiv/reach.md`、`arkiv/why-arkiv.md`、`arkiv/how-you-use-arkiv.md` を実測根拠で揃え、README用の書込アドレス・クエリをT036へ渡す。秘密・ペア・相性結果を公開せず、ログ書込のみでは完了にしない。
-- [ ] T033 デモ担当：T031と実演可能な製品経路の結果を受け、`docs/demo-script.md` にEF-CROPS・ENS-V2・ARKIV-APPそれぞれの実演箇所、実験段階、外部接続、対象コミットを記す。2〜3分の動画と公開リンクを確認する。証明生成・取引確定の待機だけをカットし、同じ実行の開始と結果を通常速度で残して実測秒数を添える。EF-RPCを追加する場合も実際の経路を示す。最終選択はT036へ引き渡す。
+- [ ] T033 デモ担当：T031・T043と実演可能な結果を受け、`docs/demo-script.md` を120秒の対面プレゼンへ仕上げる。キャッチコピー→利用者操作→スポンサーの役割を示し、リハーサル実測を残す。別途2〜3分の提出動画に実演箇所・対象コミット・実接続/合成/未接続・公開リンクを記録する。証明生成/取引確定待ちのカットは実測秒数を添え、同じ実行の開始/結果を残す。EF-RPC/ARKIV-SWARMは実証時のみ追加し、T036へ渡す。
 - [ ] T035 [P] Web/ZK担当：T008・T016・T017・T031後、API・資金担当とEF-CROPSの情報境界とCROPS4項目を確認し、`specs/001-private-dating/evidence/ef-crops.md` に2端末の実照合、第三者観察、トラッカー検査、秘密の所在、運営依存・残る推測可能性を記す。資金経路を主張する場合はT024も照合する。Web担当は追加賞EF-RPCを `specs/001-private-dating/evidence/anon-rpc.md` で別判定し、標準読取の成功・対象範囲・例外の理由・障害時の挙動を記録する。
 - [ ] T036 提出担当：T030〜T035の結果（未達を含む）を集め、`specs/001-private-dating/evidence/prizes.md` にEF-CROPS・ENS-V2・ARKIV-APPと追加EF-RPCの判定を個別に記録する。公式条件を再確認し、証拠・README・動画・ライブデモの主張を照合する。`README.md` に賞別証拠、Arkiv書込ウォレットと再現クエリを反映し、第三者アクセスを確認する。提出可・未達・再確認待ちの理由、担当・対象コミットを残し、チームがDashboardで選択・提出した後に選択結果と受付を記録する。資料作成だけで応募完了にしない。
 
