@@ -4,6 +4,8 @@
 
 ブース訪問後、**ENSの権限分離・独立検証 → 希望条件付き二者照合 → 多人数候補選択**を採用した。[更新Plan](../specs/001-private-dating/plan.md)・[検討の根拠](mentor-feedback-proposal.md)を参照。以下の動画・画像は拡張前の概要で、独立検証と多人数選択はまだ描いていない。
 
+[評判・没収・運営収益の検討案](reputation-and-bond-proposal.md)は別途整理した。参加資格の制限と、証拠・裁定・異議を伴う金銭罰則を区別する未採用の案で、既存の返却条件はまだ変更していない。
+
 ## 最初に見せる32秒
 
 [![Animated concept overview in English](assets/private-dating-overview.gif)](overview.html)
