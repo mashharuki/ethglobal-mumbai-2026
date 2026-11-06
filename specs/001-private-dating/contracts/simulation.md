@@ -25,6 +25,9 @@
 | POST /v1/simulation/identity | 親の本人セッション・Originを検証し、サーバーが選んだsubjectについて`{sub, aud: "love-match-masala", exp}`をHMAC-SHA256で署名したassertionを返す。期限は発行から15分以内。署名共有鍵はサーバー専用。URL・公開ログ・Arkivへ載せない |
 | GET /v1/matches/{matchId} | AIBotのサービスBearer認証と`X-Player-Subject`を検証。`{matchId, agentPersonaId, playerSubject, simulationConsent: true, expiresAt}`を返す。主体のマッチ参加、拘束成立、ブロック、両者の現行同意、Persona対応をサーバーで確認。未認可は404、同意/期限失効は利用不可 |
 | POST /v1/date-requests | 同じサービス認証と主体確認。`Idempotency-Key: gameSessionId`、body `{matchId, gameSessionId}`。同じ内容の再送は同じ`requestId`。別内容は409。原則pendingとし、acceptedは相手の独立した承諾記録がある場合のみ。連絡先の解放は別操作 |
+| PUT /v1/matches/{matchId}/simulation-consents/me（新設） | 本人セッション・Origin・マッチ参加を確認し、本人のAI参加意思と、自分のPersonaをその相手に使わせる許可を別々に設定/撤回する。expectedVersionを検証し、対象主体は認証から決める。ブラウザーが他人の同意を更新できない |
+
+**Persona所有者の引継ぎは追加実装が必要**。現在のAIBot承認APIがブラウザーへ返すpersonaIdだけでは所有者・承認状態を証明できない。T026でAIBot担当と、サービス認証付きの最小メタデータ照会（owner subject、personaId、現行承認/撤回状態と版）を定義する。AIBotのサーバーが保存する所有者を根拠に親へ結び付け、Persona本文は返さない。T025/T028で利用許可時とマッチ照会時に現行状態を確認し、取得不能ならAI利用を許可しない。これは既存Adapterだけでは満たさない未実装の接続部分であり、AIBot側の変更は担当者との承認後に行う。
 
 ブラウザーはassertionをAIBotの`POST /api/session`へ`adultConfirmed: true`とともに送る。異なるオリジンのCookieを共有できるとは仮定しない。安全な引継ぎページまたは同一オリジンproxyのどちらかをT028で確定し、Origin・Cookie・再送・なりすましを試す。現行assertionにはnonceがないため、短期限だけを単回利用の保証と説明しない。単回引継ぎを追加する場合は両担当の変更として扱う。
 
@@ -40,6 +43,8 @@ AIBotは開始・発話・Retry・申請の各時点で親のマッチを再照�
 
 ## 結合の合格条件
 
-T029は架空の成人データで、認証引継ぎ→正しいマッチ/Persona→個別送信同意→3シーン9ターン→pending申請を再現する。別主体・別Persona・期限切れ・同意撤回・ブロック・相手の未承諾・再送・モデル停止・プロセス再起動を含める。失効後の新規推論と無権限閲覧を拒否し、会話中断でも資金返却は妨げない。操作失敗時に元の会話を二重適用しないことは親接続後に追加検証する。
+T029は架空の成人データで、認証引継ぎ→正しいマッチ/Persona→個別送信同意→3シーン9ターン→pending申請を再現する。別主体・別Persona・期限切れ・同意撤回・ブロック・相手の未承諾・再送・モデル停止・プロセス再起動を含める。失効後の新規推論と無権限閲覧を拒否し、会話中断でも資金返却は妨げない。
+
+会話送信の冪等性は現行AIBotにない。`game/message`の結果が不明な場合、同じ発話を自動再送せず、確認不能としてそのゲームを終了し再開始を案内する方針をT027/T028で結合する。ゲーム内Retry（会話をやり直す操作）をHTTP再送の代わりに使わない。この制約で過去会話を保持した回復を保証しない。将来、operationId/revisionによる会話の冪等化を追加する場合はAIBot担当の別変更とする。申請APIの冪等性とは分けて検証する。
 
 T025〜T029は親側の結合が未完了のため未チェックを維持する。AIBot単体を独立デモとして見せる場合は「架空マッチ／親未接続」を明示し、US1やSC-003の製品結合合格と数えない。

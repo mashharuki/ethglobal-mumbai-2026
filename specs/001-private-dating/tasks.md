@@ -85,10 +85,10 @@
 
 **独立試験**：[AIBot契約](contracts/simulation.md)の本人引継ぎ→現行同意→承認済みPersonaとの会話→申請。単体実装は再作成せず、親側の認可/申請を結合する。旧共同手番は後続（FR-006〜008、SC-003）。
 
-- [ ] T025 [P] [US3] API担当：T006・T013・T016後、`apps/backend/src/simulation/access.ts` に成立マッチとsubject/相手Persona/現行同意/ブロック/期限の対応を実装する。[AIBot契約](contracts/simulation.md)のGET match用認可を担い、架空の成立fixtureでは先行試験可。会話状態やPersonaを親へ複製しない。
-- [ ] T026 [P] [US3] API・AIBot担当：`packages/api-specs/openapi.yaml` と `packages/shared/src/simulation/contract.ts` に[既存Adapter](../../ethglobal-mumbai-2026-AIBot/docs/MATCHING_ADAPTER.md)との本人引継ぎ・マッチ照会・冪等申請を定義する。HMAC形式/期限/audience、サービス認証、同意撤回、失敗時、別Originを固定する。単体の実装・作者試験は `evidence/aibot-inspection.md` を参照。サブモジュール変更が必要なら担当者と承認を得て行う。
+- [ ] T025 [P] [US3] API担当：T006・T013・T016・T026後、`apps/backend/src/simulation/access.ts` に成立マッチとsubject/相手Persona/現行同意/ブロック/期限の対応を実装する。Persona所有者・承認/撤回はT026の信頼できるサーバー照会で確認し、相手別の利用同意を本人認証で記録する。[AIBot契約](contracts/simulation.md)のGET match用認可を担い、架空の成立fixtureでは先行試験可。会話状態やPersonaを親へ複製しない。
+- [ ] T026 [P] [US3] API・AIBot担当：`packages/api-specs/openapi.yaml` と `packages/shared/src/simulation/contract.ts` に[既存Adapter](../../ethglobal-mumbai-2026-AIBot/docs/MATCHING_ADAPTER.md)との本人引継ぎ・マッチ照会・冪等申請を定義する。HMAC形式/期限/audience、サービス認証、相手別同意の設定/撤回、失敗時、別Originを固定する。AIBotに未実装のowner subject/Persona/現行承認のメタデータ照会を担当者と定義し、ブラウザー申告だけでは関連付けない。単体の実装・作者試験は `evidence/aibot-inspection.md` を参照。サブモジュール変更が必要なら担当者と承認を得て行う。
 - [ ] T027 [P] [US3] Web担当：T026後、`apps/frontend/src/pages/Simulation.tsx` に任意参加・AI送信の別同意・AIBotへの遷移・戻り・期限切れ/再開始の案内を実装する。校正/会話UIはAIBotを再利用。実AI/定型デモと架空/実マッチを別表示し、未接続の導線を製品完成と表示しない。
-- [ ] T028 [US3] 結合担当：T025〜T027後、`apps/backend/src/simulation/routes.ts` と `apps/frontend/src/simulation/session.ts` に本人assertion、サービス認証付きマッチ照会、冪等デート申請、別Originの安全な引継ぎを接続する。AIBotの各操作で同意/ブロックを再確認し、親の部屋DOは追加しない。秘密・assertion・Persona・会話をPWAキャッシュや公開ログへ残さない。
+- [ ] T028 [US3] 結合担当：T025〜T027後、`apps/backend/src/simulation/routes.ts` と `apps/frontend/src/simulation/session.ts` に本人assertion、サービス認証付きマッチ照会、冪等デート申請、別Originの安全な引継ぎを接続する。AIBotの各操作で同意/ブロックを再確認し、親の部屋DOは追加しない。秘密・assertion・Persona・会話をPWAキャッシュや公開ログへ残さない。会話送信の結果不明時は自動再送せず終了/再開始を案内し、既存Retryや申請冪等性と区別する。Personaメタデータ照会等のAIBot変更は担当者の承認後に結合する。
 - [ ] T029 [US3] 検証担当：T028後、`specs/001-private-dating/evidence/simulation.md` にSC-003の初見5人、3シーン9ターン、Retry、撤回・ブロック・失効・別主体、モデル停止・再起動、申請再送の結果を記録する。対象AIBot/親コミット、作者の既存試験と自分たちの結合試験、実AI/定型デモ/架空マッチを分離する。両リポジトリの正しいgitlinkで再現できることも確認する。
 
 ## Phase 6 — 統合・提出準備
