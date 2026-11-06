@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Private Dating — animated concept overview</title>
+    <meta name="description" content="A 32-second illustrated walkthrough of a proposed private dating app. No live transactions." />
+    <style>/* PLAYER_STYLE */</style>
+  </head>
+  <body>
+    <main>
+      <header>
+        <div><h1>Private Dating</h1><p id="tagline">Find a connection. Keep your profile private.</p></div>
+        <fieldset class="language" aria-label="Language / 言語">
+          <button type="button" data-language="en" aria-pressed="true">English</button>
+          <button type="button" data-language="ja" aria-pressed="false">日本語</button>
+        </fieldset>
+      </header>
+      <section class="presentation" aria-label="Illustrated concept walkthrough">
+        <div id="stage"><!-- INITIAL_FRAME --></div>
+        <div class="controls">
+          <button id="play" type="button" aria-pressed="false">Play</button>
+          <button id="replay" type="button">Replay</button>
+          <input id="position" type="range" min="0" max="32" step="0.05" value="0" aria-label="Playback position" />
+          <output id="clock" for="position">00 / 32s</output>
+        </div>
+      </section>
+      <nav id="chapters" aria-label="Story chapters"></nav>
+      <p id="caption" aria-live="polite"></p>
+      <p id="mobile-summary"></p>
+      <p id="note"></p>
+      <noscript><p>This is a proposed design. JavaScript enables playback. <a href="architecture-en.drawio.png">Open the static overview</a>.</p></noscript>
+      <footer>
+        <a href="mentor-brief.md" data-copy="brief">Mentor talking points</a>
+        <a href="architecture.md" data-copy="details">Architecture details</a>
+        <a href="architecture-en.drawio.png" data-copy="still">Static overview</a>
+      </footer>
+    </main>
+    <!-- ICON_LICENSE -->
+    <script>/* PLAYER_SCRIPT */</script>
+  </body>
+</html>

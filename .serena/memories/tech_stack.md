@@ -1,11 +1,15 @@
 # Tech stack
 
-- Node 24 (CI), TypeScript 7.x, ESM everywhere (`"type": "module"`).
-- pnpm 11.24.0 (pinned via `packageManager` + `devEngines`); workspaces `apps/*`, `packages/*` (submodule is NOT a workspace).
-- pnpm 11 blocks dependency build scripts: whitelist in root `pnpm-workspace.yaml` `allowBuilds:` (`name: true`). On failure pnpm writes placeholder keys there — edit them, don't append (duplicate key breaks YAML). `apps/backend/pnpm-workspace.yaml` is a template leftover; only the root one is honored.
-- `pnpm run <script>` auto-runs `pnpm install` when deps are stale; a broken install therefore blocks every turbo task.
-- Turborepo 2.x: root scripts `build|dev|check-types|lint|test` → `turbo run`. `turbo.json`: `build` dependsOn `^build`, outputs `dist/**`, `.next/**`; `check-types` dependsOn `^check-types`; `test` dependsOn `^build`; `dev` persistent+uncached. A package participates only if it defines that script. Bundled docs: `node_modules/turbo/docs/README.md`.
-- Root devDeps: Biome 2.5.10 (format+lint, double quotes, space indent), knip 6, jscpd 5, typescript, @types/node.
-- `apps/frontend` lints with oxlint (not Biome) — Biome still formats/lints it at root level.
-- Tests: Vitest intended (`.claude/rules/testing.md`), not installed. Validation: zod at boundaries (not installed).
-- Native binaries (`workerd`, `@biomejs/cli-*`, `@turbo/*`) come from optional platform packages; flaky network leaves dangling symlinks → `MODULE_NOT_FOUND`/postinstall failure. Fix: rerun `pnpm install`.
+- Node 24 in CI, ESM packages. Root/frontend TypeScript 7; contract TypeScript 6. Read manifests/lockfile for exact installed versions.
+- pnpm 11.24.0 pinned via `packageManager` + `devEngines`; workspaces `apps/*`, `packages/*`. Python submodule is not a workspace.
+- pnpm build-script allowlist is root `pnpm-workspace.yaml` `allowBuilds`. Edit existing keys rather than creating duplicates. Backend's nested workspace YAML is a template leftover.
+- Stale dependencies may trigger installation during pnpm scripts. Native optional packages (workerd, Biome, Turbo) can be missing after failed installs; distinguish installation failures from code failures.
+- Turborepo 2: build/check-types depend on corresponding upstream tasks; test depends on upstream build; dev persistent + uncached. Packages only participate when they define the script.
+- Build cache outputs include `dist/**`, `.next/**`, `artifacts/**`, `cache/**`, but not Void's `.cloudflare/output/**`. Read installed `node_modules/turbo/docs/README.md` before an authorized Turbo config change.
+- Root Biome 2.5.10; frontend oxlint; Solidity Prettier. `pnpm format` is formatting only, not lint autofix.
+- Frontend: React/Vite + lism-css, Void plugin and PWA. `mem:frontend/core`.
+- Backend: Hono/Workers; no build/check-types/test scripts. `mem:backend/core`.
+- Contracts: Hardhat/viem with Solidity + node:test tests, experimental slang profile for local work. `mem:contract/core`.
+- Vitest/zod are intended app conventions, not currently configured app infrastructure.
+- `api-specs` / `shared` test scripts intentionally exit 1 as package scaffolding.
+- knip still references obsolete apps/regatta-web and apps/cdk. Biome excludes .claude/.serena/.codegraph, but checks .agents skill scripts; keep imported tooling failures distinct from app failures.

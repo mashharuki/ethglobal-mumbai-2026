@@ -1,0 +1,170 @@
+<mxfile host="app.diagrams.net" type="device">
+  <diagram id="private-dating-architecture" name="System architecture">
+    <mxGraphModel dx="1880" dy="1280" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1880" pageHeight="1280" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="fe" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F0F6FF;strokeColor=#A9C5F6;strokeWidth=1.5;fontColor=#14243B;fontSize=17;fontFamily=Hiragino Sans;align=left;verticalAlign=top;spacing=16;arcSize=10;container=1;collapsible=0;recursiveResize=0;" vertex="1" parent="1">
+          <mxGeometry x="40" y="180" width="500" height="680" as="geometry" />
+        </mxCell>
+        <mxCell id="be" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EFF9F7;strokeColor=#9CCFC5;strokeWidth=1.5;fontColor=#14243B;fontSize=17;fontFamily=Hiragino Sans;align=left;verticalAlign=top;spacing=16;arcSize=10;container=1;collapsible=0;recursiveResize=0;" vertex="1" parent="1">
+          <mxGeometry x="700" y="180" width="500" height="500" as="geometry" />
+        </mxCell>
+        <mxCell id="direct" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F7F9FC;strokeColor=#CDD7E3;strokeWidth=1.5;fontColor=#14243B;fontSize=17;fontFamily=Hiragino Sans;align=left;verticalAlign=top;spacing=16;arcSize=10;container=1;collapsible=0;recursiveResize=0;" vertex="1" parent="1">
+          <mxGeometry x="40" y="930" width="1800" height="230" as="geometry" />
+        </mxCell>
+        <mxCell id="http" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=2;strokeColor=#087F8C;endArrow=block;endFill=1;exitX=1.0;exitY=0.17647058823529413;entryX=0.0;entryY=0.35714285714285715;exitPerimeter=0;entryPerimeter=0;startArrow=block;startFill=1;" edge="1" parent="1" source="fe" target="api">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="relay" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=2;strokeColor=#087F8C;endArrow=block;endFill=1;exitX=1.0;exitY=0.45588235294117646;entryX=0.0;entryY=0.47619047619047616;exitPerimeter=0;entryPerimeter=0;startArrow=block;startFill=1;" edge="1" parent="1" source="fe" target="search">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="roomflow" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=2;strokeColor=#7851B8;endArrow=block;endFill=1;exitX=1.0;exitY=0.6617647058823529;entryX=0.0;entryY=0.6;exitPerimeter=0;entryPerimeter=0;startArrow=block;startFill=1;dashed=1;dashPattern=7 5;" edge="1" parent="1" source="fe" target="room">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="enscall" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=2;strokeColor=#087F8C;endArrow=block;endFill=1;exitX=1.0;exitY=0.25;entryX=0.0;entryY=0.3448275862068966;exitPerimeter=0;entryPerimeter=0;" edge="1" parent="1" source="api" target="ens">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="arkivcall" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=2;strokeColor=#087F8C;endArrow=block;endFill=1;exitX=1.0;exitY=0.7857142857142857;entryX=0.0;entryY=0.3870967741935484;exitPerimeter=0;entryPerimeter=0;startArrow=block;startFill=1;" edge="1" parent="1" source="api" target="arkiv">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1265" y="360" />
+              <mxPoint x="1265" y="490" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="confirm" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=2;strokeColor=#087F8C;endArrow=block;endFill=1;exitX=1.0;exitY=0.6666666666666666;entryX=0.0;entryY=0.3181818181818182;exitPerimeter=0;entryPerimeter=0;" edge="1" parent="1" source="search" target="funds">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1230" y="510" />
+              <mxPoint x="1230" y="710" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="modelcall" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=2;strokeColor=#7851B8;endArrow=block;endFill=1;exitX=0.5;exitY=1.0;entryX=0.5;entryY=0.0;exitPerimeter=0;entryPerimeter=0;startArrow=block;startFill=1;dashed=1;dashPattern=7 5;" edge="1" parent="1" source="room" target="model">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="read1" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=2;strokeColor=#2563EB;endArrow=block;endFill=1;exitX=1.0;exitY=0.4909090909090909;entryX=0.0;entryY=0.4909090909090909;exitPerimeter=0;entryPerimeter=0;" edge="1" parent="1" source="readstart" target="readtransport">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="read2" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=2;strokeColor=#2563EB;endArrow=block;endFill=1;exitX=1.0;exitY=0.4909090909090909;entryX=0.0;entryY=0.4909090909090909;exitPerimeter=0;entryPerimeter=0;startArrow=block;startFill=1;" edge="1" parent="1" source="readtransport" target="readchain">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="tx" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=2;strokeColor=#A25D09;endArrow=block;endFill=1;exitX=1.0;exitY=0.4909090909090909;entryX=0.0;entryY=0.4909090909090909;exitPerimeter=0;entryPerimeter=0;" edge="1" parent="1" source="txstart" target="txchain">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="title" value="&lt;div style=&quot;font-size:34px;line-height:1.48;font-weight:bold&quot;&gt;PRIVATE DATING  /  システムアーキテクチャ&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=none;strokeWidth=1.5;fontColor=#14243B;fontSize=34;fontFamily=Hiragino Sans;align=left;verticalAlign=top;spacing=16;arcSize=10;shape=text;spacing=0;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="40" y="32" width="1340" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="subtitle" value="&lt;div style=&quot;font-size:20px;line-height:1.48;font-weight:normal&quot;&gt;秘密は各端末に保持。公開登録は ENSv2 × Arkiv、資金の確定は Ethereum Sepolia。&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=none;strokeWidth=1.5;fontColor=#52647B;fontSize=20;fontFamily=Hiragino Sans;align=left;verticalAlign=top;spacing=16;arcSize=10;shape=text;spacing=0;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="40" y="95" width="1570" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="draft" value="&lt;div style=&quot;font-size:17px;font-weight:bold;margin-bottom:9px&quot;&gt;TARGET DESIGN · DRAFT&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F1EAF9;strokeColor=#C9B7E1;strokeWidth=1.5;fontColor=#7851B8;fontSize=17;fontFamily=Hiragino Sans;align=left;verticalAlign=top;spacing=16;arcSize=10;" vertex="1" parent="1">
+          <mxGeometry x="1580" y="38" width="260" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="date" value="&lt;div style=&quot;font-size:16px;line-height:1.48;font-weight:normal&quot;&gt;仕様基準：2026-11-06&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=none;strokeWidth=1.5;fontColor=#52647B;fontSize=16;fontFamily=Hiragino Sans;align=left;verticalAlign=top;spacing=16;arcSize=10;shape=text;spacing=0;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="1580" y="99" width="260" height="28" as="geometry" />
+        </mxCell>
+        <mxCell id="fehead" value="&lt;div style=&quot;font-size:21px;line-height:1.48;font-weight:bold&quot;&gt;01  FRONTEND  /  apps/frontend&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=none;strokeWidth=1.5;fontColor=#2563EB;fontSize=21;fontFamily=Hiragino Sans;align=left;verticalAlign=top;spacing=16;arcSize=10;shape=text;spacing=0;rounded=0;" vertex="1" parent="fe">
+          <mxGeometry x="25" y="20" width="450" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="a" value="&lt;div style=&quot;font-size:20px;font-weight:bold;margin-bottom:9px&quot;&gt;独立端末 A&lt;/div&gt;&lt;div style=&quot;font-size:15px;line-height:1.48;font-weight:normal&quot;&gt;React / Vite / PWA&lt;/div&gt;&lt;div style=&quot;font-size:15px;line-height:1.48;font-weight:normal&quot;&gt;プロフィール・秘密鍵&lt;/div&gt;&lt;div style=&quot;font-size:15px;line-height:1.48;font-weight:normal&quot;&gt;本人のnote / 復元情報&lt;/div&gt;&lt;div style=&quot;font-size:15px;line-height:1.48;font-weight:normal&quot;&gt;Noir：証明生成・検証&lt;/div&gt;&lt;div style=&quot;font-size:15px;line-height:1.48;font-weight:normal&quot;&gt;Kohaku / ウォレット&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#ABC5EF;strokeWidth=1.5;fontColor=#2563EB;fontSize=15;fontFamily=Hiragino Sans;align=left;verticalAlign=top;spacing=16;arcSize=10;" vertex="1" parent="fe">
+          <mxGeometry x="25" y="70" width="220" height="235" as="geometry" />
+        </mxCell>
+        <mxCell id="b" value="&lt;div style=&quot;font-size:20px;font-weight:bold;margin-bottom:9px&quot;&gt;独立端末 B&lt;/div&gt;&lt;div style=&quot;font-size:15px;line-height:1.48;font-weight:normal&quot;&gt;React / Vite / PWA&lt;/div&gt;&lt;div style=&quot;font-size:15px;line-height:1.48;font-weight:normal&quot;&gt;プロフィール・秘密鍵&lt;/div&gt;&lt;div style=&quot;font-size:15px;line-height:1.48;font-weight:normal&quot;&gt;本人のnote / 復元情報&lt;/div&gt;&lt;div style=&quot;font-size:15px;line-height:1.48;font-weight:normal&quot;&gt;Noir：証明生成・検証&lt;/div&gt;&lt;div style=&quot;font-size:15px;line-height:1.48;font-weight:normal&quot;&gt;Kohaku / ウォレット&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#ABC5EF;strokeWidth=1.5;fontColor=#2563EB;fontSize=15;fontFamily=Hiragino Sans;align=left;verticalAlign=top;spacing=16;arcSize=10;" vertex="1" parent="fe">
+          <mxGeometry x="260" y="70" width="215" height="235" as="geometry" />
+        </mxCell>
+        <mxCell id="secret" value="&lt;div style=&quot;font-size:16px;line-height:1.48;font-weight:normal&quot;&gt;照合証明・真偽は当事者間だけ。&lt;/div&gt;&lt;div style=&quot;font-size:16px;line-height:1.48;font-weight:normal&quot;&gt;相手の秘密を一つの端末に集めない。&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=none;strokeWidth=1.5;fontColor=#2563EB;fontSize=16;fontFamily=Hiragino Sans;align=left;verticalAlign=top;spacing=16;arcSize=10;shape=text;spacing=0;rounded=0;" vertex="1" parent="fe">
+          <mxGeometry x="25" y="325" width="450" height="54" as="geometry" />
+        </mxCell>
+        <mxCell id="third" value="&lt;div style=&quot;font-size:16px;line-height:1.48;font-weight:bold&quot;&gt;第三者 C の画面：仮名の公開登録だけ&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=none;strokeWidth=1.5;fontColor=#14243B;fontSize=16;fontFamily=Hiragino Sans;align=left;verticalAlign=top;spacing=16;arcSize=10;shape=text;spacing=0;rounded=0;" vertex="1" parent="fe">
+          <mxGeometry x="25" y="385" width="450" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="anon" value="&lt;div style=&quot;font-size:19px;font-weight:bold;margin-bottom:9px&quot;&gt;アプリ読取：Anon-RPCを標準に&lt;/div&gt;&lt;div style=&quot;font-size:14px;line-height:1.48;font-weight:normal&quot;&gt;Sepoliaの読取経路は下段①。失敗は表示して再試行。&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#ABC5EF;strokeWidth=1.5;fontColor=#2563EB;fontSize=14;fontFamily=Hiragino Sans;align=left;verticalAlign=top;spacing=16;arcSize=10;" vertex="1" parent="fe">
+          <mxGeometry x="25" y="435" width="450" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="wallet" value="&lt;div style=&quot;font-size:19px;font-weight:bold;margin-bottom:9px&quot;&gt;資金操作：本人の署名と証明&lt;/div&gt;&lt;div style=&quot;font-size:14px;line-height:1.48;font-weight:normal&quot;&gt;チェーンへの送信は下段②。秘密noteは端末で復元。&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D2BC97;strokeWidth=1.5;fontColor=#A25D09;fontSize=14;fontFamily=Hiragino Sans;align=left;verticalAlign=top;spacing=16;arcSize=10;" vertex="1" parent="fe">
+          <mxGeometry x="25" y="555" width="450" height="95" as="geometry" />
+        </mxCell>
+        <mxCell id="behead" value="&lt;div style=&quot;font-size:21px;line-height:1.48;font-weight:bold&quot;&gt;02  BACKEND  /  apps/backend&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=none;strokeWidth=1.5;fontColor=#087F8C;fontSize=21;fontFamily=Hiragino Sans;align=left;verticalAlign=top;spacing=16;arcSize=10;shape=text;spacing=0;rounded=0;" vertex="1" parent="be">
+          <mxGeometry x="25" y="20" width="450" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="api" value="&lt;div style=&quot;font-size:19px;font-weight:bold;margin-bottom:9px&quot;&gt;同一オリジン BFF / Hono on Workers&lt;/div&gt;&lt;div style=&quot;font-size:16px;line-height:1.48;font-weight:normal&quot;&gt;署名認証・入力検証・公開登録API&lt;/div&gt;&lt;div style=&quot;font-size:16px;line-height:1.48;font-weight:normal&quot;&gt;ENSの権限とArkivの現行版を照合&lt;/div&gt;&lt;div style=&quot;font-size:16px;line-height:1.48;font-weight:normal&quot;&gt;平文の趣味・相性結果は受け取らない&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#9CCFC5;strokeWidth=1.5;fontColor=#087F8C;fontSize=16;fontFamily=Hiragino Sans;align=left;verticalAlign=top;spacing=16;arcSize=10;" vertex="1" parent="be">
+          <mxGeometry x="25" y="70" width="450" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="search" value="&lt;div style=&quot;font-size:20px;font-weight:bold;margin-bottom:9px&quot;&gt;検索・招待用 Durable Object&lt;/div&gt;&lt;div style=&quot;font-size:15px;line-height:1.48;font-weight:normal&quot;&gt;リース・暗号文配送・再送を直列化&lt;/div&gt;&lt;div style=&quot;font-size:15px;line-height:1.48;font-weight:normal&quot;&gt;両noteの拘束確定後だけ部屋資格を発行&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#9CCFC5;strokeWidth=1.5;fontColor=#087F8C;fontSize=15;fontFamily=Hiragino Sans;align=left;verticalAlign=top;spacing=16;arcSize=10;" vertex="1" parent="be">
+          <mxGeometry x="25" y="260" width="450" height="105" as="geometry" />
+        </mxCell>
+        <mxCell id="room" value="&lt;div style=&quot;font-size:18px;font-weight:bold;margin-bottom:9px&quot;&gt;P2：部屋ごとの Durable Object&lt;/div&gt;&lt;div style=&quot;font-size:15px;line-height:1.48;font-weight:normal&quot;&gt;参加資格・revision・actionId・手番&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FAF6FF;strokeColor=#B49ACF;strokeWidth=1.5;fontColor=#7851B8;fontSize=15;fontFamily=Hiragino Sans;align=left;verticalAlign=top;spacing=16;arcSize=10;dashed=1;dashPattern=7 5;" vertex="1" parent="be">
+          <mxGeometry x="25" y="405" width="450" height="75" as="geometry" />
+        </mxCell>
+        <mxCell id="model" value="&lt;div style=&quot;font-size:20px;font-weight:bold;margin-bottom:9px&quot;&gt;P2：外部 World Model&lt;/div&gt;&lt;div style=&quot;font-size:15px;line-height:1.48;font-weight:normal&quot;&gt;共有テーマ・場面・匿名A/Bの選択 → 次場面&lt;/div&gt;&lt;div style=&quot;font-size:15px;line-height:1.48;font-weight:normal&quot;&gt;プロフィール・仮名・資金は渡さない&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FAF6FF;strokeColor=#B49ACF;strokeWidth=1.5;fontColor=#7851B8;fontSize=15;fontFamily=Hiragino Sans;align=left;verticalAlign=top;spacing=16;arcSize=10;dashed=1;dashPattern=7 5;" vertex="1" parent="1">
+          <mxGeometry x="725" y="760" width="450" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="python" value="&lt;div style=&quot;font-size:14px;line-height:1.48;font-weight:normal&quot;&gt;Pythonサブモジュールとの接続契約は未確定&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=none;strokeWidth=1.5;fontColor=#7851B8;fontSize=14;fontFamily=Hiragino Sans;align=left;verticalAlign=top;spacing=16;arcSize=10;shape=text;spacing=0;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="725" y="866" width="450" height="25" as="geometry" />
+        </mxCell>
+        <mxCell id="publichead" value="&lt;div style=&quot;font-size:20px;line-height:1.48;font-weight:bold&quot;&gt;03  PUBLIC SERVICES / CONTRACTS&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=none;strokeWidth=1.5;fontColor=#14243B;fontSize=20;fontFamily=Hiragino Sans;align=left;verticalAlign=top;spacing=16;arcSize=10;shape=text;spacing=0;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="1380" y="180" width="460" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="ens" value="&lt;div style=&quot;font-size:21px;font-weight:bold;margin-bottom:9px&quot;&gt;ENSv2 / Ethereum Sepolia&lt;/div&gt;&lt;div style=&quot;font-size:16px;line-height:1.48;font-weight:normal&quot;&gt;サブネームの発行・実解決&lt;/div&gt;&lt;div style=&quot;font-size:16px;line-height:1.48;font-weight:normal&quot;&gt;所有権と更新権を別々に確認&lt;/div&gt;&lt;div style=&quot;font-size:16px;line-height:1.48;font-weight:normal&quot;&gt;ENS-V2：仮名を登録認可に利用&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F5F4FF;strokeColor=#BBB3E3;strokeWidth=1.5;fontColor=#7851B8;fontSize=16;fontFamily=Hiragino Sans;align=left;verticalAlign=top;spacing=16;arcSize=10;" vertex="1" parent="1">
+          <mxGeometry x="1380" y="235" width="460" height="145" as="geometry" />
+        </mxCell>
+        <mxCell id="arkiv" value="&lt;div style=&quot;font-size:21px;font-weight:bold;margin-bottom:9px&quot;&gt;Arkiv / 現行テストネット&lt;/div&gt;&lt;div style=&quot;font-size:15px;line-height:1.48;font-weight:normal&quot;&gt;仮名・登録版・コミットメント・登録証明&lt;/div&gt;&lt;div style=&quot;font-size:15px;line-height:1.48;font-weight:normal&quot;&gt;公開登録の実書込 → 索引反映 → 実読取&lt;/div&gt;&lt;div style=&quot;font-size:15px;line-height:1.48;font-weight:normal&quot;&gt;秘密値・ペア・相性結果を保存しない&lt;/div&gt;&lt;div style=&quot;font-size:15px;line-height:1.48;font-weight:normal&quot;&gt;ARKIV-APP：画面が実データを読む&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F0F9F6;strokeColor=#99CDBB;strokeWidth=1.5;fontColor=#087F8C;fontSize=15;fontFamily=Hiragino Sans;align=left;verticalAlign=top;spacing=16;arcSize=10;" vertex="1" parent="1">
+          <mxGeometry x="1380" y="430" width="460" height="155" as="geometry" />
+        </mxCell>
+        <mxCell id="funds" value="&lt;div style=&quot;font-size:20px;font-weight:bold;margin-bottom:9px&quot;&gt;スマートコントラクト / Sepolia&lt;/div&gt;&lt;div style=&quot;font-size:16px;line-height:1.48;font-weight:normal&quot;&gt;apps/contract · Hardhat / Solidity&lt;/div&gt;&lt;div style=&quot;font-size:16px;line-height:1.48;font-weight:normal&quot;&gt;CircleのテストUSDC・EURCを預託&lt;/div&gt;&lt;div style=&quot;font-size:16px;line-height:1.48;font-weight:normal&quot;&gt;両noteの原子的拘束 → 精算・返却・受領&lt;/div&gt;&lt;div style=&quot;font-size:16px;line-height:1.48;font-weight:normal&quot;&gt;資金の確定状態はチェーンが正本&lt;/div&gt;&lt;div style=&quot;font-size:16px;line-height:1.48;font-weight:normal&quot;&gt;仮名ペア・申告内容を公開しない&lt;/div&gt;&lt;div style=&quot;font-size:16px;line-height:1.48;font-weight:normal&quot;&gt;独自の秘匿精算・回復は実証前&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF8EC;strokeColor=#DFC292;strokeWidth=1.5;fontColor=#A25D09;fontSize=16;fontFamily=Hiragino Sans;align=left;verticalAlign=top;spacing=16;arcSize=10;" vertex="1" parent="1">
+          <mxGeometry x="1380" y="640" width="460" height="220" as="geometry" />
+        </mxCell>
+        <mxCell id="httplabel" value="&lt;div style=&quot;font-size:15px;line-height:1.48;font-weight:normal&quot;&gt;登録・公開照会&lt;/div&gt;&lt;div style=&quot;font-size:15px;line-height:1.48;font-weight:normal&quot;&gt;HTTPS / session&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=none;strokeWidth=1.5;fontColor=#087F8C;fontSize=15;fontFamily=Hiragino Sans;align=left;verticalAlign=top;spacing=16;arcSize=10;shape=text;spacing=0;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="552" y="250" width="160" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="relaylabel" value="&lt;div style=&quot;font-size:15px;line-height:1.48;font-weight:normal&quot;&gt;暗号文・リース&lt;/div&gt;&lt;div style=&quot;font-size:15px;line-height:1.48;font-weight:normal&quot;&gt;WebSocket&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=none;strokeWidth=1.5;fontColor=#087F8C;fontSize=15;fontFamily=Hiragino Sans;align=left;verticalAlign=top;spacing=16;arcSize=10;shape=text;spacing=0;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="552" y="441" width="160" height="46" as="geometry" />
+        </mxCell>
+        <mxCell id="roomlabel" value="&lt;div style=&quot;font-size:15px;line-height:1.48;font-weight:normal&quot;&gt;P2：任意参加&lt;/div&gt;&lt;div style=&quot;font-size:15px;line-height:1.48;font-weight:normal&quot;&gt;部屋資格・手番&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=none;strokeWidth=1.5;fontColor=#7851B8;fontSize=15;fontFamily=Hiragino Sans;align=left;verticalAlign=top;spacing=16;arcSize=10;shape=text;spacing=0;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="552" y="585" width="160" height="42" as="geometry" />
+        </mxCell>
+        <mxCell id="enslabel" value="&lt;div style=&quot;font-size:15px;line-height:1.48;font-weight:normal&quot;&gt;実解決・権限確認&lt;/div&gt;&lt;div style=&quot;font-size:15px;line-height:1.48;font-weight:normal&quot;&gt;登録参照の照合&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=none;strokeWidth=1.5;fontColor=#087F8C;fontSize=15;fontFamily=Hiragino Sans;align=left;verticalAlign=top;spacing=16;arcSize=10;shape=text;spacing=0;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="1207" y="239" width="150" height="43" as="geometry" />
+        </mxCell>
+        <mxCell id="arkivlabel" value="&lt;div style=&quot;font-size:15px;line-height:1.48;font-weight:normal&quot;&gt;公開登録だけ&lt;/div&gt;&lt;div style=&quot;font-size:15px;line-height:1.48;font-weight:normal&quot;&gt;書込 / 読取&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=none;strokeWidth=1.5;fontColor=#087F8C;fontSize=15;fontFamily=Hiragino Sans;align=left;verticalAlign=top;spacing=16;arcSize=10;shape=text;spacing=0;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="1212" y="389" width="135" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="confirmlabel" value="&lt;div style=&quot;font-size:15px;line-height:1.48;font-weight:normal&quot;&gt;拘束の確定&lt;/div&gt;&lt;div style=&quot;font-size:15px;line-height:1.48;font-weight:normal&quot;&gt;状態を照会&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=none;strokeWidth=1.5;fontColor=#A25D09;fontSize=15;fontFamily=Hiragino Sans;align=left;verticalAlign=top;spacing=16;arcSize=10;shape=text;spacing=0;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="1250" y="656" width="115" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="modellabel" value="&lt;div style=&quot;font-size:15px;line-height:1.48;font-weight:normal&quot;&gt;共有入力 → 生成&lt;/div&gt;&lt;div style=&quot;font-size:15px;line-height:1.48;font-weight:normal&quot;&gt;← 場面・2〜4選択肢&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=none;strokeWidth=1.5;fontColor=#7851B8;fontSize=15;fontFamily=Hiragino Sans;align=left;verticalAlign=top;spacing=16;arcSize=10;shape=text;spacing=0;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="970" y="694" width="220" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="directhead" value="&lt;div style=&quot;font-size:20px;line-height:1.48;font-weight:bold&quot;&gt;端末 ↔ チェーンの直接経路  /  API・World Modelに資金移動の決定権はない&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=none;strokeWidth=1.5;fontColor=#14243B;fontSize=20;fontFamily=Hiragino Sans;align=left;verticalAlign=top;spacing=16;arcSize=10;shape=text;spacing=0;rounded=0;" vertex="1" parent="direct">
+          <mxGeometry x="25" y="17" width="1710" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="readstart" value="&lt;div style=&quot;font-size:18px;font-weight:bold;margin-bottom:9px&quot;&gt;① 端末のアプリ読取&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#ABC5EF;strokeWidth=1.5;fontColor=#2563EB;fontSize=17;fontFamily=Hiragino Sans;align=left;verticalAlign=top;spacing=16;arcSize=10;" vertex="1" parent="direct">
+          <mxGeometry x="25" y="70" width="310" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="readtransport" value="&lt;div style=&quot;font-size:18px;font-weight:bold;margin-bottom:9px&quot;&gt;Anon-RPC［標準経路］&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#ABC5EF;strokeWidth=1.5;fontColor=#2563EB;fontSize=17;fontFamily=Hiragino Sans;align=left;verticalAlign=top;spacing=16;arcSize=10;" vertex="1" parent="direct">
+          <mxGeometry x="440" y="70" width="325" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="readchain" value="&lt;div style=&quot;font-size:18px;font-weight:bold;margin-bottom:9px&quot;&gt;Sepolia：ENSv2の参照 / 預託・取引の確定状態&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#ABC5EF;strokeWidth=1.5;fontColor=#2563EB;fontSize=17;fontFamily=Hiragino Sans;align=left;verticalAlign=top;spacing=16;arcSize=10;" vertex="1" parent="direct">
+          <mxGeometry x="885" y="70" width="890" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="txstart" value="&lt;div style=&quot;font-size:18px;font-weight:bold;margin-bottom:9px&quot;&gt;② 端末：本人署名・資金用証明&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#DFC292;strokeWidth=1.5;fontColor=#A25D09;fontSize=17;fontFamily=Hiragino Sans;align=left;verticalAlign=top;spacing=16;arcSize=10;" vertex="1" parent="direct">
+          <mxGeometry x="25" y="150" width="430" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="txchain" value="&lt;div style=&quot;font-size:18px;font-weight:bold;margin-bottom:9px&quot;&gt;Sepolia：預託 → 拘束 → 精算 / 期限返却 → 受領&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#DFC292;strokeWidth=1.5;fontColor=#A25D09;fontSize=17;fontFamily=Hiragino Sans;align=left;verticalAlign=top;spacing=16;arcSize=10;" vertex="1" parent="direct">
+          <mxGeometry x="570" y="150" width="705" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="recovery" value="&lt;div style=&quot;font-size:15px;line-height:1.48;font-weight:normal&quot;&gt;期限返却はAPI・相手の停止中も可能にする。&lt;/div&gt;&lt;div style=&quot;font-size:15px;line-height:1.48;font-weight:normal&quot;&gt;本人の秘密・復元情報は必要（設計要件）。&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=none;strokeWidth=1.5;fontColor=#A25D09;fontSize=15;fontFamily=Hiragino Sans;align=left;verticalAlign=top;spacing=16;arcSize=10;shape=text;spacing=0;rounded=0;" vertex="1" parent="direct">
+          <mxGeometry x="1315" y="150" width="460" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="foot1" value="&lt;div style=&quot;font-size:17px;line-height:1.48;font-weight:bold&quot;&gt;応募目標：EF-CROPS（Web/ZK） · ENS-V2（API） · ARKIV-APP（Arkiv/API）  /  破線：任意のP2経路&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=none;strokeWidth=1.5;fontColor=#14243B;fontSize=17;fontFamily=Hiragino Sans;align=left;verticalAlign=top;spacing=16;arcSize=10;shape=text;spacing=0;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="40" y="1190" width="1800" height="28" as="geometry" />
+        </mxCell>
+        <mxCell id="foot2" value="&lt;div style=&quot;font-size:16px;line-height:1.48;font-weight:normal&quot;&gt;計画中の構成。二者照合・秘匿精算は未検証。公開送金の相関や運営の通信メタデータ観察まで消えるとは主張しない。&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=none;strokeWidth=1.5;fontColor=#52647B;fontSize=16;fontFamily=Hiragino Sans;align=left;verticalAlign=top;spacing=16;arcSize=10;shape=text;spacing=0;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="40" y="1226" width="1800" height="28" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
