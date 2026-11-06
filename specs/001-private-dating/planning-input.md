@@ -6,8 +6,8 @@
 
 | 担当範囲 | 指定された技術・構成 | 主な仕様との対応 |
 | --- | --- | --- |
-| フロントエンド | React、Vite、VoidZero、TypeScript、lism CSS、PWA、Kohaku、Anon RPC。仮名はENS V2サブドメイン、ZK証明は端末で生成 | 登録・ウォレット・公開範囲の説明・相性確認・二人の手番・精算内容の確認 |
-| バックエンド | Cloudflare Workers、Wrangler、Hono、Zod、OpenAPI、OpenAPI Generator。秘匿した入力を含まない記録はArkivを利用。AIBotは別Nodeサービスで承認済みPersonaとの自由会話を提供 | 証明と候補、共同セッション、再開、場面生成に渡す情報の境界 |
+| フロントエンド | React、Vite、VoidZero、TypeScript、lism CSS、PWA、Kohaku、Anon RPC。仮名はENS V2サブドメイン、ZK証明は端末で生成 | 登録・ウォレット・公開範囲の説明・相性確認・AIBotへの任意遷移・精算内容の確認 |
+| バックエンド | Cloudflare Workers、Wrangler、Hono、Zod、OpenAPI、OpenAPI Generator。秘匿した入力を含まない記録はArkivを利用。AIBotは別Nodeサービスで承認済みPersonaとの自由会話を提供 | 証明と候補、AIBotへの本人/マッチ/申請API、AI送信の別同意 |
 | スマートコントラクト | Ethereum Sepolia、Hardhat V3、Solidity | Circle公式テストUSDC・EURCの預託、マッチへの引当、双方の確認、期限後の返却、同じ銘柄・元本での各自への全額返却 |
 | リポジトリ共通 | pnpm、Turborepo、TypeScript、Biome、jscpd、knip、GitHub Spec Kit | モノレポで3領域の計画・検証を分担 |
 | ゼロ知識証明 | 回路の記述には **Noir** を採用する。ブラウザー上の入力処理にはNoirJS、証明生成・検証にはBarretenbergを候補とし、動作確認した組み合わせを固定する | 公開の登録証明（FR-002）、二人の非公開照合（FR-004、SC-002）、対面提示時の登録版の確認（FR-008） |

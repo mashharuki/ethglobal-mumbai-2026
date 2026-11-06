@@ -10,7 +10,7 @@ ETHGlobal Mumbai 2026 hackathon monorepo. Existing private-dating proposal and S
 - Frontend template, Void/PWA build and styling: `mem:frontend/core`.
 - Hono Worker, bindings and backend script limitations: `mem:backend/core`.
 - Hardhat sample, test layers and compiler profiles: `mem:contract/core`.
-- Separate teammate-owned simulation plan and submodule boundaries: `mem:python_runtime/core`.
+- Independent Next.js AIBot, approved Persona data and parent adapter boundaries: `mem:aibot/core`.
 - Toolchain/workspace/cache details: `mem:tech_stack`.
 - Commands and CLI traps: `mem:suggested_commands`.
 - Style, tests and Git rules: `mem:conventions`.

@@ -6,7 +6,7 @@
 
 `ethglobal-mumbai-2026-AIBot/` は別チームメンバーが管理するNext.js / React / TypeScriptアプリ。親のpnpm workspace・Workersへのコピーは行わず、単一Nodeプロセスと永続ディスクを持つ別サービスとして接続する。親は認可とマッチ、AIBotはインタビュー・Persona・会話画面とゲーム状態を担当する。
 
-確認したコードは`4efa4249cce0fc3d268c7f7af1ea96deef66be3d`。作者の単体・ビルド・実API検証の報告と、今回の読み取り確認、親との結合試験を区別する。[確認記録](../evidence/aibot-inspection.md)。サブモジュールの親gitlinkは別途コミットする必要があり、作業ディレクトリが新しいだけでクローンの再現性を満たさない。
+確認したコードは`4efa4249cce0fc3d268c7f7af1ea96deef66be3d`。作者の単体・ビルド・実API検証の報告と、今回の読み取り確認、親との結合試験を区別する。[確認記録](../evidence/aibot-inspection.md)。親コミット`a35535d`でも同じgitlinkが記録された。今後も作業ディレクトリと親gitlinkを照合し、新規クローンで再現を検証する。
 
 ## 所有する処理
 

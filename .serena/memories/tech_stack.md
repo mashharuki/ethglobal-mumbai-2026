@@ -1,7 +1,7 @@
 # Tech stack
 
 - Node 24 in CI, ESM packages. Root/frontend TypeScript 7; contract TypeScript 6. Read manifests/lockfile for exact installed versions.
-- pnpm 11.24.0 pinned via `packageManager` + `devEngines`; workspaces `apps/*`, `packages/*`. Python submodule is not a workspace.
+- pnpm 11.24.0 pinned via `packageManager` + `devEngines`; workspaces `apps/*`, `packages/*`. The Next.js AIBot submodule is an independent npm project, not a parent workspace.
 - pnpm build-script allowlist is root `pnpm-workspace.yaml` `allowBuilds`. Edit existing keys rather than creating duplicates. Backend's nested workspace YAML is a template leftover.
 - Stale dependencies may trigger installation during pnpm scripts. Native optional packages (workerd, Biome, Turbo) can be missing after failed installs; distinguish installation failures from code failures.
 - Turborepo 2: build/check-types depend on corresponding upstream tasks; test depends on upstream build; dev persistent + uncached. Packages only participate when they define the script.
