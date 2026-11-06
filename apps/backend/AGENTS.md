@@ -7,7 +7,7 @@ Package guide for the API. Read the root `AGENTS.md` first; its approval boundar
 - Hono 4 template on Cloudflare Workers, run with Wrangler 4. `src/index.ts` only serves `GET /` → `"Hello Hono!"`. No planned endpoint exists yet.
 - `wrangler.jsonc` still uses the template Worker name `my-app` and has no bindings. `nodejs_compat`, KV, D1, R2 and observability are commented-out examples, not decisions.
 - No Workers type definitions are generated yet (`worker-configuration.d.ts` is absent), and `tsconfig.json` uses `hono/jsx`.
-- zod, Vitest and a typecheck script are **not installed**. Adding any of them is a dependency change: ask first and give the reason and alternatives.
+- `viem` and `@arkiv-network/sdk@1.0.1` are installed. The participation code uses `shared` for zod schemas and signatures. Node 24 tests and a `check-types` script cover the new pure ENS/Arkiv preparation code; no live writer or API endpoint exists yet.
 - `apps/backend/pnpm-workspace.yaml` is a template leftover. pnpm reads only the root `pnpm-workspace.yaml` (`allowBuilds:` there).
 
 ## Planned responsibility (Draft spec, not implemented)
@@ -26,9 +26,10 @@ Contracts to follow: `contracts/service.md`, `participation.md`, `participation-
 - Never receive, log or store plaintext matching attributes, preference masks or hobbies. The API relays ciphertext only, and a delivery receipt is not a match result.
 - Never forward matching secrets or fund notes to the AIBot or an AI model. Only separately consented Persona/conversation data goes there.
 - Never put pairs, match results, Personas or conversations in public Arkiv/Swarm records or logs.
-- Validate every request body, query and param at the boundary (zod once it is approved). Use constant-time comparison for tokens and rate-limit auth and search endpoints.
+- Validate every request body, query and param at the boundary with the shared zod schemas. Use constant-time comparison for tokens and rate-limit auth and search endpoints.
 - Secrets: put local values in `.dev.vars` (gitignored) and production values in `wrangler secret put`. Never commit them or hardcode them in `wrangler.jsonc` `vars`.
 - Writes to external systems (Arkiv, chain, AIBot) must be idempotent. When an outcome is unknown, re-query the same operation instead of resending a new one.
+- Arkiv SDK 1.0.1 uses Rabdi (chain 7794095) and `viem` as its peer. Keep `ARKIV_ACCESS_KEY` and the writer key server-side; never log keyed RPC URLs. Public bytes columns are public data. For funded writes, use explicit latest nonce/gas/gasPrice, a bounded budget and receipt/readback checks; persist intent before admission and reconcile uncertain sends before any retry.
 
 ## Implementation conventions
 
@@ -43,10 +44,12 @@ Contracts to follow: `contracts/service.md`, `participation.md`, `participation-
 ```sh
 pnpm --filter backend dev                                         # wrangler dev (local)
 pnpm --filter backend cf-typegen                                  # regenerate CloudflareBindings
+pnpm --filter backend check-types
+pnpm --filter backend test
 pnpm --filter backend exec wrangler deploy --dry-run --outdir=dist  # CI build check
 ```
 
-There are no `build`, `check-types` or `test` scripts, so turbo skips this package for those tasks.
+There is no `build` script; the Wrangler dry-run checks the Worker bundle.
 
 ## Verify before saying "done"
 

@@ -6,10 +6,15 @@
   "scripts": {
     "dev": "wrangler dev",
     "deploy": "wrangler deploy --minify",
-    "cf-typegen": "wrangler types --env-interface CloudflareBindings"
+    "cf-typegen": "wrangler types --env-interface CloudflareBindings",
+    "check-types": "tsc --noEmit",
+    "test": "node --test src/participation/*.test.ts"
   },
   "dependencies": {
-    "hono": "^4.13.16"
+    "@arkiv-network/sdk": "1.0.1",
+    "hono": "^4.13.16",
+    "shared": "workspace:*",
+    "viem": "2.57.16"
   },
   "devDependencies": {
     "wrangler": "^4.110.0"

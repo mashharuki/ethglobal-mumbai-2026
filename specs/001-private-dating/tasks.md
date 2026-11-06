@@ -2,7 +2,7 @@
 
 [統合仕様（Draft）](spec.md)・[実装計画](plan.md)・[データモデル](data-model.md)・[設計判断](research.md)・[正式応募目標](prize-targets.md)を入力とする。パスはリポジトリルート基準で、新規ファイルの予定位置も含む。チェックは受入条件を満たした時に付ける。担当は役割で表す。[P] は先行条件を満たした別担当・別ファイルでの並行作業。既存T001〜T036の参照を維持するため、追加はT037〜T044とし、番号順ではなく明記した依存順で実行する。
 
-**採用順**：A（T037→T038→T039、T041→T042→T034）→ B（T007→T011→T012）→ C（T009→T040→製品結合）。審査APIの認証準備はT003→T006を並行する。Aは入金・ZKを待たない。資格停止/異議/回復を採用し、資金は元本返却専用へ変更する。独立保証金・金銭没収は追加しない。全44タスクは未完了。AIBot単体は実装済みで、T025〜T029は親側の結合を対象とする。T043は説明/UI、T044は条件付きSwarm追加。
+**採用順**：A（T037→T038→T039、T041→T042→T034）→ B（T007→T011→T012）→ C（T009→T040→製品結合）。審査APIの認証準備はT003→T006を並行する。Aは入金・ZKを待たない。資格停止/異議/回復を採用し、資金は元本返却専用へ変更する。独立保証金・金銭没収は追加しない。T001・T002・T037は完了、残り41タスク。AIBot単体は実装済みで、T025〜T029は親側の結合を対象とする。T043は説明/UI、T044は条件付きSwarm追加。
 
 ## 仕様とタスクの主担当
 
@@ -29,8 +29,8 @@
 
 ## Phase 1 — セットアップ
 
-- [ ] T001 [P] 開発担当：Node・pnpm・Hardhat・Noirのローカル版と利用可能な端末を照合し、必要な追加依存・選ぶ理由・代案・既存CIの失敗を `specs/001-private-dating/quickstart.md` に記録する。依存追加の承認後、対象package.jsonと `pnpm-lock.yaml` を同期する。
-- [ ] T002 [P] デモ担当：`specs/001-private-dating/fixtures/scenarios.json` に架空のA/B/C、H=8・G=3・I=2の合成辞書と指定なしを含む希望mask、SC-002の10例、SC-005の資格正負例、SC-006のN/K設定、既存の職業・年齢帯・2銘柄・期限境界を固定する。合成カテゴリを一般利用者向け分類として扱わない。
+- [X] T001 [P] 開発担当：Node・pnpm・Hardhat・Noirのローカル版と利用可能な端末を照合し、必要な追加依存・選ぶ理由・代案・既存CIの失敗を `specs/001-private-dating/quickstart.md` に記録する。依存追加の承認後、対象package.jsonと `pnpm-lock.yaml` を同期する。
+- [X] T002 [P] デモ担当：`specs/001-private-dating/fixtures/scenarios.json` に架空のA/B/C、H=8・G=3・I=2の合成辞書と指定なしを含む希望mask、SC-002の10例、SC-005の資格正負例、SC-006のN/K設定、既存の職業・年齢帯・2銘柄・期限境界を固定する。合成カテゴリを一般利用者向け分類として扱わない。
 
 ## Phase 2 — 担当間で先に固定する契約
 
@@ -47,7 +47,7 @@
 
 ### 段階A：ENS資格を先に実証
 
-- [ ] T037 [US1] API担当：T001・T002後、`packages/shared/src/participation/schema.ts` と `specs/001-private-dating/fixtures/participation.json` に[資格契約](contracts/participation.md)のschema、署名/digest形式、状態・エラー、権限表、信頼するnamespace/issuerを固定する。公式deployment版・ABI・実コード・発行世代の確認方法を照合し、実測した公開設定だけをfixtureへ記録する。
+- [X] T037 [US1] API担当：T001・T002後、`packages/shared/src/participation/schema.ts` と `specs/001-private-dating/fixtures/participation.json` に[資格契約](contracts/participation.md)のschema、署名/digest形式、状態・エラー、権限表、信頼するnamespace/issuerを固定する。公式deployment版・ABI・実コード・発行世代の確認方法を照合し、実測した公開設定だけをfixtureへ記録する。
 - [ ] T038 [US1] API/Arkiv担当：T037後、`scripts/issue-participation.ts` と `apps/backend/src/participation/issuer.ts` に専用Resolver、非譲渡サブネーム、限定キー委任、署名付き公開資格のArkiv書込とENS参照更新・有限期限付き停止を実装する。審査停止は参照無効化で代替せず、基盤障害をunavailableとして区別する。`apps/contract/test/ParticipationPermissions.ts` で本人による資格/Resolver/LINK/UPGRADE/admin迂回、別参加者更新、失効鍵を拒否する。外部デプロイ・書込は必要な承認を得て実行し、ZK・入金とは依存させない。
 - [ ] T039 [US1] Web担当：T038後、`apps/frontend/src/pages/Participation.tsx` と `scripts/verify-participation.ts` に2つの独立読取実装を作る。共有はschema/fixtureまでとし、後者はWebのBFF・判定・検証関数を使わずENS/Arkivを読む。eligible/ineligible/unavailable、同一ブロック/版での一致、BFF停止、旧版/再発行/別発行者拒否を確認する。
 - [ ] T041 [US1] API担当：T037・T038・T006後、`apps/backend/src/participation/review.ts` と `apps/backend/src/participation/review.test.ts` に[審査契約](contracts/participation-review.md)の規則版、合成ケースの私的状態、審査/異議の役割、本人通知、有限停止の集約と有効な資格への反映、再発行時の主体継続、期限を実装する。受付だけで停止せず、無権限・利益相反・再送延長を拒否する。停止中も救済APIへ本人認証でアクセス可能にする。

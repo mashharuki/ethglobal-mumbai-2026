@@ -4,18 +4,18 @@ Shared TypeScript code for `apps/frontend`, `apps/backend` and the planned indep
 
 ## Current state
 
-- The package is **empty**: only `package.json` exists, with no `src/`, `tsconfig.json` or exports. No app depends on it yet.
-- `package.json` is the `npm init` default: `main: index.js` (missing file), and a `test` script that exits 1. As a result, root `pnpm test` fails here. This is a known, pre-existing failure, not a regression.
+- The package exports the participation schema and pure signing/digest helpers from `src/index.ts`. `zod` and `viem` are approved dependencies, and `tsconfig.json` plus `check-types`/`test` scripts are configured.
+- The backend's participation preparation code consumes this package. The ENS participant Registry, issuer write flow, and independent verifier remain unimplemented. The Sepolia parent snapshot is evidence for the parent name only, not an active participant trust configuration.
 
 ## Planned contents (from `specs/001-private-dating/tasks.md`)
 
 | Path | Task | Content |
 |---|---|---|
 | `src/generated/client.ts` | T003 | Client/types generated from `packages/api-specs/openapi.yaml` (OpenAPI Generator planned). **Never hand-edit**; regenerate it. |
-| `src/participation/schema.ts` | T037 | Participation credential schema, signature/digest formats, states/errors, the permission table, and the trusted namespace/issuer (`contracts/participation.md`) |
+| `src/participation/schema.ts`, `credential.ts` | T037 | Participation schema, EIP-712 signing/digest format, states/errors, permission table, and the observed parent fixture (`contracts/participation.md`) |
 | `src/simulation/contract.ts` | T026 | AIBot handoff contract: the HMAC format, expiry/audience and consent states (`contracts/simulation.md`) |
 
-Planned only. Create these files when the matching task is authorized, and keep their names aligned with `tasks.md`.
+Create the remaining planned files when the matching task is authorized, and keep their names aligned with `tasks.md`.
 
 ## Design rules
 
@@ -24,16 +24,16 @@ Planned only. Create these files when the matching task is authorized, and keep 
 - **Contract, not app logic**: put HTTP shapes in OpenAPI first and generate them. Hand-written types here are for non-HTTP contracts (credential formats, digests, AIBot handoff) and pure helpers shared by more than one consumer. App-specific code stays in its app.
 - **Privacy**: never define a type that places plaintext attributes, preference masks, hobbies or fund notes in an API/public payload. Model owner-only and public projections as separate types.
 - Use the Result type `{ ok: true, data } | { ok: false, error }` for expected validation failures. Prefer discriminated unions for states, and `satisfies` over `as`. Exported functions need explicit return types.
-- Runtime validation uses zod once it is approved (it is not installed). Export the schema and its inferred type together so the frontend and backend validate identically.
+- Runtime validation uses zod. Export each schema and its inferred type together so the frontend and backend validate identically.
 - Do not add circular imports and do not import from `apps/*`.
 
-## Setting up the package (needs approval)
+## Consumers
 
-Before the first source file, the package needs `src/index.ts` (or subpath `exports`), a `tsconfig.json`, a fixed `main`/`exports`, a `check-types` script and a real or removed `test` script. Consumers then add `"shared": "workspace:*"`. These are configuration and dependency changes: propose them and get approval first. Keep `pnpm-lock.yaml` in sync.
+When a frontend or backend consumer is implemented, add `"shared": "workspace:*"` to that package and keep `pnpm-lock.yaml` in sync. The signature helper checks the record's structure and signature; consumers must also verify the pinned issuer, current ENS Registry and issuance generation, Arkiv reference/digest, status, and expiry before accepting participation.
 
 ## Tests
 
-Vitest is not configured. Once approved, colocate `foo.test.ts` tests named `it("should <x> when <y>")`. Cover schema accept/reject cases with fixtures (for example `specs/001-private-dating/fixtures/participation.json`, planned in T037 and not yet created), never with real credentials.
+Node 24's test runner is used. Colocate `foo.test.ts` tests named `it("should <x> when <y>")`. Cover schema accept/reject cases with fixtures and synthetic credentials, never real signing keys.
 
 ## Verify before saying "done"
 

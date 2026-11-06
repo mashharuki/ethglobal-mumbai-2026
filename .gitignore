@@ -1,6 +1,16 @@
 **/.env
+**/.env*
+!**/.env.example
 **/.DS_Store
 **/node_modules
+**/dist/
+**/build/
+*.log
+*.tmp
+*.swp
+.idea/
+.vscode/
 .claude/logs
 .claude/settings.local.json
 .turbo
+.pnpm-store
