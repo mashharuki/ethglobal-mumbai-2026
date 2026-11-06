@@ -16,7 +16,7 @@
 | フロントエンド | 既存React 19・Vite 8・TypeScript・lism CSS・PWA。Kohakuでウォレット接続、Anon RPCでアプリの読取。秘密値は端末に保持、PWAキャッシュは静的ファイルのみ | プロフィール公開範囲と預託条件を署名前に示す。検索、招待、手番、対面提示、返却可能額を確認できる |
 | ZK | Noirで登録版と暗号化入力を拘束する。NoirJS・Barretenbergで生成・検証。相性証明は当事者間で検証、公開する登録証明はペアに依存しない | [二者照合契約](contracts/matching.md)の正負例を独立端末で再現。端末性能・ツールの版・検証鍵を記録 |
 | バックエンド | 既存Hono・Workers・Wrangler。Zodで境界検証。検索リースを直列化し、共同セッションは部屋ごとのDurable Object。公開登録はArkiv、権限はENSv2で確認 | [サービス契約](contracts/service.md)に従い、再送・切断・モデル障害から復帰。モデルには識別子や登録値を渡さない |
-| コントラクト | 既存Hardhat 3・Solidity・viem。テストはローカル、外部ネットワークの目標はEthereum Sepolia。公開するのは資金の出入りと検証に必要な値 | [精算契約](contracts/settlement.md)の保存則・期限返却・公開情報の検査を通す。預託銘柄を限定しない方針と非標準動作の限界を表示 |
+| コントラクト | 既存Hardhat 3・Solidity・viem。テストはローカル、外部ネットワークの目標はEthereum Sepolia。公開するのは資金の出入りと検証に必要な値 | [精算契約](contracts/settlement.md)の保存則・期限返却・公開情報の検査を通す。Circle公式テストUSDC・EURCの入金だけを認め、同名の別アドレスを拒否する |
 | 共通 | Node 24・pnpm 11・Turborepo。API定義はOpenAPI、共有型と生成クライアントを利用。Biome、oxlint、Vitest、既存のHardhatテスト、knip・jscpdを利用範囲に合わせる | SC-001〜004の測定と再現手順を記録。受入人数・時間目標は[仕様書](spec.md)の数値を使用 |
 
 **対象規模**：会場で一組・2台と第三者確認用1台。期限判定と再送の競合をローカルで再現する。大量同時検索や実資産運用は評価範囲外。

@@ -16,7 +16,7 @@
 ## Phase 1 — セットアップ
 
 - [ ] T001 [P] 開発担当：Node・pnpm・Hardhat・Noirのローカル版と利用可能な端末を照合し、必要な追加依存・選ぶ理由・代案・既存CIの失敗を `specs/001-private-dating/quickstart.md` に記録する。依存追加の承認後、対象package.jsonと `pnpm-lock.yaml` を同期する。
-- [ ] T002 [P] デモ担当：`specs/001-private-dating/fixtures/scenarios.json` に架空のA/B/C、8項目の趣味辞書、職業・年齢帯、2銘柄の原単位、7日の期限境界と期待結果を定義する。実名・本物の鍵を含めない。
+- [ ] T002 [P] デモ担当：`specs/001-private-dating/fixtures/scenarios.json` に架空のA/B/C、8項目の趣味辞書、職業・年齢帯、USDCとEURCの原単位、7日の期限境界と期待結果を定義する。実名・本物の鍵を含めない。
 
 ## Phase 2 — 担当間で先に固定する契約
 
@@ -34,18 +34,18 @@
 - [ ] T007 [P] [US1] ZK担当：`circuits/register/src/main.nr` に項目別乱数で登録版を固定する証明を実装し、`apps/frontend/src/proofs/register.ts` で本物の証明を生成・検証する。所有者・登録版・入力値の差し替えは失敗させる。
 - [ ] T008 [P] [US1] Web担当：`apps/frontend/src/wallet/connect.ts` と `apps/frontend/src/profile/private-store.ts` にKohaku接続、Anon RPCでのSepolia読取、端末内プロフィール・秘密の暗号化バックアップと復元を実装する。匿名読取の失敗は画面に返す。
 - [ ] T009 [P] [US1] API担当：`apps/backend/src/search/coordinator.ts` と `apps/backend/wrangler.jsonc` に検索リース・所有者認可・暗号文配送・招待受付を実装する。退出・切断・再送・連続検索を処理し、必要なバインディング型を再生成する。
-- [ ] T010 [P] [US1] 資金担当：`apps/contract/contracts/DepositVault.sol` に原単位の入金、実残高差、入金ブロック時刻から7日の期限、noteルート、消費印、転送失敗の巻き戻しを実装する。異なる小数桁のテスト資産で照合し、二重使用を拒否する。資金コード着手前にリポジトリ指定のethskillsを読む。
+- [ ] T010 [P] [US1] 資金担当：`apps/contract/contracts/DepositVault.sol` に原単位の入金、実残高差、入金ブロック時刻から7日の期限、noteルート、消費印、転送失敗の巻き戻しを実装する。USDC・EURCの許可アドレスで照合し、同名の別トークンと二重使用を拒否する。資金コード着手前にリポジトリ指定のethskillsを読む。
 - [ ] T011 [US1] ZK担当：T007後、`circuits/matching/src/main.nr` に暗号化したビット列、非ゼロ乱数でマスクした内積、復号した真偽の各証明を実装する。[照合契約](contracts/matching.md)の群・入力範囲・登録版・チャレンジ・リースを拘束し、不正な点、ゼロマスク、旧版を拒否する。
 - [ ] T012 [US1] Web/ZK担当：T011後、`apps/frontend/src/search/match-session.ts` を独立端末2台のテスト鍵・各自の架空登録版・テスト用暗号文配送で動かす。照合は両端末で本物の証明を生成・相互検証する。一致件数を公開せず、終了済みリースから候補を追加しない。一致・不一致を各1回以上再現し、検索開始→結果表示の実時間と各端末の生成・検証時間を記録する。
 - [ ] T013 [US1] 資金/ZK担当：T010後、`circuits/lock/src/main.nr` と `apps/contract/contracts/NoteLock.sol` に両noteの個別証明を同じ一回限りの拘束条件へ結ぶ処理を実装する。後継noteの復元を署名前に確認し、同じ預託を使う競合招待は一方だけ成功させる。
-- [ ] T014 [US1] API担当：T007・T010後、`apps/backend/src/registrations/registry.ts` にENSv2サブネームの発行・実解決・所有権確認、Arkiv Rabdiへの公開版書込と読取、預託確定と証明検証を接続する。更新権移転・失効・ネットワーク障害を区別する。ENS実装前に公式索引を確認する。
-- [ ] T015 [US1] Web担当：T008・T010・T014後、`apps/frontend/src/pages/Registration.tsx` と `apps/frontend/src/pages/PublicRegistration.tsx` に預託前の銘柄・数量・期限計算・配分・送金相関の説明、入金後の確定期限表示、確認中からの再開、仮名別の公開確認を実装する。
+- [ ] T014 [US1] API担当：T007・T010後、`apps/backend/src/registrations/registry.ts` にENSv2サブネームの発行・実解決・所有権確認、Arkiv Rabdiへの公開版書込と読取、許可されたUSDC・EURCの預託確定と証明検証を接続する。更新権移転・失効・ネットワーク障害を区別する。ENS実装前に公式索引を確認する。
+- [ ] T015 [US1] Web担当：T008・T010・T014後、`apps/frontend/src/pages/Registration.tsx` と `apps/frontend/src/pages/PublicRegistration.tsx` にSepolia上のUSDC・EURCの二択、預託前の数量・期限計算・配分・送金相関の説明、入金後の確定期限表示、確認中からの再開、仮名別の公開確認を実装する。
 - [ ] T016 [US1] 結合担当：T008・T009・T012〜T015後、`apps/frontend/src/pages/Search.tsx` と `apps/frontend/src/App.tsx` でT012を実ウォレット・検索リース・中継に接続する。双方承諾→拘束確認中→両預託の拘束確定→成立を通し、失敗・期限切れ・競合では当該招待の部屋資格発行を拒否する。自己招待・未確定預託を拒否し、画面再読込後も同じ受付結果を表示する。
 - [ ] T017 [US1] 検証担当：`specs/001-private-dating/evidence/matching.md` にSC-001の5人の時間・理解度、SC-002の5例、部外者の登録照会、各端末・中継・公開台帳の観察結果を記録する。対面提示の観察結果はT024から参照する。
 
 ## Phase 4 — US2：対面後の確認と預託金の精算（P1）
 
-**独立試験**：成立済みマッチのfixtureから開始。Aの100 Xについて双方が職業の虚偽に合意した場合はBに90 Xと自身の40 Y、運営に10 X。不一致・無回答では期限後に各自が全額を回収する（FR-008〜012、SC-002/004）。
+**独立試験**：成立済みマッチのfixtureから開始。Aの100 USDCについて双方が職業の虚偽に合意した場合はBに90 USDCと自身の40 EURC、運営に10 USDC。不一致・無回答では期限後に各自が全額を回収する（FR-008〜012、SC-002/004）。
 
 - [ ] T018 [P] [US2] 資金検証担当：`apps/contract/test/Settlement.ts` にSC-004の受取額、最小単位101、期限直前と同時刻、別チェーン・別責任者・別項目、競合・二重請求、転送失敗の試験を用意する。
 - [ ] T019 [P] [US2] ZK担当：`circuits/settle/src/main.nr` に同じマッチへの両者の最終署名、元銘柄別の保存則、90/10の端数、本人・相手・運営の受取先を拘束する。片側署名、回答不一致、出力先差替えで証明が通らないことを確認する。
