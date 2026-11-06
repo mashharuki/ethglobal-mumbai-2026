@@ -1,8 +1,8 @@
+import { existsSync } from "node:fs";
+import path from "node:path";
 import hardhatSlang from "@nomicfoundation/hardhat-slang";
 import hardhatToolboxViemPlugin from "@nomicfoundation/hardhat-toolbox-viem";
 import { configVariable, defineConfig } from "hardhat/config";
-import { existsSync } from "node:fs";
-import path from "node:path";
 
 // Load secrets (RPC URLs, private keys) from apps/contract/.env into process.env.
 // configVariable() falls back to process.env, and is only resolved when a network
@@ -13,10 +13,7 @@ if (existsSync(envFilePath)) {
 }
 
 export default defineConfig({
-  plugins: [
-    hardhatToolboxViemPlugin,
-    hardhatSlang
-  ],
+  plugins: [hardhatToolboxViemPlugin, hardhatSlang],
   solidity: {
     profiles: {
       default: {

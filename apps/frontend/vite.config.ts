@@ -3,7 +3,6 @@ import { defineConfig } from "vite";
 import { VitePWA } from "vite-plugin-pwa";
 import { voidPlugin } from "void";
 
-
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [

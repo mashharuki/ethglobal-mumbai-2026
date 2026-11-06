@@ -10,8 +10,6 @@
     }
   ],
   "compilerOptions": {
-    "types": [
-      "void/env"
-    ]
+    "types": ["void/env"]
   }
 }
