@@ -2,7 +2,7 @@
 
 **Purpose**: 次の計画段階へ進めるかを要件の記述から確認する。  
 **Created**: 2026-11-06  
-**Feature**: [仕様書](../spec.md)
+**Feature**: [統合仕様](../spec.md)・[フロントエンド](../frontend.md)・[バックエンド](../backend.md)・[スマートコントラクト](../smart-contract.md)
 
 ## Content Quality
 
