@@ -10,6 +10,6 @@
 | 運営・外部モデル | 検索時だけ短命の中継を使う。相性結果は当事者間で暗号化する。モデルに渡すものは二人が共有したテーマ・場面・選択だけ。参加者識別子と資金情報は除く | モデルが相性を推定する方式は検証可能な判定にならない。推論が止まってもペアは退出・対面判断・精算へ進める。 |
 | 資金とプライバシー | テストネットで各人の預託を別の秘密の権利として扱い、公開書込みの入力から仮名や資金の相手を直接列挙できない設計を先に試験する。[精算契約](contracts/settlement.md) | 二つの公開ENS名や預託IDを一緒に記録する通常のマッチ台帳は不採用。金額・時刻・送金元の相関は残り、完全な匿名性を主張しない。 |
 | 多銘柄 | Circleのファウセットで取得できるSepoliaのUSDC・EURCに絞り、原単位・原銘柄で会計する。価格オラクルや銘柄間の換算は不要 | 任意のアドレスが本当にステーブルコインかは判定できない。手数料・リベース・凍結・虚偽の残高応答を持つ資産で額面どおりの受取を保証できない。アドレス指定の自由入力は対象外とし、公式の2銘柄を許可リストで検証する。 |
-| 締切 | P1の合否を先に確定し、残り時間を2ターンと録画に充てる。連携を実演できた賞だけ申し込む | 模擬照合や既存Counterデプロイを完成証拠に使わない。公開スターター、再利用したOSS、新作、AIによる支援箇所を提出時に区別する。 |
+| 正式応募目標と締切 | EF-CROPS・ENS-V2・ARKIV-APPを正式目標に固定し、P1の実証と3目標の証拠・提出物をP2の追加より優先する。T036で各賞を個別判定する | 正式目標であっても未達を応募完了にしない。模擬照合や既存Counterは完成証拠に使わず、公開スターター・OSS・新作・AI支援を区別する。EF-RPCは同じEF枠の追加判定とする。 |
 
-暗号化された集合計算の背景は[Private Collection Matching Protocols](https://petsymposium.org/2023/files/papers/issue3/popets-2023-0091.pdf)、ローカル証明の実行経路は[Noirのブラウザーガイド](https://noir-lang.org/docs/guides/building_a_web_app)、曲線演算の実装可否は[Noir公式の演算リファレンス](https://noir-lang.org/docs/libraries/standard_library/cryptographic_primitives/embedded_curve_ops)で確認する。文献は以下の組み合わせ全体の監査結果を意味しない。大会・スポンサーの公式条件は[提出条件とプライズ候補](planning-input.md)を参照。
+暗号化された集合計算の背景は[Private Collection Matching Protocols](https://petsymposium.org/2023/files/papers/issue3/popets-2023-0091.pdf)、ローカル証明の実行経路は[Noirのブラウザーガイド](https://noir-lang.org/docs/guides/building_a_web_app)、曲線演算の実装可否は[Noir公式の演算リファレンス](https://noir-lang.org/docs/libraries/standard_library/cryptographic_primitives/embedded_curve_ops)で確認する。文献は以下の組み合わせ全体の監査結果を意味しない。大会・スポンサーの公式条件は[正式応募目標と提出判定](prize-targets.md)を参照。

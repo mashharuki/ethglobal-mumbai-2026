@@ -18,14 +18,12 @@
 - **相性照合**では、二人がそれぞれ持つ秘密を一つの端末に集めるとFR-001を満たせない。二者が入力を秘密にしたまま「共通項が一つ以上ある」という真偽だけを得る方式と、各入力が登録版の許可済み趣味に由来することをNoirで結び付ける方法を、最初に検証する。ペア・双方の登録版・検索セッションを検証対象に含め、相性証明やペア識別子は公開しない。趣味を列挙して照合できる固定ハッシュも公開しない。
 - **提出前の確認**では、2端末で共通趣味あり／なしを試し、別人・別版の証明再利用と片方の検索終了を含むSC-002の5例を確認する。実測した証明時間と各端末・運営・公開記録が取得できた情報を記録する。二者照合まで通らなければ、デモで実証できた登録証明と未検証の相性判定を明示する。[Noir公式ブラウザーガイド](https://noir-lang.org/docs/guides/building_a_web_app)
 
-## From Scratchの提出条件とプライズ候補
+## From Scratchの提出条件と正式応募目標
 
 2026年11月7日（土）09:00 ISTまでにHacker Dashboardで提出する。製品固有のコード・設計・素材は大会開始後の作業を対象とし、再利用する公開スターターやライブラリは出典を区別する。既存の雛形・構成図・サブモジュールもこの区分で確認する。開発履歴、Spec Kitの仕様・プロンプト・計画資料、AIやAgent Skillを使った箇所とチーム自身の作業を提出リポジトリに残す。[大会公式ルール](https://ethglobal.com/events/mumbai/info/details)
 
-パートナーは最大3社。以下は現行仕様との対応から選んだ応募候補で、応募先の確定は実演できた統合に合わせる。[公式プライズ一覧](https://ethglobal.com/events/mumbai/prizes)
+2026-11-06の依頼者決定により、**Ethereum Foundation / Best CROPS App、ENS / Best Use of ENSv2、Arkiv / Build on Arkiv (from scratch)** を正式目標とする。3提供元の枠をこの組合せに割り当てる。
 
-| 候補 | この製品で示すこと・用意するもの |
-| --- | --- |
-| Ethereum Foundation / Best CROPS App | 2台で照合し、第三者に趣味やペアが公開されることなく結果を確認できる場面を示す。公開FOSSリポジトリ、起動手順、READMEのCROPS節、トラッカーなしのクライアント、2〜3分の動画を用意する。Anon-RPCを標準の読取経路として実演できれば同社のAnon-RPC賞も候補。EFからの受賞は1件まで。[公式条件](https://ethglobal.com/events/mumbai/prizes/ethereum-foundation) |
-| ENS / Best Use of ENSv2 | Sepoliaで利用者のサブネームを実際に解決し、その仮名の登録証明を確認する。仮名の権限が製品上で果たす役割を示し、公開コードと動作するライブデモへのリンクを提出する。[公式条件](https://ethglobal.com/events/mumbai/prizes/ens) |
-| Arkiv / Build on Arkiv (from scratch) | 現行テストネットに公開可能な登録記録を書き、仮名の登録確認画面でその記録を読む。READMEに書込アドレスと再現用クエリを記載し、公開ライセンスと指定資料（schema、friction、reach、why-arkiv、how-you-use-arkiv）を揃えられた場合の候補とする。[公式条件](https://ethglobal.com/events/mumbai/prizes/arkiv) |
+公式条件・役割・証拠・未達時の扱いは[応募目標と提出判定](prize-targets.md)に集約する。ENSは公式にmainnetとSepoliaの両方が対象で、本計画ではSepoliaを使う。Arkivの公開登録は必須の実演経路とし、単なる任意の賞候補とは扱わない。Anon-RPCは同じEF枠の追加応募判定EF-RPCに従う。
+
+3目標の作業は実装計画に含め、実行後にT036でそれぞれ提出可・未達・再確認待ちを記録する。正式目標の決定だけを理由に、未実装や模擬データを実統合の証拠としない。
