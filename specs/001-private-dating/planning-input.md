@@ -10,7 +10,7 @@
 | リポジトリ共通 | pnpm、Turborepo、TypeScript、Biome、jscpd、knip、GitHub Spec Kit | モノレポで3領域の計画・検証を分担 |
 | ゼロ知識証明 | 回路の記述には **Noir** を採用する。ブラウザー上の入力処理にはNoirJS、証明生成・検証にはBarretenbergを候補とし、動作確認した組み合わせを固定する | 公開の登録証明（FR-002）、二人の非公開照合（FR-004、SC-002）、対面提示時の登録版の確認（FR-008） |
 
-[提供された構成図](../../docs/architechture.drawio.png)では、端末がウォレット・デーティング画面・証明生成を担い、World Modelが場面を返す。バックエンドとモデルの接続方法、異なる銘柄の移転特性、公開識別子間の関連付けは設計段階の検証対象とする。
+[更新したシステムアーキテクチャ](../../docs/architecture.md)では、独立端末、Hono / Durable Objects、ENSv2、Arkiv、Sepoliaの資金契約を分け、暗号文中継と端末からチェーンへの直接経路を示す。[図の編集用ソース](../../docs/architecture.drawio)と[PNG](../../docs/architechture.drawio.png)は同じ設計を表す。World Modelは任意のP2経路で、Python側との接続は未確定。二者照合、秘匿精算・回復、外部連携は実証対象であり、この図を稼働済み構成とは扱わない。
 
 ## Noirで証明する範囲
 

@@ -1,0 +1,789 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Private Dating — animated concept overview</title>
+    <meta name="description" content="A 32-second illustrated walkthrough of a proposed private dating app. No live transactions." />
+    <style>:root {
+  color-scheme: light;
+  font-family: "Avenir Next", "Hiragino Sans", Arial, sans-serif;
+  color: #173f37;
+  background: #f2f6f3;
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+}
+main {
+  max-width: 1344px;
+  margin: auto;
+  padding: 32px;
+}
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+h1 {
+  font-size: 27px;
+  letter-spacing: -0.7px;
+  margin: 0 0 6px;
+}
+p {
+  line-height: 1.6;
+  margin: 0;
+}
+header p {
+  font-size: 17px;
+}
+.language {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+button {
+  font: inherit;
+  font-size: 15px;
+  color: inherit;
+  cursor: pointer;
+  background: white;
+  border: 1px solid #afc7b9;
+  border-radius: 9px;
+  padding: 10px 16px;
+  min-height: 44px;
+}
+button:hover {
+  border-color: #23765e;
+}
+button:focus-visible,
+input:focus-visible,
+a:focus-visible {
+  outline: 3px solid #555a93;
+  outline-offset: 4px;
+}
+button[aria-pressed="true"],
+#play {
+  background: #23765e;
+  color: white;
+  border-color: #23765e;
+}
+.presentation {
+  background: white;
+  border-radius: 20px;
+  overflow: hidden;
+  border: 1px solid #dce6df;
+}
+#stage svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+#stage > svg {
+  max-height: calc(100svh - 190px);
+  min-height: 300px;
+}
+.controls {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  border-top: 1px solid #e5ede7;
+  padding: 16px 24px;
+}
+#play {
+  min-width: 110px;
+}
+input[type="range"] {
+  flex: 1;
+  min-width: 60px;
+  accent-color: #23765e;
+  cursor: pointer;
+}
+#clock {
+  white-space: nowrap;
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+}
+#chapters {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 22px;
+}
+#chapters button {
+  flex: 1;
+}
+#caption {
+  font-size: 18px;
+  margin: 20px auto 0;
+  max-width: 980px;
+  text-align: center;
+}
+#note {
+  color: #5d6f66;
+  font-size: 14px;
+  text-align: center;
+  margin: 16px 0;
+}
+footer {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+  justify-content: center;
+  padding: 8px 0;
+}
+a {
+  color: #23694e;
+  text-underline-offset: 4px;
+}
+#mobile-summary {
+  display: none;
+}
+@media (max-width: 700px) {
+  #stage > svg {
+    max-height: none;
+    min-height: 0;
+  }
+  main {
+    padding: 20px 12px;
+  }
+  header {
+    align-items: flex-start;
+    gap: 14px;
+    flex-direction: column;
+  }
+  h1 {
+    font-size: 25px;
+  }
+  .language {
+    border: 0;
+    padding: 0;
+    margin: 0;
+    align-self: flex-end;
+  }
+  .controls {
+    padding: 12px;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  input[type="range"] {
+    order: 4;
+    flex-basis: 100%;
+  }
+  #clock {
+    margin-left: auto;
+  }
+  #chapters {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  #chapters button {
+    font-size: 14px;
+    padding: 10px 8px;
+  }
+  #caption {
+    text-align: left;
+    font-size: 17px;
+  }
+  #mobile-summary {
+    display: block;
+    margin: 14px 0;
+    font-size: 15px;
+  }
+  #note {
+    text-align: left;
+  }
+  footer {
+    justify-content: flex-start;
+    gap: 16px;
+    font-size: 14px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto;
+  }
+}
+</style>
+  </head>
+  <body>
+    <main>
+      <header>
+        <div><h1>Private Dating</h1><p id="tagline">Find a connection. Keep your profile private.</p></div>
+        <fieldset class="language" aria-label="Language / 言語">
+          <button type="button" data-language="en" aria-pressed="true">English</button>
+          <button type="button" data-language="ja" aria-pressed="false">日本語</button>
+        </fieldset>
+      </header>
+      <section class="presentation" aria-label="Illustrated concept walkthrough">
+        <div id="stage"><svg xmlns="http://www.w3.org/2000/svg" width="1280" height="760" viewBox="0 0 1280 760" role="img" aria-label="Your profile stays with you." style="font-family:Arial,'Hiragino Sans',sans-serif">
+    <title>Your profile stays with you.</title><desc>Each browser keeps its own secrets. A test deposit starts the registration flow.</desc>
+    <rect x="0" y="0" width="1280" height="760" rx="0" fill="#FFFFFF" stroke="none"/>
+    <text x="60" y="49" font-size="24" fill="#23765E" text-anchor="start" font-weight="600">Private Dating</text><text x="1220" y="49" font-size="20" fill="#63766E" text-anchor="end" font-weight="400">Concept replay</text>
+    <text x="60" y="111" font-size="39" fill="#173F37" text-anchor="start" font-weight="600">Your profile stays with you.</text>
+    <text x="60" y="158" font-size="21" fill="#63766E" text-anchor="start" font-weight="400">Each browser keeps its own secrets. A test deposit starts the registration flow.</text><rect x="60" y="190" width="280" height="5" rx="2" fill="#23765E" stroke="none"/><rect x="354" y="190" width="280" height="5" rx="2" fill="#E6EDE8" stroke="none"/><rect x="648" y="190" width="280" height="5" rx="2" fill="#E6EDE8" stroke="none"/><rect x="942" y="190" width="280" height="5" rx="2" fill="#E6EDE8" stroke="none"/>
+    <path d="M370 390 L594 390" fill="none" stroke="#CEDDD5" stroke-width="2" stroke-linejoin="round"/><path d="M686 390 L910 390" fill="none" stroke="#CEDDD5" stroke-width="2" stroke-linejoin="round"/><path d="M615 354 L615 335 L530 335 L530 316" fill="none" stroke="#CEDDD5" stroke-width="2" stroke-linejoin="round"/><path d="M665 354 L665 335 L750 335 L750 316" fill="none" stroke="#CEDDD5" stroke-width="2" stroke-linejoin="round"/><path d="M220 540 L220 645 L360 645" fill="none" stroke="#23765E" stroke-width="3" stroke-linejoin="round"/><circle cx="220" cy="540" r="9" fill="#FFFFFF" stroke="#23765E" stroke-width="3"/><path d="M1060 540 L1060 645 L920 645" fill="none" stroke="#23765E" stroke-width="3" stroke-linejoin="round"/><circle cx="1060" cy="540" r="9" fill="#FFFFFF" stroke="#23765E" stroke-width="3"/><rect x="440" y="228" width="180" height="88" rx="16" fill="#F8FAF8" stroke="none"/><rect x="660" y="228" width="180" height="88" rx="16" fill="#F8FAF8" stroke="none"/>
+    <svg x="458" y="247" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#23765E" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+  <title>At Sign</title>
+  <circle cx="12" cy="12" r="4" />
+  <path d="M16 8v5a3 3 0 0 0 6 0v-1a10 10 0 1 0-4 8" />
+</svg><text x="536" y="268" font-size="25" fill="#173F37" text-anchor="middle" font-weight="600">ENS</text>
+    <text x="530" y="299" font-size="20" fill="#63766E" text-anchor="middle" font-weight="400">Pseudonyms</text>
+    <svg x="677" y="247" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#23765E" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+  <title>Database</title>
+  <ellipse cx="12" cy="5" rx="9" ry="3" />
+  <path d="M3 5V19A9 3 0 0 0 21 19V5" />
+  <path d="M3 12A9 3 0 0 0 21 12" />
+</svg><text x="757" y="268" font-size="25" fill="#173F37" text-anchor="middle" font-weight="600">Arkiv</text>
+    <text x="750" y="299" font-size="20" fill="#63766E" text-anchor="middle" font-weight="400">Public records</text>
+    <g><rect x="70" y="240" width="300" height="300" rx="24" fill="#EDF6F0" stroke="#A8CBB5"/>
+    <svg x="96" y="267" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#23765E" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+  <title>Smartphone</title>
+  <rect width="14" height="20" x="5" y="2" rx="2" ry="2" />
+  <path d="M12 18h.01" />
+</svg><text x="153" y="295" font-size="28" fill="#173F37" text-anchor="start" font-weight="600">A</text>
+    <text x="220" y="338" font-size="22" fill="#63766E" text-anchor="middle" font-weight="400">Private profile</text><rect x="100" y="363" width="155" height="10" rx="5" fill="#CCDCD2" stroke="none"/><rect x="275" y="363" width="44" height="10" rx="5" fill="#E1EAE4" stroke="none"/><rect x="100" y="393" width="137" height="10" rx="5" fill="#CCDCD2" stroke="none"/><rect x="275" y="393" width="44" height="10" rx="5" fill="#E1EAE4" stroke="none"/><rect x="100" y="423" width="119" height="10" rx="5" fill="#CCDCD2" stroke="none"/><rect x="275" y="423" width="44" height="10" rx="5" fill="#E1EAE4" stroke="none"/>
+    <rect x="90" y="472" width="260" height="44" rx="22" fill="#FFFFFF" stroke="none"/>
+    <text x="220" y="501" font-size="21" fill="#23765E" text-anchor="middle" font-weight="600">Secrets stay here</text></g><g><rect x="910" y="240" width="300" height="300" rx="24" fill="#EDF6F0" stroke="#A8CBB5"/>
+    <svg x="936" y="267" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#23765E" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+  <title>Smartphone</title>
+  <rect width="14" height="20" x="5" y="2" rx="2" ry="2" />
+  <path d="M12 18h.01" />
+</svg><text x="993" y="295" font-size="28" fill="#173F37" text-anchor="start" font-weight="600">B</text>
+    <text x="1060" y="338" font-size="22" fill="#63766E" text-anchor="middle" font-weight="400">Private profile</text><rect x="940" y="363" width="155" height="10" rx="5" fill="#CCDCD2" stroke="none"/><rect x="1115" y="363" width="44" height="10" rx="5" fill="#E1EAE4" stroke="none"/><rect x="940" y="393" width="137" height="10" rx="5" fill="#CCDCD2" stroke="none"/><rect x="1115" y="393" width="44" height="10" rx="5" fill="#E1EAE4" stroke="none"/><rect x="940" y="423" width="119" height="10" rx="5" fill="#CCDCD2" stroke="none"/><rect x="1115" y="423" width="44" height="10" rx="5" fill="#E1EAE4" stroke="none"/>
+    <rect x="930" y="472" width="260" height="44" rx="22" fill="#FFFFFF" stroke="none"/>
+    <text x="1060" y="501" font-size="21" fill="#23765E" text-anchor="middle" font-weight="600">Secrets stay here</text></g>
+    <svg x="604" y="354" width="72" height="72" viewBox="0 0 24 24" fill="none" stroke="#23765E" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+  <title>Server</title>
+  <rect width="20" height="8" x="2" y="2" rx="2" ry="2" />
+  <rect width="20" height="8" x="2" y="14" rx="2" ry="2" />
+  <line x1="6" x2="6.01" y1="6" y2="6" />
+  <line x1="6" x2="6.01" y1="18" y2="18" />
+</svg><text x="640" y="467" font-size="24" fill="#173F37" text-anchor="middle" font-weight="600">Encrypted relay</text>
+    <text x="640" y="505" font-size="20" fill="#63766E" text-anchor="middle" font-weight="400">Ciphertext only</text>
+    <text x="250" y="579" font-size="20" fill="#63766E" text-anchor="start" font-weight="400">User-signed</text><text x="1090" y="579" font-size="20" fill="#63766E" text-anchor="start" font-weight="400">User-signed</text>
+    <rect x="360" y="598" width="560" height="94" rx="20" fill="#EFEFFA" stroke="none"/>
+    <svg x="384" y="625" width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="#555A93" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+  <title>Wallet</title>
+  <path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1" />
+  <path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4" />
+</svg>
+    <text x="655" y="634" font-size="24" fill="#555A93" text-anchor="middle" font-weight="600">Ethereum Sepolia</text>
+    <text x="655" y="670" font-size="22" fill="#173F37" text-anchor="middle" font-weight="400">Test deposits</text><text x="60" y="735" font-size="18" fill="#63766E" text-anchor="start" font-weight="400">Illustration only · Two-party ZK and private settlement are unverified.</text>
+  </svg></div>
+        <div class="controls">
+          <button id="play" type="button" aria-pressed="false">Play</button>
+          <button id="replay" type="button">Replay</button>
+          <input id="position" type="range" min="0" max="32" step="0.05" value="0" aria-label="Playback position" />
+          <output id="clock" for="position">00 / 32s</output>
+        </div>
+      </section>
+      <nav id="chapters" aria-label="Story chapters"></nav>
+      <p id="caption" aria-live="polite"></p>
+      <p id="mobile-summary"></p>
+      <p id="note"></p>
+      <noscript><p>This is a proposed design. JavaScript enables playback. <a href="architecture-en.drawio.png">Open the static overview</a>.</p></noscript>
+      <footer>
+        <a href="mentor-brief.md" data-copy="brief">Mentor talking points</a>
+        <a href="architecture.md" data-copy="details">Architecture details</a>
+        <a href="architecture-en.drawio.png" data-copy="still">Static overview</a>
+      </footer>
+    </main>
+    <!-- Lucide / Feather icons
+ISC License
+
+Copyright (c) 2026 Lucide Icons and Contributors
+
+Permission to use, copy, modify, and/or distribute this software for any
+purpose with or without fee is hereby granted, provided that the above
+copyright notice and this permission notice appear in all copies.
+
+THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+
+—-
+
+The following Lucide icons are derived from the Feather project:
+
+airplay, alert-circle, alert-octagon, alert-triangle, aperture, arrow-down-circle, arrow-down-left, arrow-down-right, arrow-down, arrow-left-circle, arrow-left, arrow-right-circle, arrow-right, arrow-up-circle, arrow-up-left, arrow-up-right, arrow-up, at-sign, calendar, cast, check, chevron-down, chevron-left, chevron-right, chevron-up, chevrons-down, chevrons-left, chevrons-right, chevrons-up, circle, clipboard, clock, code, columns, command, compass, corner-down-left, corner-down-right, corner-left-down, corner-left-up, corner-right-down, corner-right-up, corner-up-left, corner-up-right, crosshair, database, divide-circle, divide-square, dollar-sign, download, external-link, feather, frown, hash, headphones, help-circle, info, italic, key, layout, life-buoy, link-2, link, loader, lock, log-in, log-out, maximize, meh, minimize, minimize-2, minus-circle, minus-square, minus, monitor, moon, more-horizontal, more-vertical, move, music, navigation-2, navigation, octagon, pause-circle, percent, plus-circle, plus-square, plus, power, radio, rss, search, server, share, shopping-bag, sidebar, smartphone, smile, square, table-2, tablet, target, terminal, trash-2, trash, triangle, tv, type, upload, x-circle, x-octagon, x-square, x, zoom-in, zoom-out
+
+The MIT License (MIT) (for the icons listed above)
+
+Copyright (c) 2013-present Cole Bemis
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+-->
+    <script>const duration = 32;
+const starts = [0, 7, 14, 23];
+const copy = {
+  en: {
+    name: "Private Dating",
+    tagline: "Find a connection. Keep your profile private.",
+    steps: [
+      "Keep it private",
+      "Register publicly",
+      "Find common ground",
+      "Agree & settle",
+    ],
+    titles: [
+      "Your profile stays with you.",
+      "A public name. A private profile.",
+      "Share the proof, not your interests.",
+      "Two people agree. The contract follows.",
+    ],
+    captions: [
+      "Each browser keeps its own secrets. A test deposit starts the registration flow.",
+      "ENS provides a pseudonym. Arkiv stores the public registration, not the private profile.",
+      "Encrypted messages pass through a relay. Only the two people learn whether interests overlap.",
+      "A match needs both deposits locked. Settlement needs agreement; timeout refunds remain available.",
+    ],
+    browser: "Own browser",
+    private: "Private profile",
+    local: "Secrets stay here",
+    public: "Public registration",
+    names: "Pseudonyms",
+    records: "Public records",
+    relay: "Encrypted relay",
+    proof: "Ciphertext only",
+    overlap: "Shared interest",
+    accept: "Accepted",
+    matched: "Match confirmed",
+    checking: "Checking privately",
+    deposit: "Test deposits",
+    confirmed: "Deposits confirmed",
+    lock: "Locking both deposits",
+    locked: "Both deposits locked",
+    refund: "Agreed settlement / timeout refund",
+    contract: "Ethereum Sepolia",
+    signing: "User-signed",
+    draft: "Concept replay",
+    footer:
+      "Illustration only · Two-party ZK and private settlement are unverified.",
+    play: "Play",
+    pause: "Pause",
+    replay: "Replay",
+    language: "Language",
+    timeline: "Playback position",
+    note: "A proposed flow, not a live product demo. No wallet connection or transaction.",
+    details: "Architecture details",
+    brief: "Mentor talking points",
+    still: "Static overview",
+    mobile:
+      "The public record never contains the private profile. The relay carries ciphertext; the contract controls deposits.",
+  },
+  ja: {
+    name: "Private Dating",
+    tagline: "プロフィールは秘密に。共通の趣味でつながる。",
+    steps: ["秘密を手元に", "公開登録", "共通点を確かめる", "合意と精算"],
+    titles: [
+      "プロフィールは、自分の端末に。",
+      "名前は公開。プロフィールは秘密。",
+      "趣味そのものではなく、証明を送る。",
+      "二人の合意を、コントラクトで確定。",
+    ],
+    captions: [
+      "秘密はそれぞれのブラウザに保持。テスト資金の預託から登録を始めます。",
+      "ENSは仮名を、Arkivは公開登録を担当。私的なプロフィールは保存しません。",
+      "暗号文を中継し、共通の趣味があるかだけを二人の端末で確かめます。",
+      "双方の預託を拘束してからマッチ成立。合意精算と期限返却をコントラクトで扱います。",
+    ],
+    browser: "本人のブラウザ",
+    private: "非公開プロフィール",
+    local: "秘密はこの端末内",
+    public: "公開登録",
+    names: "仮名",
+    records: "公開記録",
+    relay: "暗号文の中継",
+    proof: "暗号文だけを配送",
+    overlap: "共通の趣味あり",
+    accept: "招待を承諾",
+    matched: "マッチ成立",
+    checking: "非公開で照合中",
+    deposit: "テスト資金を預託",
+    confirmed: "預託確定",
+    lock: "双方の預託を拘束中",
+    locked: "双方の拘束が確定",
+    refund: "合意による精算 / 期限返却",
+    contract: "Ethereum Sepolia",
+    signing: "本人の署名",
+    draft: "構想のアニメーション",
+    footer: "設計を説明するイメージです。二者のZK照合・秘匿精算は未検証。",
+    play: "再生",
+    pause: "一時停止",
+    replay: "最初から",
+    language: "言語",
+    timeline: "再生位置",
+    note: "目標設計を説明するアニメーションです。ウォレット接続や実際の取引は行いません。",
+    details: "設計の詳細",
+    brief: "メンターへの紹介文",
+    still: "静止画を見る",
+    mobile:
+      "公開記録に私的なプロフィールは含めません。APIは暗号文を中継し、資金はコントラクトが管理します。",
+  },
+};
+
+const colors = {
+  ink: "#173F37",
+  green: "#23765E",
+  muted: "#63766E",
+  line: "#CEDDD5",
+  soft: "#EDF6F0",
+  white: "#FFFFFF",
+  lilac: "#EFEFFA",
+  violet: "#555A93",
+};
+const escapeText = (value) =>
+  String(value)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll('"', "&quot;");
+const text = (
+  x,
+  y,
+  value,
+  size = 24,
+  color = colors.ink,
+  anchor = "middle",
+  weight = 400,
+) =>
+  `<text x="${x}" y="${y}" font-size="${size}" fill="${color}" text-anchor="${anchor}" font-weight="${weight}">${escapeText(value)}</text>`;
+const rect = (x, y, width, height, fill, radius = 16, stroke = "none") =>
+  `<rect x="${x}" y="${y}" width="${width}" height="${height}" rx="${radius}" fill="${fill}" stroke="${stroke}"/>`;
+
+/** Return the active chapter for the bounded presentation clock. */
+function getStage(seconds) {
+  return starts.filter((start) => seconds >= start).length - 1;
+}
+
+function drawIcon(name, x, y, size, icons, color = colors.green) {
+  return `<svg x="${x}" y="${y}" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${icons[name]}</svg>`;
+}
+
+function drawRoute(points, active, seconds, reverse = false) {
+  const path = points
+    .map(([x, y], index) => `${index ? "L" : "M"}${x} ${y}`)
+    .join(" ");
+  const line = `<path d="${path}" fill="none" stroke="${active ? colors.green : colors.line}" stroke-width="${active ? 3 : 2}" stroke-linejoin="round"/>`;
+  if (!active) return line;
+  const segments = points.slice(1).map((point, index) => ({
+    from: points[index],
+    to: point,
+    length: Math.hypot(
+      point[0] - points[index][0],
+      point[1] - points[index][1],
+    ),
+  }));
+  const total = segments.reduce((sum, segment) => sum + segment.length, 0);
+  const travel = (((seconds * 0.35) % 1) + 1) % 1;
+  const state = { distance: (reverse ? 1 - travel : travel) * total };
+  const segment =
+    segments.find((item) => {
+      if (state.distance <= item.length) return true;
+      state.distance -= item.length;
+      return false;
+    }) || segments.at(-1);
+  const ratio = Math.min(1, state.distance / segment.length);
+  const x = segment.from[0] + (segment.to[0] - segment.from[0]) * ratio;
+  const y = segment.from[1] + (segment.to[1] - segment.from[1]) * ratio;
+  return `${line}<circle cx="${x}" cy="${y}" r="9" fill="${colors.white}" stroke="${colors.green}" stroke-width="3"/>`;
+}
+
+function getPersonStatus(stage, elapsed, t) {
+  if (stage < 2) return t.local;
+  if (stage === 2) return elapsed > 4 ? t.overlap : t.checking;
+  return elapsed < 3 ? t.accept : t.matched;
+}
+
+function drawPerson(x, identity, stage, elapsed, t, icons) {
+  const active = stage !== 1;
+  const confirmed = (stage === 2 && elapsed > 4) || stage === 3;
+  const status = getPersonStatus(stage, elapsed, t);
+  const masks = [0, 1, 2]
+    .map(
+      (index) =>
+        `${rect(x + 30, 363 + index * 30, 155 - index * 18, 10, "#CCDCD2", 5)}${rect(x + 205, 363 + index * 30, 44, 10, "#E1EAE4", 5)}`,
+    )
+    .join("");
+  return `<g>${rect(x, 240, 300, 300, active ? colors.soft : "#F5F7F5", 24, active ? "#A8CBB5" : colors.line)}
+    ${drawIcon("smartphone", x + 26, 267, 36, icons)}${text(x + 83, 295, identity, 28, colors.ink, "start", 600)}
+    ${text(x + 150, 338, t.private, 22, colors.muted)}${masks}
+    ${rect(x + 20, 472, 260, 44, confirmed ? colors.green : colors.white, 22)}
+    ${text(x + 150, 501, status, 21, confirmed ? colors.white : colors.green, "middle", 600)}</g>`;
+}
+
+function drawRegistry(t, stage, icons) {
+  const fill = stage === 1 ? colors.soft : "#F8FAF8";
+  return `${rect(440, 228, 180, 88, fill)}${rect(660, 228, 180, 88, fill)}
+    ${drawIcon("at-sign", 458, 247, 30, icons)}${text(536, 268, "ENS", 25, colors.ink, "middle", 600)}
+    ${text(530, 299, t.names, 20, colors.muted)}
+    ${drawIcon("database", 677, 247, 30, icons)}${text(757, 268, "Arkiv", 25, colors.ink, "middle", 600)}
+    ${text(750, 299, t.records, 20, colors.muted)}`;
+}
+
+function getFundStatus(stage, elapsed, t) {
+  if (stage === 0) return t.deposit;
+  if (stage < 3) return t.confirmed;
+  if (elapsed < 3) return t.lock;
+  return elapsed < 6 ? t.locked : t.refund;
+}
+
+function drawFunds(stage, elapsed, t, icons) {
+  return `${rect(360, 598, 560, 94, stage === 0 || stage === 3 ? colors.lilac : "#F8F8FC", 20)}
+    ${drawIcon("wallet", 384, 625, 38, icons, colors.violet)}
+    ${text(655, 634, t.contract, 24, colors.violet, "middle", 600)}
+    ${text(655, 670, getFundStatus(stage, elapsed, t), 22, colors.ink)}`;
+}
+
+const routePaths = {
+  left: [
+    [370, 390],
+    [594, 390],
+  ],
+  right: [
+    [686, 390],
+    [910, 390],
+  ],
+  ens: [
+    [615, 354],
+    [615, 335],
+    [530, 335],
+    [530, 316],
+  ],
+  arkiv: [
+    [665, 354],
+    [665, 335],
+    [750, 335],
+    [750, 316],
+  ],
+  fundsA: [
+    [220, 540],
+    [220, 645],
+    [360, 645],
+  ],
+  fundsB: [
+    [1060, 540],
+    [1060, 645],
+    [920, 645],
+  ],
+};
+
+function drawRoutes(stage, elapsed) {
+  const isProofActive = stage === 2 && elapsed < 4;
+  const isFundActive = stage === 0 || (stage === 3 && elapsed < 3);
+  const shouldReverse = Math.floor(elapsed / 2) % 2 === 1;
+  return [
+    drawRoute(routePaths.left, isProofActive, elapsed, shouldReverse),
+    drawRoute(routePaths.right, isProofActive, elapsed, shouldReverse),
+    drawRoute(routePaths.ens, stage === 1, elapsed),
+    drawRoute(routePaths.arkiv, stage === 1, elapsed, true),
+    drawRoute(routePaths.fundsA, isFundActive, elapsed),
+    drawRoute(routePaths.fundsB, isFundActive, elapsed),
+  ].join("");
+}
+
+/** Render a deterministic illustration. It makes no network or wallet calls. */
+function renderFrame(seconds, language, icons) {
+  const time = Math.min(duration - 0.001, Math.max(0, seconds));
+  const stage = getStage(time);
+  const elapsed = time - starts[stage];
+  const t = copy[language];
+  const routes = drawRoutes(stage, elapsed);
+  const progress = starts
+    .map((_start, index) =>
+      rect(
+        60 + index * 294,
+        190,
+        280,
+        5,
+        stage >= index ? colors.green : "#E6EDE8",
+        2,
+      ),
+    )
+    .join("");
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="760" viewBox="0 0 1280 760" role="img" aria-label="${escapeText(t.titles[stage])}" style="font-family:Arial,'Hiragino Sans',sans-serif">
+    <title>${escapeText(t.titles[stage])}</title><desc>${escapeText(t.captions[stage])}</desc>
+    ${rect(0, 0, 1280, 760, colors.white, 0)}
+    ${text(60, 49, "Private Dating", 24, colors.green, "start", 600)}${text(1220, 49, t.draft, 20, colors.muted, "end")}
+    ${text(60, 111, t.titles[stage], language === "ja" ? 36 : 39, colors.ink, "start", 600)}
+    ${text(60, 158, t.captions[stage], 21, colors.muted, "start")}${progress}
+    ${routes}${drawRegistry(t, stage, icons)}
+    ${drawPerson(70, "A", stage, elapsed, t, icons)}${drawPerson(910, "B", stage, elapsed, t, icons)}
+    ${drawIcon("server", 604, 354, 72, icons)}${text(640, 467, t.relay, 24, colors.ink, "middle", 600)}
+    ${text(640, 505, t.proof, 20, colors.muted)}
+    ${text(250, 579, t.signing, 20, colors.muted, "start")}${text(1090, 579, t.signing, 20, colors.muted, "start")}
+    ${drawFunds(stage, elapsed, t, icons)}${text(60, 735, t.footer, 18, colors.muted, "start")}
+  </svg>`;
+}
+
+const icons = {"smartphone":"\n  <title>Smartphone</title>\n  <rect width=\"14\" height=\"20\" x=\"5\" y=\"2\" rx=\"2\" ry=\"2\" />\n  <path d=\"M12 18h.01\" />\n","server":"\n  <title>Server</title>\n  <rect width=\"20\" height=\"8\" x=\"2\" y=\"2\" rx=\"2\" ry=\"2\" />\n  <rect width=\"20\" height=\"8\" x=\"2\" y=\"14\" rx=\"2\" ry=\"2\" />\n  <line x1=\"6\" x2=\"6.01\" y1=\"6\" y2=\"6\" />\n  <line x1=\"6\" x2=\"6.01\" y1=\"18\" y2=\"18\" />\n","at-sign":"\n  <title>At Sign</title>\n  <circle cx=\"12\" cy=\"12\" r=\"4\" />\n  <path d=\"M16 8v5a3 3 0 0 0 6 0v-1a10 10 0 1 0-4 8\" />\n","database":"\n  <title>Database</title>\n  <ellipse cx=\"12\" cy=\"5\" rx=\"9\" ry=\"3\" />\n  <path d=\"M3 5V19A9 3 0 0 0 21 19V5\" />\n  <path d=\"M3 12A9 3 0 0 0 21 12\" />\n","wallet":"\n  <title>Wallet</title>\n  <path d=\"M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1\" />\n  <path d=\"M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4\" />\n"};
+const elements = Object.fromEntries(
+  [
+    "stage",
+    "play",
+    "replay",
+    "position",
+    "clock",
+    "caption",
+    "chapters",
+    "note",
+    "mobile-summary",
+  ].map((id) => [id, document.getElementById(id)]),
+);
+const preferences = window.matchMedia("(prefers-reduced-motion: reduce)");
+const initialLanguage =
+  new URLSearchParams(window.location.search).get("lang") === "ja"
+    ? "ja"
+    : "en";
+const state = {
+  language: initialLanguage,
+  time: 0,
+  isPlaying: !preferences.matches,
+  previous: 0,
+  lastPaint: 0,
+  renderedTime: -1,
+  stage: -1,
+};
+
+function updateControls() {
+  const t = copy[state.language];
+  elements.play.textContent = state.isPlaying
+    ? t.pause
+    : state.time >= duration
+      ? t.replay
+      : t.play;
+  elements.play.setAttribute("aria-pressed", String(state.isPlaying));
+  elements.replay.textContent = t.replay;
+  elements.position.value = state.time;
+  elements.position.setAttribute("aria-label", t.timeline);
+  elements.clock.textContent = `${Math.floor(state.time).toString().padStart(2, "0")} / 32s`;
+}
+
+function paintFrame() {
+  const stage = getStage(Math.min(state.time, duration - 0.001));
+  elements.stage.innerHTML = renderFrame(state.time, state.language, icons);
+  if (stage !== state.stage) {
+    elements.caption.textContent = copy[state.language].captions[stage];
+    for (const [index, button] of [...elements.chapters.children].entries())
+      button.setAttribute("aria-pressed", String(index === stage));
+    state.stage = stage;
+  }
+  state.renderedTime = state.time;
+  updateControls();
+}
+
+function selectChapter(index) {
+  state.time = starts[index] + 0.1;
+  state.isPlaying = false;
+  paintFrame();
+}
+
+function selectLanguage(language) {
+  state.language = language;
+  state.stage = -1;
+  document.documentElement.lang = language;
+  document.getElementById("tagline").textContent = copy[language].tagline;
+  elements.chapters.replaceChildren(
+    ...copy[language].steps.map((label, index) => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.textContent = `${index + 1}. ${label}`;
+      button.addEventListener("click", () => selectChapter(index));
+      return button;
+    }),
+  );
+  for (const button of document.querySelectorAll("[data-language]"))
+    button.setAttribute(
+      "aria-pressed",
+      String(button.dataset.language === language),
+    );
+  for (const link of document.querySelectorAll("[data-copy]"))
+    link.textContent = copy[language][link.dataset.copy];
+  elements.note.textContent = copy[language].note;
+  elements["mobile-summary"].textContent = copy[language].mobile;
+  paintFrame();
+}
+
+function togglePlayback() {
+  if (state.time >= duration) state.time = 0;
+  state.isPlaying = !state.isPlaying;
+  state.previous = performance.now();
+  paintFrame();
+}
+
+function advanceClock(now) {
+  if (state.isPlaying && state.previous && !document.hidden)
+    state.time = Math.min(
+      duration,
+      state.time + Math.min(0.1, (now - state.previous) / 1000),
+    );
+  state.previous = now;
+  if (state.time >= duration) state.isPlaying = false;
+  if (now - state.lastPaint >= 1000 / 24) {
+    if (state.isPlaying || state.renderedTime !== state.time) paintFrame();
+    state.lastPaint = now;
+  }
+  requestAnimationFrame(advanceClock);
+}
+
+elements.play.addEventListener("click", togglePlayback);
+elements.replay.addEventListener("click", () => {
+  state.time = 0;
+  state.isPlaying = true;
+  state.previous = performance.now();
+  paintFrame();
+});
+elements.position.addEventListener("input", () => {
+  state.time = Number(elements.position.value);
+  state.isPlaying = false;
+  paintFrame();
+});
+for (const button of document.querySelectorAll("[data-language]"))
+  button.addEventListener("click", () =>
+    selectLanguage(button.dataset.language),
+  );
+preferences.addEventListener("change", () => {
+  if (preferences.matches) {
+    state.isPlaying = false;
+    paintFrame();
+  }
+});
+document.addEventListener("visibilitychange", () => {
+  state.previous = performance.now();
+});
+selectLanguage(initialLanguage);
+requestAnimationFrame(advanceClock);
+</script>
+  </body>
+</html>

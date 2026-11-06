@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900">
+<title>Private Dating システム構成図</title>
+<metadata>ISC License
+
+Copyright (c) 2026 Lucide Icons and Contributors
+
+Permission to use, copy, modify, and/or distribute this software for any
+purpose with or without fee is hereby granted, provided that the above
+copyright notice and this permission notice appear in all copies.
+
+THE SOFTWARE IS PROVIDED &quot;AS IS&quot; AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+
+---
+
+The following Lucide icons are derived from the Feather project:
+
+airplay, alert-circle, alert-octagon, alert-triangle, aperture, arrow-down-circle, arrow-down-left, arrow-down-right, arrow-down, arrow-left-circle, arrow-left, arrow-right-circle, arrow-right, arrow-up-circle, arrow-up-left, arrow-up-right, arrow-up, at-sign, calendar, cast, check, chevron-down, chevron-left, chevron-right, chevron-up, chevrons-down, chevrons-left, chevrons-right, chevrons-up, circle, clipboard, clock, code, columns, command, compass, corner-down-left, corner-down-right, corner-left-down, corner-left-up, corner-right-down, corner-right-up, corner-up-left, corner-up-right, crosshair, database, divide-circle, divide-square, dollar-sign, download, external-link, feather, frown, hash, headphones, help-circle, info, italic, key, layout, life-buoy, link-2, link, loader, lock, log-in, log-out, maximize, meh, minimize, minimize-2, minus-circle, minus-square, minus, monitor, moon, more-horizontal, more-vertical, move, music, navigation-2, navigation, octagon, pause-circle, percent, plus-circle, plus-square, plus, power, radio, rss, search, server, share, shopping-bag, sidebar, smartphone, smile, square, table-2, tablet, target, terminal, trash-2, trash, triangle, tv, type, upload, x-circle, x-octagon, x-square, x, zoom-in, zoom-out
+
+The MIT License (MIT) (for the icons listed above)
+
+Copyright (c) 2013-present Cole Bemis
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the &quot;Software&quot;), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+</metadata>
+<defs><marker id="arrow" markerWidth="14" markerHeight="14" refX="11" refY="7" orient="auto-start-reverse" markerUnits="userSpaceOnUse"><path d="M2 2 L11 7 L2 12" fill="none" stroke="#7B9289" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+<rect x="0" y="0" width="1600" height="900" fill="#FFFFFF"/>
+<text id="eyebrow" x="70" y="68" text-anchor="start" fill="#15725A" font-family="Hiragino Sans, Arial, sans-serif" font-size="21" font-weight="600">PRIVATE DATING / MENTOR OVERVIEW</text>
+<text id="title" x="70" y="147" text-anchor="start" fill="#153B34" font-family="Hiragino Sans, Arial, sans-serif" font-size="43" font-weight="600">プロフィールは秘密に。共通の趣味でつながる。</text>
+<rect id="draft-pill" x="1350" y="34" width="180" height="52" rx="26" fill="#EDF5F1" stroke="none" stroke-width="1.5"/>
+<text id="draft" x="1440" y="69" text-anchor="middle" fill="#15725A" font-family="Hiragino Sans, Arial, sans-serif" font-size="22" font-weight="600">DRAFT</text>
+<rect id="private-boundary" x="70" y="245" width="520" height="350" rx="25" fill="#F1F8F4" stroke="#CEE3D6" stroke-width="1.5"/>
+<text id="device-label" x="330" y="295" text-anchor="middle" fill="#15725A" font-family="Hiragino Sans, Arial, sans-serif" font-size="28" font-weight="600">それぞれのブラウザ</text>
+<image id="device-a" x="195" y="330" width="84" height="84" href="data:image/svg+xml;base64,PHN2ZwogIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIKICB3aWR0aD0iMjQiCiAgaGVpZ2h0PSIyNCIKICB2aWV3Qm94PSIwIDAgMjQgMjQiCiAgZmlsbD0ibm9uZSIKICBzdHJva2U9IiMxNTcyNUEiCiAgc3Ryb2tlLXdpZHRoPSIxLjQiCiAgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIgogIHN0cm9rZS1saW5lam9pbj0icm91bmQiCj4KICA8cmVjdCB3aWR0aD0iMTQiIGhlaWdodD0iMjAiIHg9IjUiIHk9IjIiIHJ4PSIyIiByeT0iMiIgLz4KICA8cGF0aCBkPSJNMTIgMThoLjAxIiAvPgo8L3N2Zz4K"/>
+<image id="device-b" x="381" y="330" width="84" height="84" href="data:image/svg+xml;base64,PHN2ZwogIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIKICB3aWR0aD0iMjQiCiAgaGVpZ2h0PSIyNCIKICB2aWV3Qm94PSIwIDAgMjQgMjQiCiAgZmlsbD0ibm9uZSIKICBzdHJva2U9IiMxNTcyNUEiCiAgc3Ryb2tlLXdpZHRoPSIxLjQiCiAgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIgogIHN0cm9rZS1saW5lam9pbj0icm91bmQiCj4KICA8cmVjdCB3aWR0aD0iMTQiIGhlaWdodD0iMjAiIHg9IjUiIHk9IjIiIHJ4PSIyIiByeT0iMiIgLz4KICA8cGF0aCBkPSJNMTIgMThoLjAxIiAvPgo8L3N2Zz4K"/>
+<text id="alice" x="237" y="455" text-anchor="middle" fill="#153B34" font-family="Hiragino Sans, Arial, sans-serif" font-size="25" font-weight="400">端末 A</text>
+<text id="bob" x="423" y="455" text-anchor="middle" fill="#153B34" font-family="Hiragino Sans, Arial, sans-serif" font-size="25" font-weight="400">端末 B</text>
+<text id="private-label" x="330" y="537" text-anchor="middle" fill="#15725A" font-family="Hiragino Sans, Arial, sans-serif" font-size="26" font-weight="600">秘密は端末内。ZKで相性を検証</text>
+<polyline id="encrypted-relay" points="615,380 765,380" fill="none" stroke="#7B9289" stroke-width="2.5" stroke-linejoin="round" marker-end="url(#arrow)" marker-start="url(#arrow)"/>
+<text id="message-label" x="690" y="345" text-anchor="middle" fill="#5D6D68" font-family="Hiragino Sans, Arial, sans-serif" font-size="23" font-weight="400">暗号文</text>
+<image id="relay" x="793" y="336" width="84" height="84" href="data:image/svg+xml;base64,PHN2ZwogIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIKICB3aWR0aD0iMjQiCiAgaGVpZ2h0PSIyNCIKICB2aWV3Qm94PSIwIDAgMjQgMjQiCiAgZmlsbD0ibm9uZSIKICBzdHJva2U9IiMxNTcyNUEiCiAgc3Ryb2tlLXdpZHRoPSIxLjQiCiAgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIgogIHN0cm9rZS1saW5lam9pbj0icm91bmQiCj4KICA8cmVjdCB3aWR0aD0iMjAiIGhlaWdodD0iOCIgeD0iMiIgeT0iMiIgcng9IjIiIHJ5PSIyIiAvPgogIDxyZWN0IHdpZHRoPSIyMCIgaGVpZ2h0PSI4IiB4PSIyIiB5PSIxNCIgcng9IjIiIHJ5PSIyIiAvPgogIDxsaW5lIHgxPSI2IiB4Mj0iNi4wMSIgeTE9IjYiIHkyPSI2IiAvPgogIDxsaW5lIHgxPSI2IiB4Mj0iNi4wMSIgeTE9IjE4IiB5Mj0iMTgiIC8+Cjwvc3ZnPgo="/>
+<text id="relay-label" x="835" y="468" text-anchor="middle" fill="#153B34" font-family="Hiragino Sans, Arial, sans-serif" font-size="26" font-weight="400">認証・暗号文の中継</text>
+<polyline id="ens-call" points="905,355 1080,355 1080,282 1215,282" fill="none" stroke="#7B9289" stroke-width="2.5" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<polyline id="arkiv-call" points="905,395 1080,395 1080,517 1215,517" fill="none" stroke="#7B9289" stroke-width="2.5" stroke-linejoin="round" marker-end="url(#arrow)" marker-start="url(#arrow)"/>
+<image id="ens" x="1252" y="240" width="84" height="84" href="data:image/svg+xml;base64,PHN2ZwogIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIKICB3aWR0aD0iMjQiCiAgaGVpZ2h0PSIyNCIKICB2aWV3Qm94PSIwIDAgMjQgMjQiCiAgZmlsbD0ibm9uZSIKICBzdHJva2U9IiMxNTcyNUEiCiAgc3Ryb2tlLXdpZHRoPSIxLjQiCiAgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIgogIHN0cm9rZS1saW5lam9pbj0icm91bmQiCj4KICA8Y2lyY2xlIGN4PSIxMiIgY3k9IjEyIiByPSI0IiAvPgogIDxwYXRoIGQ9Ik0xNiA4djVhMyAzIDAgMCAwIDYgMHYtMWExMCAxMCAwIDEgMC00IDgiIC8+Cjwvc3ZnPgo="/>
+<text id="ens-label" x="1294" y="376" text-anchor="middle" fill="#153B34" font-family="Hiragino Sans, Arial, sans-serif" font-size="27" font-weight="400">ENS · 仮名と登録権限</text>
+<image id="arkiv" x="1252" y="475" width="84" height="84" href="data:image/svg+xml;base64,PHN2ZwogIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIKICB3aWR0aD0iMjQiCiAgaGVpZ2h0PSIyNCIKICB2aWV3Qm94PSIwIDAgMjQgMjQiCiAgZmlsbD0ibm9uZSIKICBzdHJva2U9IiMxNTcyNUEiCiAgc3Ryb2tlLXdpZHRoPSIxLjQiCiAgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIgogIHN0cm9rZS1saW5lam9pbj0icm91bmQiCj4KICA8ZWxsaXBzZSBjeD0iMTIiIGN5PSI1IiByeD0iOSIgcnk9IjMiIC8+CiAgPHBhdGggZD0iTTMgNVYxOUE5IDMgMCAwIDAgMjEgMTlWNSIgLz4KICA8cGF0aCBkPSJNMyAxMkE5IDMgMCAwIDAgMjEgMTIiIC8+Cjwvc3ZnPgo="/>
+<text id="arkiv-label" x="1294" y="611" text-anchor="middle" fill="#153B34" font-family="Hiragino Sans, Arial, sans-serif" font-size="27" font-weight="400">Arkiv · 公開登録</text>
+<polyline id="user-signed" points="330,615 330,690" fill="none" stroke="#7B9289" stroke-width="2.5" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<text id="sign-label" x="360" y="659" text-anchor="start" fill="#5D6D68" font-family="Hiragino Sans, Arial, sans-serif" font-size="23" font-weight="400">本人が署名</text>
+<image id="ethereum" x="294" y="718" width="72" height="72" href="data:image/svg+xml;base64,PHN2ZwogIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIKICB3aWR0aD0iMjQiCiAgaGVpZ2h0PSIyNCIKICB2aWV3Qm94PSIwIDAgMjQgMjQiCiAgZmlsbD0ibm9uZSIKICBzdHJva2U9IiMxNTcyNUEiCiAgc3Ryb2tlLXdpZHRoPSIxLjQiCiAgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIgogIHN0cm9rZS1saW5lam9pbj0icm91bmQiCj4KICA8cGF0aCBkPSJNMTkgN1Y0YTEgMSAwIDAgMC0xLTFINWEyIDIgMCAwIDAgMCA0aDE1YTEgMSAwIDAgMSAxIDF2NGgtM2EyIDIgMCAwIDAgMCA0aDNhMSAxIDAgMCAwIDEtMXYtMmExIDEgMCAwIDAtMS0xIiAvPgogIDxwYXRoIGQ9Ik0zIDV2MTRhMiAyIDAgMCAwIDIgMmgxNWExIDEgMCAwIDAgMS0xdi00IiAvPgo8L3N2Zz4K"/>
+<text id="ethereum-label" x="415" y="741" text-anchor="start" fill="#153B34" font-family="Hiragino Sans, Arial, sans-serif" font-size="29" font-weight="600">Ethereum Sepolia</text>
+<text id="funds-label" x="415" y="786" text-anchor="start" fill="#5D6D68" font-family="Hiragino Sans, Arial, sans-serif" font-size="25" font-weight="400">預託 → 合意精算 / 期限返却</text>
+<text id="status" x="70" y="861" text-anchor="start" fill="#5D6D68" font-family="Hiragino Sans, Arial, sans-serif" font-size="20" font-weight="400">設計案：二者照合・秘匿精算はこれから検証</text>
+</svg>
