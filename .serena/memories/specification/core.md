@@ -10,10 +10,12 @@
 - Prize evidence tasks: T032 Arkiv, T034 ENS (first technical gate), T035 EF, T036 final per-prize decision. Existing T001–T036 IDs are preserved; additions extend the list. Specification-quality checkboxes do not mean live integrations or submission are complete.
 - Cryptographic matching across independent clients and private atomic settlement/recovery are feasibility gates in the plan. Do not equate mocks or registration proofs with complete private matching/settlement.
 - HTTP design Markdown has not yet been populated into `packages/api-specs/openapi.yaml`. Shared implementation belongs in `packages/shared`.
-- Python submodule's simulation plan is separate; no integration may be inferred from its presence. See `mem:python_runtime/core`.
+- Optional US3 now adopts the standalone Persona-conversation AIBot, not two-human shared turns. Parent identity/match/date-request integration remains unverified. See `mem:aibot/core` and contracts/simulation.md. AI consent/data are separate from matching secrets.
 
 ## Local Spec Kit behavior
 - Read `.specify/init-options.json` and `integration.json` for installed version/integrations; existing initialization records v1.0.3 and Claude. A Codex manifest alone does not establish registration.
 - `.specify/scripts/bash/common.sh` resolves feature directory from `SPECIFY_FEATURE_DIRECTORY`, then `.specify/feature.json`; it does not infer from the Git branch.
 - `.specify/feature.json` is local/ignored and absent in a fresh clone. Explicit existing target: `SPECIFY_FEATURE_DIRECTORY=specs/001-private-dating`.
 - Do not regenerate spec/plan/tasks or ratify the constitution merely to review project status.
+
+- Arkiv booth follow-up: 120-second live pitch, value-first UI (`docs/demo-script.md`). T043 tracks UI/clarity, T044 conditionally integrates public scene assets using Arkiv + Swarm. Bonus is an additional Arkiv award, not a fourth provider; keep AI private data off public storage. All original task IDs retained, completion gates still apply.

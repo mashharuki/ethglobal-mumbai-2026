@@ -6,7 +6,7 @@ Always reply to the user in **Japanese**.
 ## Project status
 
 - Hackathon project for **ETHGlobal Mumbai 2026**.
-- An existing **private dating / matching proposal** lives in `specs/001-private-dating/`. Specifications and implementation plans exist; frontend/backend and the Counter contract remain templates. A written requirement is not implemented behavior.
+- An existing **private dating / matching proposal** lives in `specs/001-private-dating/`. Parent frontend/backend and Counter remain templates. The AIBot submodule has a standalone Persona conversation implementation; parent authentication/matching integration is unverified. A written requirement is not implemented behavior.
 - The specification remains **Draft** and `.specify/memory/constitution.md` is an unratified template. Ethereum Foundation, ENS and Arkiv are confirmed prize targets; this does not imply that the whole specification is approved or the prize requirements are met.
 - **Do not generate or modify Spec Kit artifacts** (`speckit-*`, `.specify/`, `specs/`) unless the user asks for specification work. A status review may read them without starting a workflow.
 
@@ -27,23 +27,24 @@ Always reply to the user in **Japanese**.
 | `apps/contract` | Counter sample, Solidity + TS tests, Ignition | Hardhat 3, viem, Solidity 0.8.37, TypeScript 6 |
 | `packages/api-specs` | API contract (`openapi.yaml`, empty for now) | OpenAPI |
 | `packages/shared` | Shared TS code (empty for now) | TypeScript |
-| `ETH-Global-Mumbai-2026-P/` | **Python runtime (git submodule)** | Python, see below |
+| `ethglobal-mumbai-2026-AIBot/` | **Independent AI simulation app (git submodule)** | Next.js, React, TypeScript; its own npm project |
 | `specs/001-private-dating/` | Existing proposal, design and implementation tasks | Spec Kit Markdown artifacts |
 | `.claude/rules/` | Authoritative coding / git / testing / security rules | — |
 | `.claude/skills/`, `.agents/skills/` | Project skills; discover availability before invoking | — |
 
 Tooling: pnpm 11 workspaces (`apps/*`, `packages/*`) + Turborepo 2 + Biome 2.5 + knip + jscpd. Node 24.
 
-## Python runtime submodule: `ETH-Global-Mumbai-2026-P/`
+## AI simulation submodule: `ethglobal-mumbai-2026-AIBot/`
 
-Python runtime work is planned in a separate repository, mounted here as a git submodule:
-`https://github.com/Jun0908/ETH-Global-Mumbai-2026-P` (owned by a teammate).
+The teammate-owned repository is `https://github.com/Jun0908/ethglobal-mumbai-2026-AIBot.git`. It contains LOVE MATCH MASALA, a standalone Next.js / React / TypeScript app for approved Persona conversations.
 
-- It is **not** part of the pnpm workspace, Turborepo, or Biome. Never apply JS tooling there, and never add Python code under `apps/` or `packages/`.
-- Its tracked content is setup/plan documentation. `Task.md` (IDs like `T01.01`) proposes a MuJoCo/Cosmos simulation platform; `SETUP.md` covers human setup. This is a separate teammate-owned plan, not the private-dating specification. Do not assume the two plans are integrated.
-- To change it: commit and push **inside the submodule first** (`git -C ETH-Global-Mumbai-2026-P ...`), then commit the updated submodule pointer in this repo. Ask before pushing to the teammate's repo.
-- After a fresh clone: `git submodule update --init --recursive`.
-- Its `.env` holds secrets. Never read, print, or commit it.
+- It is **not** a parent pnpm workspace or Turbo package. Use its own `AGENTS.md`, npm lockfile and scripts when work there is authorized; never run parent-wide formatters over it or copy it into `apps/`.
+- Source-level implementation and author-reported tests exist. Parent PSI/authentication, real date requests and external publication are separate integration gates. Read its `README.md` and `docs/MATCHING_ADAPTER.md`; the parent contract is `specs/001-private-dating/contracts/simulation.md`.
+- The user adopted Persona conversation as optional P2. The old two-human shared World Model and the old Python/MuJoCo/Cosmos plan are not the current implementation target.
+- Keep matching secrets on the client. Persona/interview/conversation data use a separate AI consent flow and are processed by the AIBot/AI provider. At-rest encryption is not E2EE.
+- Ask before submodule edits, pointer updates or pushes. Preserve an existing dirty gitlink as user work. A working checkout may be newer than the commit recorded by the parent.
+- For authorized edits, commit/push inside the submodule first, then record the new parent gitlink. Use `git -C ethglobal-mumbai-2026-AIBot ...`; after clone use `git submodule update --init --recursive`.
+- Never read, print or commit `.env*`, `.data/`, keys, Persona capsules or conversation data.
 
 ## Commands
 

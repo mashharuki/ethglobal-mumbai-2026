@@ -6,7 +6,13 @@
 
 [評判・没収・運営収益の検討記録](reputation-and-bond-proposal.md)から、根拠付きの資格停止・異議・回復と運営の罰金収入ゼロを採用した。マッチ用預託は各自への元本返却専用へ変更。独立保証金・新しい没収は未採用。現行仕様は[資格審査契約](../specs/001-private-dating/contracts/participation-review.md)を参照。
 
-## 最初に見せる32秒
+## 2分プレゼン
+
+**シークレットTinder — 写真より先に、共通点から。**
+
+技術名から始めず、利用者の流れと情報の扱いを先に伝える。[120秒の英語原稿・画面順・UI方針](demo-script.md)と[Arkivフィードバック](arkiv-feedback.md)を参照。既存32秒アニメーションは設計の補足として使う。
+
+## 補足の32秒
 
 [![Animated concept overview in English](assets/private-dating-overview.gif)](overview.html)
 
@@ -22,9 +28,9 @@
 
 ## 最初の30秒
 
-> We’re exploring private dating with participation credentials that different clients can verify through ENS. Users can update their connection keys, but cannot rewrite issuer-controlled credentials. Private matching checks mutual preferences and shared interests without publishing profiles. We will first demonstrate independent credential verification, then two-person matching, then bounded candidate selection for more users.
+> We’re building Secret Tinder: common ground before photos. Find shared interests without publishing your dating profile. Then, if you choose, try a conversation with an approved AI Persona before deciding whether to meet. AI sharing is optional and separate from private matching.
 
-> ENSを通じて別のクライアントでも参加資格を確認できる、非公開プロフィールのマッチングを考えています。本人は接続用の鍵を更新できますが、発行者が管理する資格は書き換えられません。秘密計算で双方の希望と共通趣味の条件を確認します。まず資格の独立検証、次に二者照合、その後に多人数の候補選択を実証する計画です。
+> シークレットTinder。写真より先に、共通点から。プロフィールを公開せずに条件が合う相手を探し、希望する人は承認済みのAI Personaと会話してみる。会うかどうかは本人が決めます。AIへの共有は任意で、非公開照合とは別に同意します。
 
 ## フィードバックをもらう3点
 
@@ -39,6 +45,6 @@
 - **何が秘密か**：趣味の内容は各端末に置き、照合結果は当事者だけに返す目標。ZKが検証するのは登録した自己申告との整合性であり、現実の趣味や身元が真実かまで保証しない。通信時刻や公開取引の相関まで隠せるとは主張しない。
 - **何が公開か**：ENSの仮名と登録参照、Arkivの公開可能な登録記録・証明。プロフィールやペア一覧を公開データベースへ置かない。
 - **預託はどう返るか**：Sepoliaのテスト資金を各自の元本として返す。未拘束は即時取消、双方終了合意なら期限前に返却、合意がなくても固定期限後に単独返却できる。通報・資格停止・異議で減額や期限延長をせず、運営は受け取らない。
-- **AIの共同体験はどこか**：マッチ後のWorld Modelによる共同体験は任意のP2機能。最初の図から省略し、関心があれば[詳細図](architecture-detail.drawio.png)で説明する。
+- **AI会話はどこか**：任意P2として[完成したAIBot](../ethglobal-mumbai-2026-AIBot/README.md)を採用。本人承認済みPersonaとの自由会話で、二人同時の共同World Modelは後続。承認済み入力は推論先が処理し、親のマッチングとは未接続。
 - **応募先はどこか**：正式目標はEthereum Foundation・ENS・Arkiv。[応募条件・担当・証拠](../specs/001-private-dating/prize-targets.md)は別紙に整理済み。
-- **今どこまで動くか**：アプリはひな形段階。図は目標設計であり、二者の実証明・秘匿精算・復元を含む統合デモはこれから検証する。
+- **今どこまで動くか**：親アプリはひな形段階。AIBot単体には実装と作者の試験報告がある。二者の実証明・秘匿精算・復元・AIBotの親接続はこれから検証する。

@@ -137,7 +137,7 @@ Arkivは、ENSから参照される公開登録版を別クライアントが取
 
 実装前にENSの実際のネットワーク・deployment版・ABI・アドレスを固定して照合する。今回確認した固定版コードと、現在チェーン上の実装bytecodeの一致は未確認。ENSv1のName Wrapper/fusesや、旧Resolverの`setAlias`を現行APIとして混ぜない。[公式索引](https://docs.ens.domains/llms.txt)・[deployment版の変更履歴](https://github.com/ensdomains/contracts-v2/releases/tag/sepolia-deployment-2026-09-15)
 
-採用した順序は**ENSの権限分離と独立検証 → 希望条件付き二者照合 → 多人数候補選択**。客観的違反の限定実験とWorld Model追加は後続。仕様・Plan・task・賞別判定は更新したが、既存アニメーション・画像は今回の拡張をまだ描いていない。未実装の案を実演済みとして表示しない。
+採用した順序は**ENSの権限分離と独立検証 → 希望条件付き二者照合 → 多人数候補選択**。客観的違反の限定実験は後続。任意P2は後日のユーザー確認によりAIBotのPersona会話を採用した。[Arkivブース後の更新](arkiv-feedback.md)を参照。仕様・Plan・task・賞別判定は更新したが、既存アニメーション・画像は今回の拡張をまだ描いていない。未実装の案を実演済みとして表示しない。
 
 ## 次のブース訪問で確認したいこと
 
