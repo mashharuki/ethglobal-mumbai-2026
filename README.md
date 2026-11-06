@@ -6,6 +6,8 @@
 
 **採用した実証順序：ENSの権限分離と独立クライアント検証 → 希望条件付き二者照合 → 多人数候補選択。** [更新Plan](specs/001-private-dating/plan.md)と[タスク](specs/001-private-dating/tasks.md)に反映しました。以下の動画・画像は拡張前の設計概要で、独立検証と多人数選択は未反映です。機能は未実装・検証前です。
 
+資格の停止は根拠通知・異議・期限付き回復と合わせて実証します。マッチ用預託は各自への元本返却専用とし、旧90/10配分・運営の罰金収入は廃止しました。新しい没収や独立保証金は未採用で、動画・画像にもこの精算変更は未反映です。
+
 [![32秒の概要：秘密を端末に置く、公開登録、非公開照合、双方の合意と精算](docs/assets/private-dating-overview.gif)](docs/overview.html)
 
 **[再生・一時停止できる概要ページ / English・日本語](docs/overview.html)** · [日本語GIF](docs/assets/private-dating-overview-ja.gif) · [30秒の紹介文](docs/mentor-brief.md)
