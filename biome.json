@@ -10,6 +10,7 @@
     "includes": [
       "**",
       "!**/src/api/generated",
+      "!apps/backend/worker-configuration.d.ts",
       "!.claude",
       "!.agents",
       "!.serena",

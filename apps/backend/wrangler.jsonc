@@ -2,7 +2,13 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "my-app",
   "main": "src/index.ts",
-  "compatibility_date": "2026-11-05"
+  "compatibility_date": "2026-11-05",
+  "durable_objects": {
+    "bindings": [{ "name": "AUTH_STORE", "class_name": "AuthStore" }]
+  },
+  "migrations": [
+    { "tag": "auth-store-v1", "new_sqlite_classes": ["AuthStore"] }
+  ]
   // "compatibility_flags": [
   //   "nodejs_compat"
   // ],
