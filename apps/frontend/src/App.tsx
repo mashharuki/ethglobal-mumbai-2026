@@ -9,6 +9,7 @@ const AnonRpcDiagnostics = import.meta.env.DEV
   : null;
 const Simulation = lazy(() => import("./pages/Simulation.tsx"));
 const Registration = lazy(() => import("./pages/Registration.tsx"));
+const RestoreBackup = lazy(() => import("./pages/RestoreBackup.tsx"));
 
 const heroBackground =
   "radial-gradient(circle at 85% 20%, color-mix(in srgb, var(--brand) 18%, transparent), transparent 40%), radial-gradient(circle at 10% 85%, color-mix(in srgb, var(--accent) 12%, transparent), transparent 45%)";
@@ -275,6 +276,7 @@ function subscribeToPath(onChange: () => void): () => void {
 
 function getCurrentPath(): string {
   if (window.location.hash === "#simulation") return "/simulation";
+  if (window.location.hash === "#restore") return "/restore";
   return window.location.pathname;
 }
 
@@ -306,6 +308,13 @@ export default function App() {
     return (
       <Suspense fallback={<p>Loading simulation preview...</p>}>
         <Simulation />
+      </Suspense>
+    );
+  }
+  if (currentPath === "/restore") {
+    return (
+      <Suspense fallback={<p>Loading backup restoration...</p>}>
+        <RestoreBackup />
       </Suspense>
     );
   }

@@ -63,6 +63,12 @@ export default function Registration() {
   const [backup, setBackup] = useState<string | null>(null);
 
   async function generateProof(): Promise<void> {
+    if (passphrase.length > 0 && passphrase.length < 16) {
+      setResult(
+        "Use at least 16 characters for an encrypted backup, or leave the passphrase empty.",
+      );
+      return;
+    }
     setIsBusy(true);
     setBackup(null);
     setResult(
@@ -84,6 +90,7 @@ export default function Registration() {
         registration.publicProof,
         claim,
       );
+      let backupNotice = "";
       if (isVerified && passphrase.length >= 16) {
         const { createRegistrationBackup } = await import(
           "../profile/registration-backup.ts"
@@ -92,11 +99,17 @@ export default function Registration() {
           registration.privateMaterial,
           passphrase,
         );
-        if (encrypted.ok) setBackup(encrypted.data);
+        if (encrypted.ok) {
+          setBackup(encrypted.data);
+          backupNotice = " Encrypted backup ready to download.";
+        } else {
+          backupNotice =
+            " Encrypted backup failed; private material was not saved.";
+        }
       }
       setResult(
         isVerified
-          ? `Proof verified locally. Public commitment: ${claim.root}`
+          ? `Proof verified locally. Public commitment: ${claim.root}.${backupNotice}`
           : "Proof verification failed. No registration was created.",
       );
     } catch (error) {
@@ -196,6 +209,7 @@ export default function Registration() {
               Download encrypted private backup
             </button>
           )}
+          <a href="#restore">Restore a private backup on this device</a>
         </Stack>
       </Wrapper>
     </Stack>
