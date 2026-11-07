@@ -6,7 +6,7 @@ Always reply to the user in **Japanese**.
 ## Project status
 
 - Hackathon project for **ETHGlobal Mumbai 2026**.
-- An existing **private dating / matching proposal** lives in `specs/001-private-dating/`. The frontend now has an overview and read-only ENSv2/Arkiv participation verifier. The Hono API and Counter are still starters; issuer and independent verification scripts live outside those app routes. The AIBot submodule has a standalone Persona conversation implementation; parent authentication/matching integration is unverified. A written requirement is not implemented behavior.
+- An existing **private dating / matching proposal** lives in `specs/001-private-dating/`. The live frontend has an overview and read-only ENSv2/Arkiv participation verifier. This branch adds local SIWE/Hono auth and an isolated in-person disclosure preview; they are not deployed or joined to matching. Counter is still the only sample contract. Issuer and independent verification scripts live outside the app routes. The AIBot submodule has a standalone Persona conversation implementation; parent matching integration is unverified. A written requirement is not implemented behavior.
 - The specification remains **Draft** and `.specify/memory/constitution.md` is an unratified template. Ethereum Foundation, ENS and Arkiv are confirmed prize targets; this does not imply that the whole specification is approved or the prize requirements are met.
 - **Do not generate or modify Spec Kit artifacts** (`speckit-*`, `.specify/`, `specs/`) unless the user asks for specification work. A status review may read them without starting a workflow.
 
@@ -15,7 +15,7 @@ Always reply to the user in **Japanese**.
 - Start with `specs/001-private-dating/spec.md`. Functional requirements are split across `frontend.md`, `backend.md`, and `smart-contract.md`; read the relevant part as well.
 - `planning-input.md` records planning input; `plan.md`, `research.md`, `data-model.md`, and `contracts/` describe the proposed implementation. `tasks.md` tracks implementation; `checklists/requirements.md` tracks specification quality, not feature completion.
 - `prize-targets.md` is the source of truth for the three confirmed prize targets, official conditions, role owners, demos and submission decisions. Keep its IDs aligned with the specifications and tasks; distinguish documented targets from verified eligibility.
-- `quickstart.md` distinguishes current scaffolding from the intended application. Proposed HTTP contracts in `specs/001-private-dating/contracts/service.md` have not yet been populated into `packages/api-specs/openapi.yaml`.
+- `quickstart.md` distinguishes current scaffolding from the intended application. `packages/api-specs/openapi.yaml` now describes the proposed HTTP contract; most operations do not have live handlers and the generated client is pending.
 - Feature selection uses `SPECIFY_FEATURE_DIRECTORY` or local, ignored `.specify/feature.json`, **not the Git branch name**. For the existing proposal use `SPECIFY_FEATURE_DIRECTORY=specs/001-private-dating` when running an authorized workflow. Check local integration metadata before assuming a particular agent integration is registered.
 
 ## Repository map
@@ -23,9 +23,9 @@ Always reply to the user in **Japanese**.
 | Path | What it is | Stack |
 |---|---|---|
 | `apps/frontend` | Overview UI and read-only ENSv2/Arkiv verifier, with Void + PWA | React 19, Vite 8, TypeScript 7, lism-css, oxlint |
-| `apps/backend` | Hono API starter plus participation issuance/evidence code | Hono 4 on Cloudflare Workers (wrangler) |
+| `apps/backend` | Local SIWE/Hono routes plus participation issuance/evidence code | Hono 4 on Cloudflare Workers (wrangler) |
 | `apps/contract` | Counter sample, Solidity + TS tests, Ignition | Hardhat 3, viem, Solidity 0.8.37, TypeScript 6 |
-| `packages/api-specs` | API contract (`openapi.yaml`, empty for now) | OpenAPI |
+| `packages/api-specs` | Proposed HTTP API contract (`openapi.yaml`) | OpenAPI 3.1 |
 | `packages/shared` | Participation schema, trust anchor and signature format | TypeScript, Zod, viem |
 | `ethglobal-mumbai-2026-AIBot/` | **Independent AI simulation app (git submodule)** | Next.js, React, TypeScript; its own npm project |
 | `specs/001-private-dating/` | Existing proposal, design and implementation tasks | Spec Kit Markdown artifacts |
@@ -62,7 +62,7 @@ pnpm --filter contract build       # local build using experimental slang profil
 pnpm --filter contract test        # Solidity tests + node:test integration tests
 ```
 
-A package only runs a turbo task if it defines that script. Backend has no `build`, `check-types` or `test` script; frontend has no `test` script. `api-specs` and `shared` have placeholder `test` scripts that exit 1, so root `pnpm test` is not a green test suite.
+A package only runs a turbo task if it defines that script. Backend has `check-types` and a `test` script covering participation and auth. Frontend has no `test` script; its in-person and review fixture tests are run explicitly. The shared package has a working participation `test` script. `api-specs` may still have a placeholder script, so verify package scripts before treating root `pnpm test` as a gate.
 
 ## Verify before saying "done"
 
