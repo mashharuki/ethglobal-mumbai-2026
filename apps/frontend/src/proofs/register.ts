@@ -7,6 +7,7 @@ const INTENTS = ["i1", "i2"] as const;
 const VK_SHA256 =
   "a43ba027d8548eb19f4e45f15d83fa50d293481d751a640aee9d9d9292c239d7";
 const MAX_U128 = (1n << 128n) - 1n;
+const MAX_SALT = (1n << 248n) - 1n;
 
 export type SyntheticProfile = {
   hobbies: readonly string[];
@@ -34,6 +35,28 @@ export type RegistrationProof = ProofData & {
   root: `0x${string}`;
   verificationKey: Uint8Array;
 };
+
+export type RegistrationPrivateMaterial = RegistrationRequest & {
+  root: `0x${string}`;
+  salts: readonly string[];
+};
+
+export class RegistrationResult {
+  readonly publicProof: RegistrationProof;
+  #privateMaterial: RegistrationPrivateMaterial;
+
+  constructor(
+    publicProof: RegistrationProof,
+    privateMaterial: RegistrationPrivateMaterial,
+  ) {
+    this.publicProof = publicProof;
+    this.#privateMaterial = privateMaterial;
+  }
+
+  get privateMaterial(): RegistrationPrivateMaterial {
+    return this.#privateMaterial;
+  }
+}
 
 type FieldLists = {
   hobbies: number[];
@@ -157,9 +180,121 @@ async function sha256Hex(value: Uint8Array): Promise<string> {
   ).join("");
 }
 
+function storedRecord(value: unknown): Record<string, unknown> {
+  if (typeof value !== "object" || value === null || Array.isArray(value)) {
+    throw new Error("Invalid private registration material");
+  }
+  return value as Record<string, unknown>;
+}
+
+function storedStrings(value: unknown): string[] {
+  if (!Array.isArray(value) || value.some((item) => typeof item !== "string")) {
+    throw new Error("Invalid private registration list");
+  }
+  return [...value];
+}
+
+function parseStoredProfile(value: unknown): SyntheticProfile {
+  const item = storedRecord(value);
+  if (
+    typeof item.gender !== "string" ||
+    typeof item.intent !== "string" ||
+    typeof item.job !== "number" ||
+    typeof item.ageBand !== "number"
+  ) {
+    throw new Error("Invalid private registration fields");
+  }
+  const profile: SyntheticProfile = {
+    hobbies: storedStrings(item.hobbies),
+    gender: item.gender,
+    intent: item.intent,
+    acceptsGenders: storedStrings(item.acceptsGenders),
+    acceptsIntents: storedStrings(item.acceptsIntents),
+    job: item.job,
+    ageBand: item.ageBand,
+  };
+  validateProfile(profile);
+  return profile;
+}
+
+function parsePrivateMaterial(value: unknown): RegistrationPrivateMaterial {
+  const record = storedRecord(value);
+  if (
+    typeof record.subjectId !== "string" ||
+    typeof record.issuanceId !== "string" ||
+    typeof record.profileVersion !== "number" ||
+    typeof record.root !== "string"
+  ) {
+    throw new Error("Invalid private registration fields");
+  }
+  const profile = parseStoredProfile(record.profile);
+  splitId(record.subjectId);
+  splitId(record.issuanceId);
+  if (
+    !Number.isSafeInteger(record.profileVersion) ||
+    record.profileVersion < 1
+  ) {
+    throw new Error("Invalid private registration version");
+  }
+  if (!/^0x[0-9a-fA-F]{1,64}$/.test(record.root)) {
+    throw new Error("Invalid private registration root");
+  }
+  const salts = storedStrings(record.salts);
+  if (
+    salts.length !== 7 ||
+    salts.some((salt) => !/^[1-9][0-9]*$/.test(salt)) ||
+    salts.some((salt) => BigInt(salt) > MAX_SALT) ||
+    new Set(salts).size !== salts.length
+  ) {
+    throw new Error("Invalid private registration salts");
+  }
+  return {
+    subjectId: record.subjectId,
+    issuanceId: record.issuanceId,
+    profileVersion: record.profileVersion,
+    profile,
+    root: record.root as `0x${string}`,
+    salts,
+  };
+}
+
+export async function restoreRegistrationPrivateMaterial(
+  value: unknown,
+): Promise<RegistrationPrivateMaterial> {
+  const material = parsePrivateMaterial(value);
+  const values = validateProfile(material.profile);
+  const [subjectLo, subjectHi] = splitId(material.subjectId);
+  const [issuanceLo, issuanceHi] = splitId(material.issuanceId);
+  const context = [
+    1n,
+    1n,
+    subjectLo,
+    subjectHi,
+    issuanceLo,
+    issuanceHi,
+    BigInt(material.profileVersion),
+  ];
+  const { Barretenberg } = await import("@aztec/bb.js");
+  const api = await Barretenberg.new({ threads: 1, skipSrsInit: true });
+  try {
+    const root = await registrationRoot(
+      api,
+      values,
+      material.salts.map(BigInt),
+      context,
+    );
+    if (root !== BigInt(material.root)) {
+      throw new Error("Private registration root mismatch");
+    }
+    return material;
+  } finally {
+    await api.destroy();
+  }
+}
+
 export async function createRegistrationProof(
   request: RegistrationRequest,
-): Promise<RegistrationProof> {
+): Promise<RegistrationResult> {
   const values = validateProfile(request.profile);
   const [subjectLo, subjectHi] = splitId(request.subjectId);
   const [issuanceLo, issuanceHi] = splitId(request.issuanceId);
@@ -216,7 +351,27 @@ export async function createRegistrationProof(
         "Registration proof or pinned verification key is invalid",
       );
     }
-    return { ...proof, root: `0x${root.toString(16)}`, verificationKey };
+    const rootHex = `0x${root.toString(16)}` as const;
+    const privateMaterial: RegistrationPrivateMaterial = {
+      subjectId: request.subjectId,
+      issuanceId: request.issuanceId,
+      profileVersion: request.profileVersion,
+      profile: {
+        hobbies: [...request.profile.hobbies],
+        gender: request.profile.gender,
+        intent: request.profile.intent,
+        acceptsGenders: [...request.profile.acceptsGenders],
+        acceptsIntents: [...request.profile.acceptsIntents],
+        job: request.profile.job,
+        ageBand: request.profile.ageBand,
+      },
+      root: rootHex,
+      salts: salts.map(String),
+    };
+    return new RegistrationResult(
+      { ...proof, root: rootHex, verificationKey },
+      privateMaterial,
+    );
   } finally {
     await api.destroy();
   }

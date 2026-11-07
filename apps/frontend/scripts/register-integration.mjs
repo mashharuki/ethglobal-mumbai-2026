@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import {
   createRegistrationProof,
+  restoreRegistrationPrivateMaterial,
   verifyRegistrationProof,
 } from "../src/proofs/register.ts";
 
@@ -19,14 +20,42 @@ const request = {
   },
 };
 
-const result = await createRegistrationProof(request);
+const registration = await createRegistrationProof(request);
+const result = registration.publicProof;
 const claim = { ...request, root: result.root };
+assert.deepEqual(Object.keys(registration), ["publicProof"]);
+assert.equal(JSON.stringify(registration).includes("privateMaterial"), false);
+assert.equal(JSON.stringify(result).includes("salts"), false);
+const restored = await restoreRegistrationPrivateMaterial(
+  JSON.parse(JSON.stringify(registration.privateMaterial)),
+);
+assert.deepEqual(restored, registration.privateMaterial);
+assert.deepEqual(restored.profile, request.profile);
+assert.equal(restored.salts.length, 7);
+await assert.rejects(
+  restoreRegistrationPrivateMaterial({ ...restored, salts: ["0"] }),
+);
+await assert.rejects(
+  restoreRegistrationPrivateMaterial({ ...restored, root: "0x42" }),
+);
+await assert.rejects(
+  restoreRegistrationPrivateMaterial({ ...restored, profileVersion: 2 }),
+);
+await assert.rejects(
+  restoreRegistrationPrivateMaterial({
+    ...restored,
+    profile: { ...restored.profile, hobbies: ["h8"] },
+  }),
+);
 assert.equal(result.publicInputs.length, 8);
 assert.equal(await verifyRegistrationProof(result, claim), true);
 const repeated = await createRegistrationProof(request);
-assert.notEqual(repeated.root, result.root);
+assert.notEqual(repeated.publicProof.root, result.root);
 assert.equal(
-  await verifyRegistrationProof(repeated, { ...claim, root: repeated.root }),
+  await verifyRegistrationProof(repeated.publicProof, {
+    ...claim,
+    root: repeated.publicProof.root,
+  }),
   true,
 );
 assert.equal(
@@ -64,5 +93,5 @@ await assert.rejects(
   }),
 );
 process.stdout.write(
-  "Synthetic registration proof verified; fresh salts and rejection cases passed\n",
+  "Synthetic registration proof verified; separate private material restored and tampering rejected\n",
 );
