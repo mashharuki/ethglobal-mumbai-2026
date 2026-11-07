@@ -12,10 +12,11 @@ Web UI / PWA package. Read the root `AGENTS.md` first; its approval boundaries (
 
 ## Current state
 
-- React 19 + Vite 8 + TypeScript 7 + Void 1.6 + `vite-plugin-pwa`. `src/` holds only the Vite starter (`App.tsx`, `main.tsx`, CSS, assets). No planned screen exists yet.
-- lism-css is installed but not used yet. oxlint (`.oxlintrc.json`) is the linter, with `react/rules-of-hooks` set to error.
+- React 19 + Vite 8 + TypeScript 7 + Void 1.6 + `vite-plugin-pwa`. `App.tsx` now contains the overview and `src/pages/Participation.tsx` shows a read-only public participation verifier. Private matching, registration and AIBot handoff screens are still planned.
+- lism-css is used for the overview and verifier. oxlint (`.oxlintrc.json`) is the linter, with `react/rules-of-hooks` set to error. The verifier dynamically imports ENS/Arkiv readers on user action; it uses public RPCs without wallet connection.
 - Void generates `.void/` (gitignored), which `tsconfig.json` extends. The `build` script runs `void prepare` first so `tsc -b` works on a clean CI checkout. Do not remove that step or commit `.void/`.
-- Build output goes to `.cloudflare/output/` (Worker and assets) and `dist/client/` (PWA `sw.js` and workbox). `dist/` alone is not the full build.
+- Build output goes to `.cloudflare/output/` (Worker and assets) and `dist/client/` (static client). Void's PWA log names `sw.js`, but a clean local build did not retain that file; do not claim offline support without checking the final output. `dist/` alone is not the static Vercel output.
+- `vercel.json` selects `dist/client` and runs `VERCEL_STATIC_BUILD=1 pnpm build`. This leaves PWA registration out of the Vercel static bundle. Check the live URL after a deployment; the existing production deployment returned 404 on 7 November 2026.
 
 ## Planned responsibility (Draft spec, not implemented)
 
