@@ -1,2 +1,2 @@
 [workspace]
-members = ["profile", "register"]
+members = ["curve_probe", "profile", "register", "smoke"]
