@@ -93,7 +93,7 @@
 
 ## Phase 6 — 統合・提出準備
 
-- [ ] T043 [P] Web・提出担当：`docs/demo-script.md` と `apps/frontend/src/App.tsx` の説明/UIを「シークレットTinder」「条件→照合→任意AI会話」にそろえる。一画面の主操作を一つにし、公開登録・端末内の秘密・AI送信同意を区別する。初見の人に目的/次の操作/送信範囲を聞いた結果を `specs/001-private-dating/evidence/ux.md` に残す。台本原稿は作成済み、UIと実測は未完了。T033の前提とし、技術機能の完成は主張しない。
+- [ ] T043 [P] Web・提出担当：`docs/demo-script.md` と `apps/frontend/src/App.tsx` の説明/UIを「シークレットTinder」「条件→照合→任意AI会話」にそろえる。一画面の主操作を一つにし、公開登録・端末内の秘密・AI送信同意を区別する。初見の人に目的/次の操作/送信範囲を聞いた結果を `specs/001-private-dating/evidence/ux.md` に残す。台本原稿と概要UIは作成済み、初見の人による実測は未完了。T033の前提とし、技術機能の完成は主張しない。
 - [ ] T044 [P] Arkiv・Web担当：条件付きで `scripts/publish-scene-assets.ts`、`apps/frontend/src/scenes/catalog.ts` に[Swarm素材契約](contracts/swarm-assets.md)の公開素材upload→Arkiv検索→Swarm read→画面表示を実装する。`arkiv/swarm.md` に公式指定証拠を残す。依存/外部書込/支払いは承認後。期限切れ・参照不正・取得不能も確認し、実施判断は3正式目標と提出準備の不足・残時間を確認して行う。採用時はT033の動画に読取箇所を追加する。未実施/未達ならT036で追加を見送りと記録する。
 
 - [ ] T030 [P] 品質担当：`specs/001-private-dating/quickstart.md` の手順を第三者環境で再現し、Biome、frontend lint/build、Workers dry-run、Hardhat format/build/test、Noirの正負例と実証明を確認する。既存エラーと新規失敗を区別し、実測結果を `specs/001-private-dating/evidence/verification.md` に残す。
