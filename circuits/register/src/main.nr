@@ -73,9 +73,9 @@ fn main(
     profile_version: pub Field,
     root: pub Field,
 ) {
-    assert(schema_version == 1);
-    assert(dictionary_version == 1);
-    assert(profile_version != 0);
+    assert(schema_version == 1, "unsupported schema version");
+    assert(dictionary_version == 1, "unsupported dictionary version");
+    assert(profile_version != 0, "profile version must be positive");
     assert((subject_lo != 0) | (subject_hi != 0));
     assert((issuance_lo != 0) | (issuance_hi != 0));
     assert(job != 0);
@@ -228,5 +228,171 @@ fn should_reject_zero_item_salt() {
         0,
         1,
         1,
+    );
+}
+
+#[test(should_fail_with = "profile bit must be binary")]
+fn should_reject_nonbinary_hobby() {
+    main(
+        [2, 0, 0, 0, 0, 0, 0, 0],
+        [1, 0, 0],
+        [1, 0],
+        [0, 1, 0],
+        [0, 1],
+        201,
+        301,
+        [11, 12, 13, 14, 15, 16, 17],
+        1,
+        1,
+        41,
+        0,
+        51,
+        0,
+        1,
+        1,
+    );
+}
+
+#[test(should_fail_with = "hobbies must be nonempty")]
+fn should_reject_empty_hobby_selection() {
+    main(
+        [0, 0, 0, 0, 0, 0, 0, 0],
+        [1, 0, 0],
+        [1, 0],
+        [0, 1, 0],
+        [0, 1],
+        201,
+        301,
+        [11, 12, 13, 14, 15, 16, 17],
+        1,
+        1,
+        41,
+        0,
+        51,
+        0,
+        1,
+        1,
+    );
+}
+
+#[test(should_fail_with = "intent mask must be nonempty")]
+fn should_reject_empty_preference() {
+    main(
+        [1, 0, 0, 0, 0, 0, 0, 0],
+        [1, 0, 0],
+        [1, 0],
+        [0, 1, 0],
+        [0, 0],
+        201,
+        301,
+        [11, 12, 13, 14, 15, 16, 17],
+        1,
+        1,
+        41,
+        0,
+        51,
+        0,
+        1,
+        1,
+    );
+}
+
+#[test(should_fail_with = "unsupported dictionary version")]
+fn should_reject_other_dictionary_version() {
+    main(
+        [1, 0, 0, 0, 0, 0, 0, 0],
+        [1, 0, 0],
+        [1, 0],
+        [0, 1, 0],
+        [0, 1],
+        201,
+        301,
+        [11, 12, 13, 14, 15, 16, 17],
+        1,
+        2,
+        41,
+        0,
+        51,
+        0,
+        1,
+        1,
+    );
+}
+
+#[test(should_fail_with = "registration root mismatch")]
+fn should_reject_other_issuance_generation() {
+    let hobbies = [1, 1, 0, 0, 0, 0, 0, 0];
+    let gender = [1, 0, 0];
+    let intent = [1, 0];
+    let accepts_gender = [0, 1, 0];
+    let accepts_intent = [0, 1];
+    let salts = [11, 12, 13, 14, 15, 16, 17];
+    let root = registration_root(
+        hobbies,
+        gender,
+        intent,
+        accepts_gender,
+        accepts_intent,
+        201,
+        301,
+        salts,
+        [1, 1, 41, 0, 51, 0, 1],
+    );
+    main(
+        hobbies,
+        gender,
+        intent,
+        accepts_gender,
+        accepts_intent,
+        201,
+        301,
+        salts,
+        1,
+        1,
+        41,
+        0,
+        52,
+        0,
+        1,
+        root,
+    );
+}
+
+#[test]
+fn should_accept_unspecified_preference_mask() {
+    let hobbies = [1, 0, 0, 0, 0, 0, 0, 0];
+    let gender = [1, 0, 0];
+    let intent = [1, 0];
+    let accepts_gender = [1, 1, 1];
+    let accepts_intent = [1, 1];
+    let salts = [11, 12, 13, 14, 15, 16, 17];
+    let root = registration_root(
+        hobbies,
+        gender,
+        intent,
+        accepts_gender,
+        accepts_intent,
+        201,
+        301,
+        salts,
+        [1, 1, 41, 0, 51, 0, 1],
+    );
+    main(
+        hobbies,
+        gender,
+        intent,
+        accepts_gender,
+        accepts_intent,
+        201,
+        301,
+        salts,
+        1,
+        1,
+        41,
+        0,
+        51,
+        0,
+        1,
+        root,
     );
 }
