@@ -1,5 +1,5 @@
 import { Lism, Stack } from "lism-css/react";
-import { useState, useSyncExternalStore } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 
 import { simulationConsentSchema } from "../../../../packages/shared/src/simulation/contract.ts";
 import {
@@ -69,8 +69,24 @@ function UnavailableSimulation() {
   );
 }
 
-function StandaloneDemo() {
+function useStandaloneDemoConsent() {
   const [hasSeparateAiConsent, setHasSeparateAiConsent] = useState(false);
+  useEffect(() => {
+    const revokeWhenVisible = () => {
+      if (document.visibilityState === "visible") {
+        setHasSeparateAiConsent(false);
+      }
+    };
+    document.addEventListener("visibilitychange", revokeWhenVisible);
+    return () =>
+      document.removeEventListener("visibilitychange", revokeWhenVisible);
+  }, []);
+  return { hasSeparateAiConsent, setHasSeparateAiConsent };
+}
+
+function StandaloneDemo() {
+  const { hasSeparateAiConsent, setHasSeparateAiConsent } =
+    useStandaloneDemoConsent();
   const demoHref = getStandaloneDemoHref(hasSeparateAiConsent);
   return (
     <Stack as="section" aria-label="Fictional AIBot demo" g="10">
@@ -89,8 +105,9 @@ function StandaloneDemo() {
             setHasSeparateAiConsent(event.currentTarget.checked)
           }
         />{" "}
-        I choose to open the separate AIBot demo. What I enter there may be
-        processed by AIBot and its AI provider; no matching secrets are sent
+        I choose to open the separate AIBot demo. Interview answers, Persona
+        settings, messages, and conversation memory I enter there may be
+        processed by AIBot and OpenAI. No matching secrets are sent
         automatically from this page.
       </label>
       {demoHref ? (
@@ -110,6 +127,10 @@ function StandaloneDemo() {
           Choose the option above to enable the external demo link.
         </Lism>
       )}
+      <Lism as="p" c="text-2" fz="s">
+        Uncheck to withdraw this link permission. Returning to this tab also
+        clears it. This cannot undo information already sent to AIBot.
+      </Lism>
     </Stack>
   );
 }
