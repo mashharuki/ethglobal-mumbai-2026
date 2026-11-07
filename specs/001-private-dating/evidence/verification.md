@@ -7,6 +7,7 @@
 | `pnpm exec biome ci .` | 統合後124ファイル検査、exit 0 | `.agents`とAIBotサブモジュール、Wrangler生成型は親のBiome対象から除外。別repoの品質を親のCIで保証しない |
 | `pnpm --filter frontend lint` / `build` | 統合後ともにexit 0。Void準備、Worker/client bundleを確認。`VERCEL_STATIC_BUILD=1`でもbuildし、Vercel設定どおり退役用`sw.js`を出力 | 対面開示/審査UIは独立プレビューで公開Appには未接続。照合/登録UIの合格ではない |
 | Vercel本番 | PR #4マージ後、公開URLのHTMLは新しい`index-CxflyAhj.js`を参照し、Vercelがマージコミットのデプロイ成功を報告。bundleに「公開資格の実演を見る」等の新文言を確認。`/sw.js`はHTTP 200・`Cache-Control: no-store`で退役コードを配信。新規ブラウザーからAlice/Bobをそれぞれ直接検証し、両方`資格あり`・Sepolia block `12080373`・資格版`1`を表示。旧Vite starterが残っていた既存Chromeタブも再読込後に新画面へ移った | 同じ開発者の端末での観察。第三者ブラウザーや別端末での再現ではない。旧Service Workerが各利用者端末で必ず自動退役することまでは確認していない |
+| Vercel英語UI | PR #5マージコミット`538961c`後、公開URLは英語HTML（`lang="en"`）と`index-CL63-bTJ.js`を返した。クリーンブラウザーでAlice/Bobとも`Eligible`・Sepolia block `12080445`・資格版`1`を表示 | 同じ開発者の端末での追加観察。第三者環境での再現は未実施 |
 | `pnpm --filter backend check-types` / `test` | 統合後に型検査成功。参加資格34件とSIWE認証1件を通常のbackend testで実行し35件成功。2つのローカルWrangler試験が同時起動して一度失敗したため`--test-concurrency=1`で順次実行 | 外部への審査APIデプロイ、通報の接触資格検証、審査員認可、署名資格への反映は未実装・未検証 |
 | 本人向け審査API | ローカルWranglerで停止中の本人が通知GET・反証POST・異議POSTを利用でき、別人には404。操作IDの本人照会と`Cache-Control: no-store`も確認 | 合成ケースの試験用ハーネスでseed。公開の通報作成と審査員決定は本番の信頼設定がないため公開しない |
 | `pnpm --filter shared check-types` / `test` | 型検査成功、署名/schemaの12試験すべて成功 | 審査・照合・資金の受入試験ではない |

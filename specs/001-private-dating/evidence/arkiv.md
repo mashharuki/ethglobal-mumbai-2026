@@ -18,6 +18,8 @@ pnpm --filter backend exec node scripts/query-publications.ts 0x7bfef7a2d485ad0f
 
 利用者が見る[公開資格検証画面](../../../apps/frontend/src/pages/Participation.tsx)もArkivの現行entityをブラウザーから直接取得し、ENS参照と署名を検証する。PR [#4](https://github.com/mashharuki/ethglobal-mumbai-2026/pull/4)をmainへマージした後、[本番URL](https://ethglobal-mumbai-2026.vercel.app/)は未認証でHTTP 200を返し、新規ブラウザーのAlice/Bob検証はともに`資格あり`・credential版`1`・Sepolia block`12080373`だった。同じ開発者の端末での再実測であり第三者確認ではない。画面はentity keyによる現行読取であり、索引による発見は上記CLIの別経路。両経路の対象entity keyとdigestは一致する。Hono backendを止めても[Webと独立CLIの同一ブロック比較](ens.md#ブラウザーとcliの比較)は可能だった。
 
+PR [#5](https://github.com/mashharuki/ethglobal-mumbai-2026/pull/5)の英語UIマージ後、同じ端末のクリーンブラウザーで再検証し、Alice/Bobとも`Eligible`・版`1`・Sepolia block`12080445`を表示した。第三者再現の証拠には数えない。
+
 指定の[5つのArkiv資料](../../../arkiv/schema.md)は作成した。実測値に基づく範囲と未計測事項をそれぞれ明記している。2026-11-07の[提出範囲決定](../prize-targets.md)では、この公開資格をARKIV-APPの主実演にする。公開プロフィール登録、資格新版の実書込、期限切れ/失効は未実装・未検証であり、本番の照合フローと呼ばない。
 
 T032と最終提出判定には、第三者環境からのクエリ・画面再現、GitHub公開状態、新作/再利用範囲、5資料の最終照合を残す。公開URLのHTTP 200と自分たちのクリーンブラウザーの成功を、第三者実測やHacker Dashboardへの応募完了と混同しない。

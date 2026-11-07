@@ -1,6 +1,6 @@
 # 賞別提出判定（2026-11-07 IST、T036進行中）
 
-公式条件を[EF](https://ethglobal.com/events/mumbai/prizes/ethereum-foundation)、[ENS](https://ethglobal.com/events/mumbai/prizes/ens)、[Arkiv](https://ethglobal.com/events/mumbai/prizes/arkiv)、[大会規則](https://ethglobal.com/events/mumbai/info/details)で2026-11-07に再確認した。PR #4マージ後の公開基準commitは`8d1ceb7`（`origin/main`）。[本番ライブURL](https://ethglobal-mumbai-2026.vercel.app/)は新規アクセスでHTTP 200、クリーンブラウザーでAlice/Bobとも`eligible`・資格版1・Sepoliaブロック`12080373`を確認した。`/sw.js`は移行WorkerとしてHTTP 200だが、旧Chromeプロファイルの回復は未確認。公開[GitHubリポジトリ](https://github.com/mashharuki/ethglobal-mumbai-2026)は匿名アクセスでHTTP 200。**第三者による操作再現、提出動画、Hacker Dashboardの選択・受付は未確認で、以下は応募済みの記録ではない。**
+公式条件を[EF](https://ethglobal.com/events/mumbai/prizes/ethereum-foundation)、[ENS](https://ethglobal.com/events/mumbai/prizes/ens)、[Arkiv](https://ethglobal.com/events/mumbai/prizes/arkiv)、[大会規則](https://ethglobal.com/events/mumbai/info/details)で2026-11-07に再確認した。PR #5マージ後の英語UIの基準commitは`538961c`。[本番ライブURL](https://ethglobal-mumbai-2026.vercel.app/)は新規アクセスでHTTP 200、別のクリーンブラウザーでAlice/Bobとも`Eligible`・資格版1・Sepoliaブロック`12080445`を確認した。`/sw.js`は移行WorkerとしてHTTP 200で、旧Chromeタブも再読込後に新画面へ移った。公開[GitHubリポジトリ](https://github.com/mashharuki/ethglobal-mumbai-2026)は匿名アクセスでHTTP 200。**第三者による操作再現、提出動画、Hacker Dashboardの選択・受付は未確認で、以下は応募済みの記録ではない。**
 
 | 目標 | 担当 | 現在の判定 | 根拠と不足 |
 | --- | --- | --- | --- |
@@ -16,7 +16,7 @@
 
 | 項目 | 記入欄・確認条件 |
 | --- | --- |
-| 最終提出commit | ________（基準`8d1ceb7`から変更した場合は差分と公開URLを再確認） |
+| 最終提出commit | ________（英語UI基準`538961c`以降の差分と公開URLを再確認） |
 | 公開コードと新作区分 | 匿名Gitアクセス再確認：________ ／スターター・AIBot等の来歴とStart Fresh/Classic適合をチーム確認：________ ／親・サブモジュールのライセンス/提出権利を確認：________ |
 | 本番ライブ画面 | 最終URL：________ ／Alice/Bobの版・結果・同一Sepoliaブロック：________ ／旧Chromeキャッシュ対応確認：________ |
 | Arkiv第三者再現 | 実施者：________ ／実施日時：________ ／2件のREADMEクエリと画面結果：________ ／失敗時の制限・再試行：________ |
