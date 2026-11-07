@@ -322,6 +322,203 @@ describe("private review API", () => {
       };
       assert.equal((await effective(until - 1)).suspendedUntil, until);
       assert.equal((await effective(until)).suspendedUntil, null);
+
+      const reviewerA = privateKeyToAccount(generatePrivateKey());
+      const reviewerB = privateKeyToAccount(generatePrivateKey());
+      const reviewerACookie = await signIn(origin, reviewerA);
+      const reviewerBCookie = await signIn(origin, reviewerB);
+      const voteCaseId = `vote-${crypto.randomUUID()}`;
+      const voteSeed = await fetch(`${origin}/__seed-review`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          caseId: voteCaseId,
+          target: owner.address,
+          state: "reviewing-ready",
+          primaryReviewers: [reviewerA.address, reviewerB.address],
+        }),
+      });
+      assert.equal(voteSeed.status, 200, await voteSeed.text());
+      const votePath = `${origin}/v1/review-cases/${voteCaseId}/decisions`;
+      const voteDetail = await fetch(
+        `${origin}/v1/review-cases/${voteCaseId}`,
+        {
+          headers: { Cookie: ownerCookie },
+        },
+      );
+      const initialVote = (await voteDetail.json()) as { revision: number };
+      const voteUntil = new Date(Date.now() + 7_200_000).toISOString();
+      const voteBody = (revision: number) =>
+        JSON.stringify({
+          expectedRevision: revision,
+          policyVersion: 1,
+          decision: "suspend",
+          fixtureId: "synthetic",
+          suspendedUntil: voteUntil,
+        });
+      const castVote = (cookie: string, revision: number, id: string) =>
+        fetch(votePath, {
+          method: "POST",
+          headers: {
+            Origin: origin,
+            Cookie: cookie,
+            "Content-Type": "application/json",
+            "X-Operation-Id": id,
+          },
+          body: voteBody(revision),
+        });
+      assert.equal(
+        (await castVote(ownerCookie, initialVote.revision, crypto.randomUUID()))
+          .status,
+        404,
+      );
+      const firstVoteId = crypto.randomUUID();
+      assert.equal(
+        (await castVote(reviewerACookie, initialVote.revision, firstVoteId))
+          .status,
+        202,
+      );
+      assert.equal(
+        (await castVote(reviewerACookie, initialVote.revision, firstVoteId))
+          .status,
+        202,
+      );
+      assert.equal(
+        (
+          await castVote(
+            reviewerACookie,
+            initialVote.revision,
+            crypto.randomUUID(),
+          )
+        ).status,
+        409,
+      );
+      const afterFirst = await fetch(
+        `${origin}/v1/review-cases/${voteCaseId}`,
+        {
+          headers: { Cookie: ownerCookie },
+        },
+      );
+      const firstDetail = (await afterFirst.json()) as {
+        revision: number;
+        state: string;
+      };
+      assert.equal(firstDetail.state, "reviewing");
+      assert.equal(firstDetail.revision, initialVote.revision + 1);
+      assert.equal(
+        (
+          await castVote(
+            reviewerBCookie,
+            firstDetail.revision,
+            crypto.randomUUID(),
+          )
+        ).status,
+        202,
+      );
+      const afterSecond = await fetch(
+        `${origin}/v1/review-cases/${voteCaseId}`,
+        {
+          headers: { Cookie: ownerCookie },
+        },
+      );
+      assert.equal(
+        ((await afterSecond.json()) as { state: string }).state,
+        "decided",
+      );
+
+      const appealReviewerA = privateKeyToAccount(generatePrivateKey());
+      const appealReviewerB = privateKeyToAccount(generatePrivateKey());
+      const appealACookie = await signIn(origin, appealReviewerA);
+      const appealBCookie = await signIn(origin, appealReviewerB);
+      const appealCaseId = `appeal-${crypto.randomUUID()}`;
+      const appealSeed = await fetch(`${origin}/__seed-review`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          caseId: appealCaseId,
+          target: owner.address,
+          state: "decided",
+          appealReviewers: [appealReviewerA.address, appealReviewerB.address],
+        }),
+      });
+      assert.equal(appealSeed.status, 200, await appealSeed.text());
+      const appealNoticeResponse = await fetch(
+        `${origin}/v1/review-cases/${appealCaseId}`,
+        { headers: { Cookie: ownerCookie } },
+      );
+      const appealNotice = (await appealNoticeResponse.json()) as {
+        revision: number;
+      };
+      const appealSubmit = await fetch(
+        `${origin}/v1/review-cases/${appealCaseId}/appeals`,
+        {
+          method: "POST",
+          headers: {
+            Origin: origin,
+            Cookie: ownerCookie,
+            "Content-Type": "application/json",
+            "X-Operation-Id": crypto.randomUUID(),
+          },
+          body: JSON.stringify({
+            expectedRevision: appealNotice.revision,
+            fixtureId: "synthetic",
+          }),
+        },
+      );
+      assert.equal(appealSubmit.status, 202);
+      const appealPath = `${origin}/v1/review-cases/${appealCaseId}/decisions`;
+      const castAppeal = (cookie: string, revision: number) =>
+        fetch(appealPath, {
+          method: "POST",
+          headers: {
+            Origin: origin,
+            Cookie: cookie,
+            "Content-Type": "application/json",
+            "X-Operation-Id": crypto.randomUUID(),
+          },
+          body: JSON.stringify({
+            expectedRevision: revision,
+            policyVersion: 1,
+            decision: "reverse",
+            fixtureId: "synthetic",
+          }),
+        });
+      const appealedDetailResponse = await fetch(
+        `${origin}/v1/review-cases/${appealCaseId}`,
+        { headers: { Cookie: ownerCookie } },
+      );
+      const appealedDetail = (await appealedDetailResponse.json()) as {
+        revision: number;
+      };
+      assert.equal(
+        (await castAppeal(reviewerACookie, appealedDetail.revision)).status,
+        404,
+      );
+      assert.equal(
+        (await castAppeal(appealACookie, appealedDetail.revision)).status,
+        202,
+      );
+      const afterAppealVoteResponse = await fetch(
+        `${origin}/v1/review-cases/${appealCaseId}`,
+        { headers: { Cookie: ownerCookie } },
+      );
+      const afterAppealVote = (await afterAppealVoteResponse.json()) as {
+        revision: number;
+      };
+      assert.equal(
+        (await castAppeal(appealBCookie, afterAppealVote.revision)).status,
+        202,
+      );
+      const appealClosed = await fetch(
+        `${origin}/v1/review-cases/${appealCaseId}`,
+        {
+          headers: { Cookie: ownerCookie },
+        },
+      );
+      assert.equal(
+        ((await appealClosed.json()) as { state: string }).state,
+        "closed",
+      );
     } finally {
       if (!hasExited) {
         child.kill("SIGTERM");
