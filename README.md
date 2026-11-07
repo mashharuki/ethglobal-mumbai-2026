@@ -2,7 +2,7 @@
 
 **Common ground before photos.** A hackathon prototype exploring private matching, verifiable participation, and an optional AI Persona conversation.
 
-> Current state (7 November 2026): Alice and Bob have issuer-signed participation credentials on Arkiv Rabdi, referenced by separate ENSv2 names on Ethereum Sepolia. Private matching, deposits, the parent-app/AIBot handoff, and an independent browser verifier are still in development. The [landing page](apps/frontend/src/App.tsx) explains the journey; it is not a completed matching flow.
+> Current state (7 November 2026): Alice and Bob have issuer-signed participation credentials on Arkiv Rabdi, referenced by separate ENSv2 names on Ethereum Sepolia. A browser verifier and independent CLI read those public records. Private matching, deposits, and the parent-app/AIBot handoff remain in development. The [landing page](apps/frontend/src/App.tsx) explains the journey; it is not a completed matching flow.
 
 ## The idea in 30 seconds
 
@@ -19,6 +19,7 @@ ENSv2 separates issuer control of the participation credential from participant 
 | ENSv2 names and separate resolvers for Alice/Bob | Verified on Sepolia | [ENS transaction and permission evidence](specs/001-private-dating/evidence/ens.md) |
 | Issuer-signed public participation credentials | Written and read back on Arkiv Rabdi | [Alice](specs/001-private-dating/evidence/arkiv-alice-publication.json) · [Bob](specs/001-private-dating/evidence/arkiv-bob-publication.json) |
 | ENS `app.credential` references to Arkiv entities | Written and read back on Sepolia | [Alice](specs/001-private-dating/evidence/ens-alice-reference.json) · [Bob](specs/001-private-dating/evidence/ens-bob-reference.json) |
+| Independent participation verification | Browser and CLI read ENSv2 and Arkiv without the Hono backend | [Browser source](apps/frontend/src/pages/Participation.tsx) · [CLI source](scripts/verify-participation.ts) · [comparison](specs/001-private-dating/evidence/ens.md#ブラウザーとcliの比較) |
 | Private preference matching and candidate selection | Design and implementation in progress | [Implementation plan](specs/001-private-dating/plan.md) |
 | Optional AI Persona conversation | Built in a teammate-owned [submodule](ethglobal-mumbai-2026-AIBot/); parent integration pending | [Inspection record](specs/001-private-dating/evidence/aibot-inspection.md) |
 
@@ -33,13 +34,16 @@ The participation issuer is `0xcA341CE4902756bF9e96e145014DD0aB36A0Fe8E`. Its au
 
 Arkiv write transactions: [Alice](https://explorer.rabdi.arkiv.network/tx/0x9f5788fd0e4c5dc326c838bf5d5dd19a80a21503c7f3e92bde1ea3578b206399) · [Bob](https://explorer.rabdi.arkiv.network/tx/0x331de4e344cd021bbdc3b6d6bae95a1ab6fc6b5c78afe0a67a95d4c0fb214cbd).
 
-The Arkiv writer wallet is `0xcA341CE4902756bF9e96e145014DD0aB36A0Fe8E`. A reproducible, indexed query for Alice's public issuance ID is below. Set `ARKIV_ACCESS_KEY` privately from your own [Arkiv Hub](https://hub.arkiv.network/access-keys) account; do not commit or paste it into an issue. This query is currently a CLI evidence tool, not a user-facing feature, and it has not been rerun from a third-party environment.
+The Arkiv writer wallet is `0xcA341CE4902756bF9e96e145014DD0aB36A0Fe8E`. Reproducible, indexed queries for the public issuance IDs are below. The public endpoint worked for both names on 7 November 2026, but is heavily rate limited. For repeated reads, set `ARKIV_ACCESS_KEY` privately from your own [Arkiv Hub](https://hub.arkiv.network/access-keys) account; do not commit or paste it into an issue. These are CLI evidence tools, not a user-facing feature or a third-party environment test.
+
+Arkiv submission notes: [schema](arkiv/schema.md), [friction](arkiv/friction.md), [reach](arkiv/reach.md), [why Arkiv](arkiv/why-arkiv.md), [how we use Arkiv](arkiv/how-you-use-arkiv.md). These describe observed behavior and remaining limits.
 
 ```sh
 pnpm --filter backend exec node scripts/query-publications.ts 0x5d688d733b4a46be18d41c9fe5c35e9b60db847d4467bf1942723100cefecc2c
+pnpm --filter backend exec node scripts/query-publications.ts 0x7bfef7a2d485ad0f25ed0b30cc94458aea0c23da3c846c013709035b53fc9247
 ```
 
-It selects the `secret_tinder_participation_v1` schema, filters the indexed `issuance_id` by equality, scopes the original creator to the issuer, and checks the current owner and read-only flag. The result is discovery data; the signed content and current ENS reference must still be verified before deciding eligibility.
+It selects the `secret_tinder_participation_v1` schema, filters the indexed `issuance_id` by equality, scopes the original creator to the issuer, and checks the current owner and read-only flag. The live results returned the expected entity keys for Alice and Bob; see the [Arkiv read evidence](specs/001-private-dating/evidence/arkiv.md). The result is discovery data; the signed content and current ENS reference must still be verified before deciding eligibility.
 
 The verification scripts compare transaction calldata and receipts with the pinned plans, read the public entity and ENS reference, and refresh the local evidence JSON files. They do not submit transactions:
 
@@ -50,7 +54,14 @@ pnpm --filter backend exec node scripts/verify-reference.ts alice 0xf95064e137e7
 pnpm --filter backend exec node scripts/verify-reference.ts bob 0xc798656879bcb49a22eacae9bd3beb46e28911bf9e8ec6ea9e1c333b8f4e16a5
 ```
 
-These scripts are issuer-side evidence checks. An independent client that assesses eligibility without our backend is a remaining task.
+These scripts are issuer-side evidence checks. A separate read-only CLI verifies eligibility from the public ENSv2 and Arkiv state without calling our backend or importing its verification code:
+
+```sh
+pnpm exec node scripts/verify-participation.ts alice 12080090
+pnpm exec node scripts/verify-participation.ts bob 12080090
+```
+
+Both names returned `eligible` at Sepolia block `12080090` with credential version `1` on 7 November 2026. The CLI checks registry and resolver provenance, scoped permissions, the Arkiv entity and issuer signature, registration events, current owner and expiry. Its `ineligible` and `unavailable` results are separate. The browser verifier performs those reads independently of the Hono backend; [Alice/Bob browser results matched the CLI at the same Sepolia blocks](specs/001-private-dating/evidence/ens.md#ブラウザーとcliの比較). Arkiv reads use its current state, so a historical Sepolia block does not create an atomic cross-chain snapshot. The end-to-end matching flow remains unfinished. The public Arkiv endpoint may rate-limit requests; set `ARKIV_ACCESS_KEY` privately for repeated CLI reads.
 
 ## Run locally
 
@@ -62,7 +73,7 @@ pnpm install --frozen-lockfile
 pnpm --filter frontend dev
 ```
 
-Open the URL printed by Vite. The landing page needs no wallet or secrets. The Hono backend still serves only its starter route; participation issuance and evidence checks currently run as scripts. The AIBot is a teammate-owned submodule with separate setup instructions. Do not put wallet keys, RPC access keys, or private profile data in the repository.
+Open the URL printed by Vite. The public verifier needs no wallet or secrets and works with the Hono backend stopped; it sends the selected public ENS name to Sepolia and Arkiv RPCs. The Hono backend still serves only its starter route; participation issuance and issuer evidence checks currently run as scripts. The AIBot is a teammate-owned submodule with separate setup instructions. Do not put wallet keys, RPC access keys, or private profile data in the repository.
 
 ## CROPS
 
@@ -79,9 +90,9 @@ The current frontend source, HTML, Vite configuration, and public assets were se
 
 ## Prize targets and submission state
 
-We are preparing for **Ethereum Foundation (Best CROPS App)**, **ENS (Best Use of ENSv2)**, and **Arkiv (Build on Arkiv)**. The Arkiv + Swarm bonus remains conditional and is not demonstrated. The [official-condition mapping](specs/001-private-dating/prize-targets.md) lists each acceptance gate. Current evidence supports a partial ENS/Arkiv demonstration; it does not establish submission readiness for any prize. The Arkiv user-facing read, independent ENS verifier, CROPS end-to-end demo, final video, and live deployment still require verification.
+We are preparing for **Ethereum Foundation (Best CROPS App)**, **ENS (Best Use of ENSv2)**, and **Arkiv (Build on Arkiv)**. The Arkiv + Swarm bonus remains conditional and is not demonstrated. The [official-condition mapping](specs/001-private-dating/prize-targets.md) lists each acceptance gate. The browser and CLI public reads support a partial ENS/Arkiv demonstration; they do not establish submission readiness for any prize. Suspension and recovery, Arkiv update/expiry, the CROPS end-to-end demo, final video, and live deployment still require verification.
 
-A candidate [live URL](https://ethglobal-mumbai-2026.vercel.app/) exists in the prior README, but its current availability and deployed commit have not been confirmed. Do not use it as proof until checked. The [two-minute in-person script](docs/demo-script.md) is a draft; the submission video is a separate 2–4 minute artifact.
+The [Vercel project](https://ethglobal-mumbai-2026.vercel.app/) exists, but a fresh request to its production URL returned `404 NOT_FOUND` on 7 November 2026. Vercel marks its current production deployment Ready at main commit `0545316`; the frontend changes in this branch are not deployed to production. `apps/frontend/vercel.json` prepares the static client output for the next deployment, which still needs a live check before it can serve as submission evidence. The [two-minute in-person script](docs/demo-script.md) is a draft; the submission video is a separate 2–4 minute artifact.
 
 ## Structure and provenance
 
