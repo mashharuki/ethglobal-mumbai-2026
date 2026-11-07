@@ -1,6 +1,12 @@
 # 開発時の起動と受入確認
 
-以下は実装担当が使う手順。親側はテンプレート段階。独立AIBotには実装と作者の検証報告があるが、親結合は未実施。成功例は製品受入目標を示す。
+以下は実装担当が使う手順。親側の画面は概要ページ、BackendのAPIはテンプレート段階。独立AIBotには実装と作者の検証報告があるが、親結合は未実施。成功例は製品受入目標を示す。
+
+## T001 環境確認（2026-11-06、実装着手時点）
+
+- この作業環境で確認した版はNode `v24.20.0`、pnpm `11.24.0`、Hardhat `3.21.2`。`nargo`コマンドは見つからない。独立した2端末とウォレットの動作は未確認で、SC-002の実機合格を意味しない。
+- 既存のフロントエンドlint/buildとSolidityの整形検査は通過。ルートBiome CIは取り込み済み`.agents/skills/`を含む86エラー・15警告・5情報で失敗した。Workersのdry-runはバンドル生成・`--dry-run`終了を表示した一方、Wranglerのホームディレクトリへのログ書込は`EPERM`を出した。Hardhatのbuild/testはコンパイラキャッシュの`MultiProcessMutexTimeoutError`で失敗し、build単独の再試行も同じエラーだった。これらは機能実装前の測定であり、新規機能の合格証拠ではない。
+- 段階Aで必要な追加候補は、境界で資格とHTTP入力を同じ規則で検証する`zod`（代案：手書き検証）、ENSのchain read/writeと署名検証に使う`viem`（代案：ethers）、Arkivの公開レコードread/writeに使う公式SDK（代案：直接HTTP/chain呼出し）。`zod`と`viem`、`@arkiv-network/sdk@1.0.1`は承認を得て必要なworkspaceへ追加し、オフラインの`pnpm install --frozen-lockfile`でlockfileとの一致を確認した。T003のクライアント生成器と、段階BのNoirツールチェーンも別途選定する。
 
 ## ローカルの準備
 
@@ -20,6 +26,20 @@ Sepoliaでの資金試験では[Circle Testnet Faucet](https://faucet.circle.com
 ## 段階A：ENSの先行実証
 
 T037で固定した公開設定と[参加資格契約](contracts/participation.md)を用いる。入金もプロフィール証明も必要ない。発行者が合成資格を発行し、T039のWebと別検証ツールから同じブロック・版を読む。本人の接続用キー更新、資格変更の拒否、委任失効、資格停止・期限切れ・旧版・別発行者・再発行前の拒否を試す。元のBFFを停止しても別ツールが読み続けられることを示し、T034へ結果を残す。ツールの実行コマンドは実装時に追記し、現在存在するとは扱わない。
+
+公開設定の初回観測は[参加資格fixture](fixtures/participation.json)に記録した。その後、親名のRegistry接続、Alice/Bobのサブネームと専用Resolver、Arkivの公開資格2件、ENS参照2件の取引と読戻しを[実証記録](evidence/ens.md)に保存した。これは段階Aの部分達成であり、独立クライアント検証・有限停止・失効鍵検査は未了。
+
+T037のローカル契約ではEIP-712署名、発行イベントからの発行ID、Arkiv参照のdigest形式を固定した。現時点の署名テストは合成鍵・合成Registryであり、実ENS発行またはArkiv書込の証拠ではない。発行後は参加者用Registryの`LabelRegistered`と`TokenResource`をreceiptで確認し、現行`getResource`と照合する。role変更でtoken IDが変わっても発行世代を維持し、再登録では新しい発行IDを要求する。
+
+T038の計画生成は[ENSプレフライト](evidence/ens-preflight.md)に記録した。`node scripts/plan-participation.ts parent`はSepoliaの公開状態を読み、UserRegistryデプロイと親への接続用calldataを生成する。親にRegistryが接続された後は`node scripts/plan-participation.ts participant <label> <本人の公開アドレス>`で専用Resolver・非譲渡サブネーム・限定setterの計画を生成する。計画生成スクリプト自体は署名も送信もしない。Arkiv SDK 1.0.1を承認済みのBackendへ追加し、公開資格2件の実書込・receipt・entity読戻し、ENS参照2件の更新・読戻しまで実施した。取引と現在の状態は[実証記録](evidence/ens.md)を参照。
+
+親Registry接続前は`participant-preview <label> <本人の公開アドレス>`で予測Registryを使う未送信計画を作れる。Alice/Bobの入力と結果は[ENSデモ参加者fixture](fixtures/ens-demo-participants.json)・[プレフライト記録](evidence/ens-preflight.md)を参照。接続前のプレビューをそのまま実行せず、接続確認後に`participant`モードで期限と権限を再取得する。
+
+実送信の順番は[ENS送信順](evidence/ens-transaction-sequence.md)を参照。block 12078385でAlice/BobのSepolia ETH残高はともに0だったため、本人自身の限定キー更新デモにはガス代の準備が必要。残高とガス見積りは送信直前に再確認する。
+
+サブネーム登録後の`node scripts/issue-participation.ts <登録txHash> <label> <本人の公開アドレス> <trust.json>`は、現行ENS階層とFactory出自、登録receiptと現行resourceを照合してEIP-712の**署名前ドラフト**を出力する。`trust.json`には実際にデプロイされた参加者用Registryのアドレス・コードhashとResolver実装コードhashが必要で、未接続の親fixtureは代用できない。このCLIは鍵を読み込まず、署名・Arkiv書込・ENS参照更新もしない。Alice/Bobの成功結果は[実証記録](evidence/ens.md)を参照。
+
+親Registryのデプロイと接続が確定した後、`node scripts/plan-participation.ts parent`はFactoryの現行実装とコードhashを検証し、`trust`オブジェクトを出力する。両方が成立するまで`trust`は`null`。この値を保存してから署名前ドラフトに渡す。
 
 T041/T042では、初回枠→通常枠、通報のみでは停止しない例、権限外/利益相反の拒否、有限停止、本人だけの根拠通知、異議で取消、別の停止が残る取消、停止期限ちょうど、最新参照を取得できない例を検証する。実在者の証拠は入力しない。資金試験は後段でSC-004に結合し、停止中も救済APIを利用できることを確認する。
 

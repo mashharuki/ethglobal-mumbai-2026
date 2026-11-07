@@ -1,0 +1,20 @@
+{
+  "status": "verified",
+  "participant": "alice",
+  "chainId": 7794095,
+  "issuer": "0xcA341CE4902756bF9e96e145014DD0aB36A0Fe8E",
+  "txHash": "0x9f5788fd0e4c5dc326c838bf5d5dd19a80a21503c7f3e92bde1ea3578b206399",
+  "blockNumber": "304794",
+  "blockHash": "0x10a7fb59d20159e226b657017019a49d1805d1c477dea839d8cbeaba67a8021c",
+  "gasUsed": "212708",
+  "effectiveGasPrice": "1000000000",
+  "entityKey": "0x628a86b2b8d2ee96d9b91b92a9013f10ce67421e4792bf7911c46234d92ab5d6",
+  "entityExpiresAtBlock": "1600794",
+  "recordDigest": "0x5eef3a22c4bfc28571afc6839201338b553c6e0105ce09bec9f70504b8f2dded",
+  "reference": {
+    "schemaVersion": 1,
+    "arkivEntityKey": "0x628a86b2b8d2ee96d9b91b92a9013f10ce67421e4792bf7911c46234d92ab5d6",
+    "digest": "0x5eef3a22c4bfc28571afc6839201338b553c6e0105ce09bec9f70504b8f2dded",
+    "credentialVersion": 1
+  }
+}

@@ -1,0 +1,264 @@
+{
+  "schemaVersion": 1,
+  "purpose": "Synthetic test data only; category IDs are not a public identity taxonomy",
+  "dictionary": {
+    "version": "synthetic-1",
+    "hobbies": ["h1", "h2", "h3", "h4", "h5", "h6", "h7", "h8"],
+    "genders": ["g1", "g2", "g3"],
+    "intents": ["i1", "i2"],
+    "unspecifiedPreference": ["*"],
+    "coordinates": 288
+  },
+  "participants": {
+    "A": {
+      "subject": "synthetic-a",
+      "profileVersion": 1,
+      "hobbies": ["h1", "h2"],
+      "gender": "g1",
+      "intent": "i1",
+      "acceptsGenders": ["g2"],
+      "acceptsIntents": ["i2"],
+      "job": "synthetic-job-a",
+      "ageBand": "synthetic-adult-a"
+    },
+    "B": {
+      "subject": "synthetic-b",
+      "profileVersion": 1,
+      "hobbies": ["h2", "h3"],
+      "gender": "g2",
+      "intent": "i2",
+      "acceptsGenders": ["g1"],
+      "acceptsIntents": ["i1"],
+      "job": "synthetic-job-b",
+      "ageBand": "synthetic-adult-b"
+    },
+    "C": {
+      "subject": "synthetic-c",
+      "profileVersion": 1,
+      "hobbies": ["h4"],
+      "gender": "g3",
+      "intent": "i1",
+      "acceptsGenders": ["g1"],
+      "acceptsIntents": ["i1"],
+      "job": "synthetic-job-c",
+      "ageBand": "synthetic-adult-c"
+    }
+  },
+  "matchingCases": [
+    { "id": "all-conditions", "expectedCandidate": true },
+    {
+      "id": "no-shared-hobby",
+      "overrides": { "B": { "hobbies": ["h3"] } },
+      "expectedCandidate": false
+    },
+    {
+      "id": "a-gender-preference-fails",
+      "overrides": { "A": { "acceptsGenders": ["g3"] } },
+      "expectedCandidate": false
+    },
+    {
+      "id": "b-gender-preference-fails",
+      "overrides": { "B": { "acceptsGenders": ["g2"] } },
+      "expectedCandidate": false
+    },
+    {
+      "id": "a-intent-preference-fails",
+      "overrides": { "A": { "acceptsIntents": ["i1"] } },
+      "expectedCandidate": false
+    },
+    {
+      "id": "b-intent-preference-fails",
+      "overrides": { "B": { "acceptsIntents": ["i2"] } },
+      "expectedCandidate": false
+    },
+    {
+      "id": "both-unspecified",
+      "overrides": {
+        "A": { "acceptsGenders": ["*"], "acceptsIntents": ["*"] },
+        "B": { "acceptsGenders": ["*"], "acceptsIntents": ["*"] }
+      },
+      "expectedCandidate": true
+    },
+    {
+      "id": "profile-version-substitution",
+      "proof": { "subject": "synthetic-b", "profileVersion": 0 },
+      "expectedCandidate": false
+    },
+    {
+      "id": "another-subject-proof",
+      "proof": { "subject": "synthetic-c", "profileVersion": 1 },
+      "expectedCandidate": false
+    },
+    {
+      "id": "search-ended",
+      "leases": { "A": "ended", "B": "active" },
+      "expectedCandidate": false
+    }
+  ],
+  "participationBase": {
+    "nameCurrent": true,
+    "issuerTrusted": true,
+    "referenceCurrent": true,
+    "issuanceCurrent": true,
+    "credentialStatus": "eligible",
+    "credentialUnexpired": true,
+    "signatureValid": true,
+    "ensReadable": true,
+    "arkivReadable": true,
+    "blockTime": "2026-11-06T11:59:59Z"
+  },
+  "participationCases": [
+    {
+      "id": "current-eligible",
+      "nameCurrent": true,
+      "issuerTrusted": true,
+      "referenceCurrent": true,
+      "credentialStatus": "eligible",
+      "credentialUnexpired": true,
+      "expected": "eligible"
+    },
+    {
+      "id": "suspended",
+      "credentialStatus": "suspended",
+      "suspendedUntil": "2026-11-06T12:00:00Z",
+      "blockTime": "2026-11-06T11:59:59Z",
+      "expected": "ineligible"
+    },
+    {
+      "id": "suspension-boundary",
+      "credentialStatus": "suspended",
+      "suspendedUntil": "2026-11-06T12:00:00Z",
+      "blockTime": "2026-11-06T12:00:00Z",
+      "expected": "eligible"
+    },
+    {
+      "id": "expired-credential",
+      "credentialUnexpired": false,
+      "expected": "ineligible"
+    },
+    { "id": "expired-name", "nameCurrent": false, "expected": "ineligible" },
+    {
+      "id": "old-reference",
+      "referenceCurrent": false,
+      "expected": "ineligible"
+    },
+    { "id": "other-issuer", "issuerTrusted": false, "expected": "ineligible" },
+    {
+      "id": "prior-issuance",
+      "issuanceCurrent": false,
+      "expected": "ineligible"
+    },
+    {
+      "id": "credential-tampered",
+      "signatureValid": false,
+      "expected": "ineligible"
+    },
+    {
+      "id": "ens-unavailable",
+      "ensReadable": false,
+      "expected": "unavailable"
+    },
+    {
+      "id": "arkiv-unavailable",
+      "arkivReadable": false,
+      "expected": "unavailable"
+    },
+    {
+      "id": "delegated-key-revoked",
+      "operation": "update-app-key",
+      "delegationValid": false,
+      "expected": "rejected"
+    },
+    {
+      "id": "owner-cannot-update-credential",
+      "operation": "update-app-credential",
+      "actor": "owner",
+      "expected": "rejected"
+    },
+    {
+      "id": "owner-can-update-endpoint",
+      "operation": "update-app-endpoint",
+      "actor": "owner",
+      "expected": "accepted"
+    },
+    {
+      "id": "owner-cannot-replace-resolver",
+      "operation": "replace-resolver",
+      "actor": "owner",
+      "expected": "rejected"
+    },
+    {
+      "id": "owner-cannot-transfer",
+      "operation": "transfer",
+      "actor": "owner",
+      "expected": "rejected"
+    },
+    {
+      "id": "owner-cannot-unsafe-transfer",
+      "operation": "unsafe-transfer",
+      "actor": "owner",
+      "expected": "rejected"
+    },
+    {
+      "id": "owner-cannot-link",
+      "operation": "link",
+      "actor": "owner",
+      "expected": "rejected"
+    },
+    {
+      "id": "owner-cannot-upgrade",
+      "operation": "upgrade",
+      "actor": "owner",
+      "expected": "rejected"
+    },
+    {
+      "id": "owner-cannot-admin",
+      "operation": "grant-admin",
+      "actor": "owner",
+      "expected": "rejected"
+    },
+    {
+      "id": "other-owner-cannot-update-endpoint",
+      "operation": "update-app-endpoint",
+      "actor": "other-owner",
+      "expected": "rejected"
+    }
+  ],
+  "scheduling": {
+    "populationSizes": [10, 50],
+    "matchesPerRoundLimit": 3,
+    "concurrentSessionsLimit": 1,
+    "rounds": 10,
+    "newTierMatchesPerRoundLimit": 1,
+    "excludeBlockedPair": true
+  },
+  "selectiveDisclosure": {
+    "selectedFields": ["job"],
+    "hiddenFields": ["ageBand"],
+    "changedRegisteredValueExpected": "rejected"
+  },
+  "assets": [
+    {
+      "symbol": "USDC",
+      "chainId": 11155111,
+      "address": "0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238",
+      "exampleBaseUnits": "100"
+    },
+    {
+      "symbol": "EURC",
+      "chainId": 11155111,
+      "address": "0x08210F9170F89Ab7658F0B5E3fF39b0E03C594D4",
+      "exampleBaseUnits": "40"
+    }
+  ],
+  "deadlineCases": {
+    "depositBlockTime": "2026-11-06T12:00:00Z",
+    "depositExpiry": "2026-11-13T12:00:00Z",
+    "secondsUntilExpiry": 604800,
+    "beforeExpiry": "2026-11-13T11:59:59Z",
+    "atExpiry": "2026-11-13T12:00:00Z",
+    "mutualEndAllowedAtExpiry": false,
+    "soloRefundAllowedAtExpiry": true,
+    "unboundCancellationAllowedBeforeExpiry": true
+  }
+}

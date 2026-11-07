@@ -1,0 +1,23 @@
+{
+  "chainId": 11155111,
+  "blockNumber": 12076657,
+  "namespace": "secrettinder.eth",
+  "deploymentVersion": "07e55a056f5b6a9c90119f501bdd05714e67dddd",
+  "issuer": "0xcA341CE4902756bF9e96e145014DD0aB36A0Fe8E",
+  "observedOwner": "0xcA341CE4902756bF9e96e145014DD0aB36A0Fe8E",
+  "parentRegistry": "0xD4eBcbBdF463C9c45784603Db0dDD499BC44A8B4",
+  "parentResolver": "0x463d2E862B4C716ED51cBC9d1009680BaE89Cf15",
+  "parentNameExpiresAt": 1825526676,
+  "parentNameTokenId": "61646638904996846319230262241161863736732485873409700473905922513580696010752",
+  "subregistry": "0x0000000000000000000000000000000000000000",
+  "universalHelper": "0xd453e5bdb62cc3bea84341b1e306319c8ffd7dfe",
+  "universalHelperCodeHash": "0xd17b5810abdbed29895e6f0b91e887e8ac132a2715ccc76e017eb3705dd392ca",
+  "parentRegistryCodeHash": "0xddb7698fc2857f7a9e726491025fead241791f113a19714149db8cbf87688e98",
+  "parentResolverCodeHash": "0x90af2ac3353acc92cdc326a4928cb3e37db93a7679ef6e81022311f8ce161aeb",
+  "parentPermissions": {
+    "blockNumber": 12076672,
+    "account": "0xcA341CE4902756bF9e96e145014DD0aB36A0Fe8E",
+    "canSetSubregistry": true
+  },
+  "abiSource": "https://github.com/ensdomains/contracts-v2/tree/07e55a056f5b6a9c90119f501bdd05714e67dddd/contracts/deployments/sepolia"
+}

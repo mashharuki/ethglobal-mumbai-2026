@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "purpose": "Stage A ENSv2 Sepolia demo identities; public addresses only, no profile or matching secrets",
+  "namespace": "secrettinder.eth",
+  "participants": [
+    {
+      "id": "A",
+      "displayName": "Alice",
+      "label": "alice",
+      "dnsName": "alice.secrettinder.eth",
+      "subject": "0xfb6DF0D12052a1c8E58920654D44015C61552E57"
+    },
+    {
+      "id": "B",
+      "displayName": "Bob",
+      "label": "bob",
+      "dnsName": "bob.secrettinder.eth",
+      "subject": "0xD1D13C313FfBB0dD00898D8c705794D082Dc388e"
+    }
+  ]
+}

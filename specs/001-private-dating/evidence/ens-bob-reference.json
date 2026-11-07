@@ -1,0 +1,15 @@
+{
+  "status": "verified",
+  "participant": "bob",
+  "txHash": "0xc798656879bcb49a22eacae9bd3beb46e28911bf9e8ec6ea9e1c333b8f4e16a5",
+  "blockNumber": "12078884",
+  "blockHash": "0xe5fc56e3aa51d33d7391f9764847d194011fc349308cc2726085c391217d3017",
+  "gasUsed": "1148373",
+  "effectiveGasPrice": "1000000000",
+  "reference": {
+    "schemaVersion": 1,
+    "arkivEntityKey": "0x4e253c8b29d21b401d99a970bfe8624d0d27bd835e49962006e8c1440d39c151",
+    "digest": "0x492c0346ed438fd8cb9d71321a88e6e2ed8c11aa08493924974790b740fac75f",
+    "credentialVersion": 1
+  }
+}

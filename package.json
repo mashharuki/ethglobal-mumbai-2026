@@ -23,7 +23,7 @@
     "ai"
   ],
   "author": "mashharuki",
-  "license": "ISC",
+  "license": "MIT",
   "devEngines": {
     "packageManager": {
       "name": "pnpm",
@@ -34,11 +34,15 @@
   "packageManager": "pnpm@11.24.0",
   "type": "module",
   "devDependencies": {
-    "turbo": "^2.11.10",
     "@biomejs/biome": "2.5.10",
     "@types/node": "^26.6.5",
     "jscpd": "^5.4.1",
     "knip": "^6.41.0",
+    "turbo": "^2.11.10",
     "typescript": "^7.0.2"
+  },
+  "dependencies": {
+    "@arkiv-network/sdk": "1.0.1",
+    "viem": "2.57.16"
   }
 }

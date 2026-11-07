@@ -2,7 +2,7 @@
 
 [統合仕様（Draft）](spec.md)・[実装計画](plan.md)・[データモデル](data-model.md)・[設計判断](research.md)・[正式応募目標](prize-targets.md)を入力とする。パスはリポジトリルート基準で、新規ファイルの予定位置も含む。チェックは受入条件を満たした時に付ける。担当は役割で表す。[P] は先行条件を満たした別担当・別ファイルでの並行作業。既存T001〜T036の参照を維持するため、追加はT037〜T044とし、番号順ではなく明記した依存順で実行する。
 
-**採用順**：A（T037→T038→T039、T041→T042→T034）→ B（T007→T011→T012）→ C（T009→T040→製品結合）。審査APIの認証準備はT003→T006を並行する。Aは入金・ZKを待たない。資格停止/異議/回復を採用し、資金は元本返却専用へ変更する。独立保証金・金銭没収は追加しない。全44タスクは未完了。AIBot単体は実装済みで、T025〜T029は親側の結合を対象とする。T043は説明/UI、T044は条件付きSwarm追加。
+**採用順**：A（T037→T038→T039、T041→T042→T034）→ B（T007→T011→T012）→ C（T009→T040→製品結合）。審査APIの認証準備はT003→T006を並行する。Aは入金・ZKを待たない。資格停止/異議/回復を採用し、資金は元本返却専用へ変更する。独立保証金・金銭没収は追加しない。T001・T002・T037は完了、残り41タスク。AIBot単体は実装済みで、T025〜T029は親側の結合を対象とする。T043は説明/UI、T044は条件付きSwarm追加。
 
 ## 仕様とタスクの主担当
 
@@ -29,8 +29,8 @@
 
 ## Phase 1 — セットアップ
 
-- [ ] T001 [P] 開発担当：Node・pnpm・Hardhat・Noirのローカル版と利用可能な端末を照合し、必要な追加依存・選ぶ理由・代案・既存CIの失敗を `specs/001-private-dating/quickstart.md` に記録する。依存追加の承認後、対象package.jsonと `pnpm-lock.yaml` を同期する。
-- [ ] T002 [P] デモ担当：`specs/001-private-dating/fixtures/scenarios.json` に架空のA/B/C、H=8・G=3・I=2の合成辞書と指定なしを含む希望mask、SC-002の10例、SC-005の資格正負例、SC-006のN/K設定、既存の職業・年齢帯・2銘柄・期限境界を固定する。合成カテゴリを一般利用者向け分類として扱わない。
+- [X] T001 [P] 開発担当：Node・pnpm・Hardhat・Noirのローカル版と利用可能な端末を照合し、必要な追加依存・選ぶ理由・代案・既存CIの失敗を `specs/001-private-dating/quickstart.md` に記録する。依存追加の承認後、対象package.jsonと `pnpm-lock.yaml` を同期する。
+- [X] T002 [P] デモ担当：`specs/001-private-dating/fixtures/scenarios.json` に架空のA/B/C、H=8・G=3・I=2の合成辞書と指定なしを含む希望mask、SC-002の10例、SC-005の資格正負例、SC-006のN/K設定、既存の職業・年齢帯・2銘柄・期限境界を固定する。合成カテゴリを一般利用者向け分類として扱わない。
 
 ## Phase 2 — 担当間で先に固定する契約
 
@@ -47,9 +47,9 @@
 
 ### 段階A：ENS資格を先に実証
 
-- [ ] T037 [US1] API担当：T001・T002後、`packages/shared/src/participation/schema.ts` と `specs/001-private-dating/fixtures/participation.json` に[資格契約](contracts/participation.md)のschema、署名/digest形式、状態・エラー、権限表、信頼するnamespace/issuerを固定する。公式deployment版・ABI・実コード・発行世代の確認方法を照合し、実測した公開設定だけをfixtureへ記録する。
+- [X] T037 [US1] API担当：T001・T002後、`packages/shared/src/participation/schema.ts` と `specs/001-private-dating/fixtures/participation.json` に[資格契約](contracts/participation.md)のschema、署名/digest形式、状態・エラー、権限表、信頼するnamespace/issuerを固定する。公式deployment版・ABI・実コード・発行世代の確認方法を照合し、実測した公開設定だけをfixtureへ記録する。
 - [ ] T038 [US1] API/Arkiv担当：T037後、`scripts/issue-participation.ts` と `apps/backend/src/participation/issuer.ts` に専用Resolver、非譲渡サブネーム、限定キー委任、署名付き公開資格のArkiv書込とENS参照更新・有限期限付き停止を実装する。審査停止は参照無効化で代替せず、基盤障害をunavailableとして区別する。`apps/contract/test/ParticipationPermissions.ts` で本人による資格/Resolver/LINK/UPGRADE/admin迂回、別参加者更新、失効鍵を拒否する。外部デプロイ・書込は必要な承認を得て実行し、ZK・入金とは依存させない。
-- [ ] T039 [US1] Web担当：T038後、`apps/frontend/src/pages/Participation.tsx` と `scripts/verify-participation.ts` に2つの独立読取実装を作る。共有はschema/fixtureまでとし、後者はWebのBFF・判定・検証関数を使わずENS/Arkivを読む。eligible/ineligible/unavailable、同一ブロック/版での一致、BFF停止、旧版/再発行/別発行者拒否を確認する。
+- [ ] T039 [US1] Web担当：T038後、`apps/frontend/src/pages/Participation.tsx` と `scripts/verify-participation.ts` に2つの独立読取実装を作る。共有はschema/fixtureまでとし、後者はWebのBFF・判定・検証関数を使わずENS/Arkivを読む。eligible/ineligible/unavailable、同一ブロック/版での一致、BFF停止、旧版/再発行/別発行者拒否を確認する。WebとCLIのAlice/Bob正常系は各同一Sepoliaブロック/版で一致し、Hono停止時のWeb動作とCLIの一部負例を実測済み。旧版/再発行/別発行者・Web負例は未完了。
 - [ ] T041 [US1] API担当：T037・T038・T006後、`apps/backend/src/participation/review.ts` と `apps/backend/src/participation/review.test.ts` に[審査契約](contracts/participation-review.md)の規則版、合成ケースの私的状態、審査/異議の役割、本人通知、有限停止の集約と有効な資格への反映、再発行時の主体継続、期限を実装する。受付だけで停止せず、無権限・利益相反・再送延長を拒否する。停止中も救済APIへ本人認証でアクセス可能にする。
 - [ ] T042 [US1] Web/検証担当：T039・T041後、`apps/frontend/src/pages/ParticipationReview.tsx` と `scripts/verify-participation.ts` に本人の根拠/期限/異議/ブロックと実効資格の確認を接続する。SC-007の署名付きtier更新と枠判定fixture、私的ブロック状態、取消/期限ちょうど/別停止が残る回復、古い版/他人アクセス拒否、公開漏えい0件を `specs/001-private-dating/evidence/participation-review.md` へ記録する。実割当への枠/ブロック反映はT040/T016、資金不変はT024で後段検証し、候補選択や入金をAの前提にしない。
 - [ ] T034 [US1] API担当：T042後、SC-005/007とENS-V2を実ネットワークで検証し、`specs/001-private-dating/evidence/ens.md` に役割・deployment/ABI・参照・ブロック/取引、独立検証、停止/回復、管理者への信頼を記録する。審査詳細はT042の非公開項目検査を参照する。合成の判断と実世界の不正検出を混同しない。段階Aの技術合格と公開資料/T036の提出可を分ける。
@@ -93,12 +93,12 @@
 
 ## Phase 6 — 統合・提出準備
 
-- [ ] T043 [P] Web・提出担当：`docs/demo-script.md` と `apps/frontend/src/App.tsx` の説明/UIを「シークレットTinder」「条件→照合→任意AI会話」にそろえる。一画面の主操作を一つにし、公開登録・端末内の秘密・AI送信同意を区別する。初見の人に目的/次の操作/送信範囲を聞いた結果を `specs/001-private-dating/evidence/ux.md` に残す。台本原稿は作成済み、UIと実測は未完了。T033の前提とし、技術機能の完成は主張しない。
+- [ ] T043 [P] Web・提出担当：`docs/demo-script.md` と `apps/frontend/src/App.tsx` の説明/UIを「シークレットTinder」「条件→照合→任意AI会話」にそろえる。一画面の主操作を一つにし、公開登録・端末内の秘密・AI送信同意を区別する。初見の人に目的/次の操作/送信範囲を聞いた結果を `specs/001-private-dating/evidence/ux.md` に残す。台本原稿と概要UIは作成済み、初見の人による実測は未完了。T033の前提とし、技術機能の完成は主張しない。
 - [ ] T044 [P] Arkiv・Web担当：条件付きで `scripts/publish-scene-assets.ts`、`apps/frontend/src/scenes/catalog.ts` に[Swarm素材契約](contracts/swarm-assets.md)の公開素材upload→Arkiv検索→Swarm read→画面表示を実装する。`arkiv/swarm.md` に公式指定証拠を残す。依存/外部書込/支払いは承認後。期限切れ・参照不正・取得不能も確認し、実施判断は3正式目標と提出準備の不足・残時間を確認して行う。採用時はT033の動画に読取箇所を追加する。未実施/未達ならT036で追加を見送りと記録する。
 
 - [ ] T030 [P] 品質担当：`specs/001-private-dating/quickstart.md` の手順を第三者環境で再現し、Biome、frontend lint/build、Workers dry-run、Hardhat format/build/test、Noirの正負例と実証明を確認する。既存エラーと新規失敗を区別し、実測結果を `specs/001-private-dating/evidence/verification.md` に残す。
 - [ ] T031 [P] 提出担当：`README.md` に起動手順、見出し`CROPS`と各項目、トラッカーの検査、公開ライセンス、ライブデモ、3目標と条件付き追加ARKIV-SWARMを記す。Classic / From Scratchの新作範囲と再利用スターター、コミット履歴、AI支援箇所とチームの貢献、仕様・プロンプト・計画への参照を確認する。賞別証拠の最終リンクとArkiv書込アドレス・クエリはT036で反映する。
-- [ ] T032 [P] Arkiv担当：T014・T015後、ARKIV-APPの実書込→索引反映→第三者の公開登録画面での実読取、更新・失効を実演し、`specs/001-private-dating/evidence/arkiv.md` にチェーン、書込ウォレット、取引／エンティティキー、再現クエリと画面の対応を残す。`arkiv/schema.md`、`arkiv/friction.md`、`arkiv/reach.md`、`arkiv/why-arkiv.md`、`arkiv/how-you-use-arkiv.md` を実測根拠で揃え、README用の書込アドレス・クエリをT036へ渡す。秘密・ペア・相性結果を公開せず、ログ書込のみでは完了にしない。
+- [ ] T032 [P] Arkiv担当：T014・T015後、ARKIV-APPの実書込→索引反映→第三者の公開登録画面での実読取、更新・失効を実演し、`specs/001-private-dating/evidence/arkiv.md` にチェーン、書込ウォレット、取引／エンティティキー、再現クエリと画面の対応を残す。`arkiv/schema.md`、`arkiv/friction.md`、`arkiv/reach.md`、`arkiv/why-arkiv.md`、`arkiv/how-you-use-arkiv.md` を実測根拠で揃え、README用の書込アドレス・クエリをT036へ渡す。秘密・ペア・相性結果を公開せず、ログ書込のみでは完了にしない。公開索引CLIとローカルWebの実読取、指定5資料の初稿は確認済み。第三者公開画面、更新・失効、提出資料の最終照合は未完了。
 - [ ] T033 デモ担当：T031・T043と実演可能な結果を受け、`docs/demo-script.md` を120秒の対面プレゼンへ仕上げる。キャッチコピー→利用者操作→スポンサーの役割を示し、リハーサル実測を残す。別途2〜3分の提出動画に実演箇所・対象コミット・実接続/合成/未接続・公開リンクを記録する。証明生成/取引確定待ちのカットは実測秒数を添え、同じ実行の開始/結果を残す。EF-RPC/ARKIV-SWARMは実証時のみ追加し、T036へ渡す。
 - [ ] T035 [P] Web/ZK担当：T008・T016・T017・T031後、API・資金担当とEF-CROPSの情報境界とCROPS4項目を確認し、`specs/001-private-dating/evidence/ef-crops.md` に2端末の実照合、第三者観察、トラッカー検査、秘密の所在、運営依存・残る推測可能性を記す。資金経路を主張する場合はT024も照合する。Web担当は追加賞EF-RPCを `specs/001-private-dating/evidence/anon-rpc.md` で別判定し、標準読取の成功・対象範囲・例外の理由・障害時の挙動を記録する。
 - [ ] T036 提出担当：T030〜T035・T043の結果とT044の実施/見送り判断（未達を含む）を集め、`specs/001-private-dating/evidence/prizes.md` にEF-CROPS・ENS-V2・ARKIV-APPと追加EF-RPC・ARKIV-SWARMの判定を個別に記録する。公式条件を再確認し、証拠・README・動画・ライブデモの主張を照合する。`README.md` に賞別証拠、Arkiv書込ウォレットと再現クエリを反映し、第三者アクセスを確認する。提出可・未達・再確認待ちの理由、担当・対象コミットを残し、チームがDashboardで選択・提出した後に選択結果と受付を記録する。資料作成だけで応募完了にしない。
