@@ -27,10 +27,35 @@ Arkiv Rabdi（chain ID `7794095`）の公開RPCで同じ発行IDのentityが0件
 
 [ENS参照更新計画](ens-reference-plan.json)にArkiv entity key・digest・資格版を固定した。Aliceの`app.credential`は[取引](https://sepolia.etherscan.io/tx/0xf95064e137e787ef2e8f16ee9d7a0b582be4e6f31afae1504e0b26a422df9b5a)で設定され、[receiptとENS読戻し](ens-alice-reference.json)で確認した。Bobも[取引](https://sepolia.etherscan.io/tx/0xc798656879bcb49a22eacae9bd3beb46e28911bf9e8ec6ea9e1c333b8f4e16a5)で設定され、[receiptとENS読戻し](ens-bob-reference.json)で確認した。両者とも親Registryの接続、名前のowner・期限・Resolver、公式FactoryのResolver実装出自を同じ読取ブロックで照合し、ENS参照がArkiv読戻し証拠のentity key・digest・資格版と一致した。
 
+## 独立CLIによる公開検証
+
+`scripts/verify-participation.ts`はBackendのBFF・判定関数を呼ばず、固定した[公開の信頼設定](ens-trust.json)とENSv2 Sepolia・Arkiv Rabdiの公開状態を直接読む。親名/参加者Registry、Resolver Factory出自、本人のRegistry/root権限の欠如、`app.credential`のsetter分離、Arkiv entityの所有/署名/版/期限、登録イベントを照合する。2026-11-07に次を実測した。
+
+| 呼出し | 判定 | 観測 |
+| --- | --- | --- |
+| `pnpm exec node scripts/verify-participation.ts alice 12080090` | `eligible` | ENS block `12080090`、資格版`1` |
+| `pnpm exec node scripts/verify-participation.ts bob 12080090` | `eligible` | ENS block `12080090`、資格版`1` |
+| `pnpm exec node scripts/verify-participation.ts charlie 12080090` | `ineligible` | `NAME_EXPIRED`、exit 1 |
+| AliceのSepolia RPCを到達不能URLに変更 | `unavailable` | `ENS_UNAVAILABLE`、exit 1 |
+| AliceのArkiv access keyを不正値に変更 | `unavailable` | `ARKIV_UNAVAILABLE`、exit 1 |
+
+Alice/Bobの同一ブロック結果は、権限読取の追加後に再実行した。障害時の判定は障害を資格失効として扱わない。Arkivは実行時の現行entityを読むため、指定するSepolia過去ブロックとArkivの原子的スナップショットを保証しない。CLIの正常系と一部負例は実測した。
+
+## ブラウザーとCLIの比較
+
+Honoバックエンドを起動せず、Viteのローカル画面から`Participation.tsx`のAlice/Bobボタンを操作した。ブラウザー実装は共有schema・固定信頼設定以外のCLI/BFF判定コードを呼ばず、ENSv2とArkivを直接読む。公開RPCのaccess keyやウォレット接続は使用していない。
+
+| 参加者 | Webの表示 | WebのSepolia block | 同blockを指定したCLI |
+| --- | --- | --- | --- |
+| Alice | `資格あり`、版`1` | `12080132` | `eligible`、版`1` |
+| Bob | `資格あり`、版`1` | `12080133` | `eligible`、版`1` |
+
+両CLI呼出しはexit 0。Webは現行ブロックを取得するためAliceとBobのblockは異なるが、各行のWeb/CLIは同一block・版で一致した。Arkivは比較時の現行entityを読んでおり、Sepoliaとの原子的なクロスチェーン状態ではない。旧版・再発行・別発行者の合成負例、およびWeb側の障害/停止表示の試験は未実施。
+
 ## 残る合格条件
 
 - T038: 有限停止、委任鍵失効、コントラクト権限テスト。本人ウォレットからの限定キー実更新も未実施。
-- T039: Webと別CLIによるENS/Arkivの独立検証、BFF停止・旧版/別発行者・障害の判定。
+- T039: Web/CLIの正常系比較とBFF停止時のWeb動作は上記の通り実測済み。旧版/再発行/別発行者・Web障害/停止の負例は未完了。
 - T041/T042/T034: 審査停止・異議・回復、SC-005/007の総合判定と提出用証拠。
 
 発行者には親名と参加者Registryを管理する権限が残る。親やResolver実装の変更を検証者が追跡する必要がある。[ENSv2の権限モデル](https://docs.ens.domains/ensv2/enhanced-access-control/)に従い、名前のownerだけではroot権限や発行者署名を代替できない。現段階では段階Aの部分達成であり、SC-005合格やENS賞の応募条件達成とは判定しない。

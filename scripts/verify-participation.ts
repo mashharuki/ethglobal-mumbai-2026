@@ -38,9 +38,12 @@ const registryAbi = parseAbi([
   "function getResource(uint256 anyId) view returns (uint256)",
   "function getResolver(string label) view returns (address)",
   "function getSubregistry(string label) view returns (address)",
+  "function roles(uint256 resource, address account) view returns (uint256)",
 ]);
 const resolverAbi = parseAbi([
   "function resolve(bytes name, bytes data) view returns (bytes)",
+  "function roles(uint256 resource, address account) view returns (uint256)",
+  "function hasRoles(uint256 resource, uint256 roleBitmap, address account) view returns (bool)",
 ]);
 const textAbi = parseAbi([
   "function text(bytes32 node, string key) view returns (string)",
@@ -256,6 +259,82 @@ async function readReference(
   return parsed.data;
 }
 
+async function readRegistryRoles(
+  name: Awaited<ReturnType<typeof readParticipant>>,
+  trust: Trust,
+  blockNumber: bigint,
+) {
+  const [scoped, root] = await Promise.all([
+    eth.readContract({
+      address: trust.participantRegistry,
+      abi: registryAbi,
+      functionName: "roles",
+      args: [name.resource, name.owner],
+      blockNumber,
+    }),
+    eth.readContract({
+      address: trust.participantRegistry,
+      abi: registryAbi,
+      functionName: "roles",
+      args: [0n, name.owner],
+      blockNumber,
+    }),
+  ]);
+  return { scoped, root };
+}
+
+async function readResolverRoles(
+  name: Awaited<ReturnType<typeof readParticipant>>,
+  trust: Trust,
+  blockNumber: bigint,
+) {
+  const resource = BigInt(keccak256(stringToHex("app.credential")));
+  const [root, ownerCanChange, issuerCanChange] = await Promise.all([
+    eth.readContract({
+      address: name.resolver,
+      abi: resolverAbi,
+      functionName: "roles",
+      args: [0n, name.owner],
+      blockNumber,
+    }),
+    eth.readContract({
+      address: name.resolver,
+      abi: resolverAbi,
+      functionName: "hasRoles",
+      args: [resource, 1n << 4n, name.owner],
+      blockNumber,
+    }),
+    eth.readContract({
+      address: name.resolver,
+      abi: resolverAbi,
+      functionName: "hasRoles",
+      args: [resource, 1n << 4n, trust.issuer],
+      blockNumber,
+    }),
+  ]);
+  return { root, ownerCanChange, issuerCanChange };
+}
+
+async function checkPermissions(
+  name: Awaited<ReturnType<typeof readParticipant>>,
+  trust: Trust,
+  blockNumber: bigint,
+) {
+  const [registry, resolver] = await Promise.all([
+    readRegistryRoles(name, trust, blockNumber),
+    readResolverRoles(name, trust, blockNumber),
+  ]);
+  if (
+    registry.scoped !== 0n ||
+    registry.root !== 0n ||
+    resolver.root !== 0n ||
+    resolver.ownerCanChange ||
+    !resolver.issuerCanChange
+  ) {
+    throw new InvalidCredential("REGISTRY_MISMATCH");
+  }
+}
+
 async function checkIssuance(
   credential: Credential,
   label: string,
@@ -363,6 +442,10 @@ async function readCurrentRecords(label: string, requestedBlock?: bigint) {
   );
   const name = await fromNetwork(
     () => readParticipant(label, trust, block.number, block.timestamp),
+    "ENS_UNAVAILABLE",
+  );
+  await fromNetwork(
+    () => checkPermissions(name, trust, block.number),
     "ENS_UNAVAILABLE",
   );
   const reference = await fromNetwork(

@@ -10,8 +10,7 @@ const issuanceId = process.argv[2];
 if (!issuanceId || !/^0x[0-9a-fA-F]{64}$/.test(issuanceId)) {
   throw new Error("Usage: node scripts/query-publications.ts 0x<issuance-id>");
 }
-const accessKey = process.env.ARKIV_ACCESS_KEY;
-if (!accessKey) throw new Error("Set ARKIV_ACCESS_KEY before querying Rabdi");
+const accessKey = process.env.ARKIV_ACCESS_KEY ?? "";
 
 const client = createPublicClient({
   chain: rabdi({ accessKey }),

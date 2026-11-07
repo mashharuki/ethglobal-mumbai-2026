@@ -53,7 +53,7 @@ Phase 0開始前に確認した憲章は未批准テンプレート。適用す�
 | apps/contract | 新規の預託・精算と資金用証明の検証。既存Counterはスターター |
 | circuits/（新設予定） | Noir回路、公開入力の順序、検証鍵の版、成功・失敗fixture。pnpm workspaceの追加は不要 |
 | packages/api-specs/openapi.yaml、packages/shared | 機械可読HTTP契約と共有型。実装時は契約確定→クライアント生成→両アプリ接続の順 |
-| scripts/verify-participation.ts（新設予定） | Web/BFFに依存しない別の資格検証実装。schema・fixtureのみ共有し、ENS/Arkivを自分で読む |
+| scripts/verify-participation.ts（実装済み） | Web/BFFに依存しない別の資格検証実装。schema・fixtureのみ共有し、ENS/Arkivを自分で読む。正常系と一部負例の実測は[evidence/ens.md](evidence/ens.md) |
 | ethglobal-mumbai-2026-AIBot/ | Next.jsの独立アプリ。Persona承認・保存・自由会話を既存実装から再利用。[親との接続契約](contracts/simulation.md)と同意境界をT025〜T029で結合 |
 
 Phase 0の比較は[research.md](research.md)、Phase 1の保存・状態遷移は[data-model.md](data-model.md)、担当間の境界は[参加資格](contracts/participation.md)・[資格審査](contracts/participation-review.md)・[サービス](contracts/service.md)・[照合](contracts/matching.md)・[精算](contracts/settlement.md)・[AIBot](contracts/simulation.md)・[条件付きSwarm](contracts/swarm-assets.md)、試験手順は[quickstart.md](quickstart.md)を参照する。既存憲章は未批准のままで、新依存・デプロイ・pushの承認を本改訂で代替しない。

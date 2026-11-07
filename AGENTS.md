@@ -6,7 +6,7 @@ Always reply to the user in **Japanese**.
 ## Project status
 
 - Hackathon project for **ETHGlobal Mumbai 2026**.
-- An existing **private dating / matching proposal** lives in `specs/001-private-dating/`. Parent frontend/backend and Counter remain templates. The AIBot submodule has a standalone Persona conversation implementation; parent authentication/matching integration is unverified. A written requirement is not implemented behavior.
+- An existing **private dating / matching proposal** lives in `specs/001-private-dating/`. The frontend now has an overview and read-only ENSv2/Arkiv participation verifier. The Hono API and Counter are still starters; issuer and independent verification scripts live outside those app routes. The AIBot submodule has a standalone Persona conversation implementation; parent authentication/matching integration is unverified. A written requirement is not implemented behavior.
 - The specification remains **Draft** and `.specify/memory/constitution.md` is an unratified template. Ethereum Foundation, ENS and Arkiv are confirmed prize targets; this does not imply that the whole specification is approved or the prize requirements are met.
 - **Do not generate or modify Spec Kit artifacts** (`speckit-*`, `.specify/`, `specs/`) unless the user asks for specification work. A status review may read them without starting a workflow.
 
@@ -22,11 +22,11 @@ Always reply to the user in **Japanese**.
 
 | Path | What it is | Stack |
 |---|---|---|
-| `apps/frontend` | Web UI template with Void + PWA configured | React 19, Vite 8, TypeScript 7, lism-css, oxlint |
-| `apps/backend` | API (Hono template) | Hono 4 on Cloudflare Workers (wrangler) |
+| `apps/frontend` | Overview UI and read-only ENSv2/Arkiv verifier, with Void + PWA | React 19, Vite 8, TypeScript 7, lism-css, oxlint |
+| `apps/backend` | Hono API starter plus participation issuance/evidence code | Hono 4 on Cloudflare Workers (wrangler) |
 | `apps/contract` | Counter sample, Solidity + TS tests, Ignition | Hardhat 3, viem, Solidity 0.8.37, TypeScript 6 |
 | `packages/api-specs` | API contract (`openapi.yaml`, empty for now) | OpenAPI |
-| `packages/shared` | Shared TS code (empty for now) | TypeScript |
+| `packages/shared` | Participation schema, trust anchor and signature format | TypeScript, Zod, viem |
 | `ethglobal-mumbai-2026-AIBot/` | **Independent AI simulation app (git submodule)** | Next.js, React, TypeScript; its own npm project |
 | `specs/001-private-dating/` | Existing proposal, design and implementation tasks | Spec Kit Markdown artifacts |
 | `.claude/rules/` | Authoritative coding / git / testing / security rules | — |
@@ -108,5 +108,5 @@ For documentation-only edits, check `git diff --check` and referenced paths; run
 - **Errors like `TS5023 Unknown compiler option`** mean the package's dependencies aren't installed and a global, old `tsc` ran instead. Run `pnpm install`.
 - **Stale knip workspaces:** `knip.json` lists workspaces that don't exist (`apps/regatta-web`, `apps/cdk`). Update it when you touch knip.
 - **Void build output:** frontend emits Worker/assets under `.cloudflare/output/` as well as PWA files under `dist/client/`. Do not assume `dist/` is the complete build or that Turbo caches all of it.
-- **Imported skills in Biome:** `.agents/skills/` is currently checked, unlike `.claude/`; lint failures may originate in vendored skill scripts. Do not silently rewrite installed skills to make an unrelated task green.
+- **Imported skills in Biome:** `.agents/skills/` and the AIBot submodule are excluded from parent Biome, just as `.claude/` is. Validate those separately when authorized; do not rewrite installed skills to make an unrelated task green.
 - **Legacy hooks:** `.claude/hooks/*-on-save.sh` target Prettier/ESLint and do not replace the actual Biome/oxlint checks. Prettier is used separately for Solidity.

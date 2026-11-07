@@ -1,4 +1,5 @@
 import { Cluster, Columns, Lism, Stack, Wrapper } from "lism-css/react";
+import Participation from "./pages/Participation.tsx";
 import "./App.css";
 
 const heroBackground =
@@ -260,6 +261,7 @@ function Proof() {
               <ProofCard key={participant.name} participant={participant} />
             ))}
           </Columns>
+          <Participation />
           <Lism as="p" c="text-2" fz="s">
             実証したのは資格発行と公開参照です。恋愛相性、本人の誠実さ、資金の安全性をこの資格だけで保証するものではありません。
           </Lism>
