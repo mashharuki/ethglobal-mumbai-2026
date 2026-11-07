@@ -82,7 +82,7 @@ function HeroActions() {
       <Lism
         as="a"
         className="c--primaryLink"
-        href="#journey"
+        href="#proof"
         d="inline-flex"
         ai="center"
         g="10"
@@ -94,24 +94,7 @@ function HeroActions() {
         px="30"
         bdrs="99"
       >
-        体験の流れを見る <span aria-hidden="true">↗</span>
-      </Lism>
-      <Lism
-        as="a"
-        className="c--secondaryLink"
-        href="#proof"
-        d="inline-flex"
-        ai="center"
-        g="10"
-        td="none"
-        fw="bold"
-        c="text"
-        bd
-        py="15"
-        px="30"
-        bdrs="99"
-      >
-        実証済みの部分を見る
+        公開資格の実演を見る <span aria-hidden="true">↗</span>
       </Lism>
     </Cluster>
   );

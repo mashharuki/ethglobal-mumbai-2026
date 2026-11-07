@@ -1,45 +1,46 @@
-# Secret Tinder：2分プレゼン台本
+# Secret Tinder：120秒プレゼンと提出動画
 
-2026-11-06、原稿・未リハーサル。対面プレゼンはユーザーが共有した120秒制約に合わせる。提出動画は別の2〜3分条件を満たす。T033で実演したコミット、秒数、ライブURL、実接続/合成/未接続を記録して完成させる。
+**Secret Tinder — common ground before photos.** この台本は2026-11-07の実装範囲に合わせた。対面120秒と提出動画2〜3分は別物。発話・画面操作を通した人間のリハーサルと動画収録は未実施で、T033は未完了。
 
-**シークレットTinder — 写真より先に、共通点から。**
+## 対面120秒：見せるのは実装済みの公開資格
 
-**Secret Tinder — common ground before photos.**
+開始前に[本番ページ](https://ethglobal-mumbai-2026.vercel.app/)を**新しいブラウザープロファイル**で開き、`#proof`、Alice/Bobの検証ボタン、ネットワーク接続を確認する。既存Chromeには旧PWAキャッシュでViteスターターが残った観察がある。Vercel用の旧Service Worker移行コードは次回デプロイまで本番未検証。旧画面ならその場でキャッシュを無差別削除せず、準備済みのクリーンプロファイルに切り替える。
 
-## 120秒の見せ方
-
-| 時間 | 話す内容 | 見せるもの |
+| 時間 | 発話の要点 | 画面操作 |
 | --- | --- | --- |
-| 0–10秒 | Secret Tinder。写真より先に、共通点から | 一文と主ボタン。構成図は出さない |
-| 10–25秒 | 写真中心の選別や、プロフィールを大量に公開することへの不安 | 「条件を決める→非公開で照合→話してみる」の3段階 |
-| 25–60秒 | 条件は端末に、公開情報と照合結果を分ける | 実装済みの経路だけ操作。未実装なら設計プレビューと明示 |
-| 60–85秒 | ENSは参加資格を別クライアントでも確認、Arkivは公開情報を別アプリから読む | 実証済みなら資格の再検証・Arkiv実読取。未達なら役割説明に限定 |
-| 85–105秒 | 任意で承認済みPersonaと会話する | AIBotの承認画面と短い会話。架空マッチ/実AI/親未接続を表示 |
-| 105–120秒 | 自分で共有を選び、会うかを決める | 体験導線。Swarmは実読取の証拠がある場合だけ短く補足 |
+| 0–15秒 | 「Secret Tinder。写真より先に共通点から。」写真と大量の個人情報から始める課題 | ヒーローと主ボタン「公開資格の実演を見る」 |
+| 15–35秒 | 条件を決める→非公開照合→任意のAI会話、という**開発中の**体験 | 3つのステップをスクロール。照合は完成と呼ばない |
+| 35–75秒 | 今日動く参加資格。ENSv2の名前と権限、Arkivの署名済み公開記録 | 主ボタンで`#proof`へ。Alice、続いてBobを検証し、結果を読む |
+| 75–100秒 | BFFを介さずブラウザーが両ネットワークを直接読む。ENSは現行参照と権限分離、Arkivは第三者が読める公開記録 | `資格あり`、版、Sepoliaブロックを指す。取引リンクは時間があれば開く |
+| 100–120秒 | 任意のPersona会話は別チームの単体アプリ。親アプリ接続は未完了。目標と限界を一文で締める | 未実装の明示へ戻す。賞の受賞・申請可は断言しない |
 
-## 英語原稿（設計と単体デモを紹介する版）
+### 英語で話す原稿
 
-> We’re building Secret Tinder: common ground before photos.
+> We’re building Secret Tinder: common ground before photos. Dating often starts with a face and a detailed profile. Our proposed journey starts with private preferences, checks mutual interests, then lets each person decide whether to talk. The private matching step is still in development, so let me show what works today.
 >
-> Dating can feel like choosing a face while handing over a detailed personal profile. We want to give people another starting point: shared interests, mutual preferences, and control over what they share.
+> Alice and Bob each have an ENSv2 name. The issuer controls the participation credential, while the participant has limited control of their own records. Each ENS name points to an issuer-signed public credential on Arkiv Rabdi. I’ll check Alice, then Bob. This browser reads ENS and Arkiv directly, without our backend. Both currently return eligible. ENS gives us a current reference and separate permissions. Arkiv gives other clients a public record they can inspect.
 >
-> The journey has three steps. Set your preferences. Check for a private match. Then, optionally, try a conversation before deciding whether to meet.
->
-> In our matching design, private inputs stay on each person’s device. Public registration is separate from the matching result. ENS makes participation credentials verifiable by another client, while Arkiv makes permitted public records readable beyond our own app.
->
-> Our teammate has also built this AI conversation demo. You review and approve a Persona before it is used. You can revise it, withdraw consent, and try different scenes. This is a conversation with an AI representation, not the other person’s promise or a prediction of your relationship.
->
-> AI participation is optional. Approved Persona data and messages are processed by the AI service; matching secrets are not automatically sent there. The demo currently uses fictional matches, and integration with the matching app is still being completed.
->
-> Our goal is simple: help people start with common ground, choose what to share, and decide for themselves whether to meet.
+> Our teammate also built an optional AI Persona conversation as a separate app. Connecting it to this matching flow is unfinished. Our goal is to let people start with common ground and choose what they share. Today’s live proof is the participation layer, not private matching or a guarantee of anyone’s character.
 
-実統合が完了した後だけ、未接続の説明を実測結果に差し替える。原稿の速度は計測していないため、画面操作を含めT033で短縮・リハーサルする。暗号や分散保存だけで、現実の人格・誠実さ・安全性を保証する表現は使わない。
+英語原稿は約160語。話速・クリック待機を含めた120秒の実測はまだない。RPC遅延・制限時は「通信を確認できない」と読み上げ、[ENS](../specs/001-private-dating/evidence/ens.md)と[Arkiv](../specs/001-private-dating/evidence/arkiv.md)の過去の読戻し証拠へ切り替える。その場合、録画内で現在のライブ検証が成功したとは言わない。
 
-## UIで最初に伝えること
+## 提出動画：2〜3分の撮影表（未収録）
 
-- 最初の画面は一文と主ボタン「非公開マッチングを試す」。未実装の導線は「設計プレビュー」と表示する。
-- 条件入力では「端末内に保持」「公開登録」を、AI開始前では「AIへ送る内容」を別々に示す。AI同意を登録同意へまとめない。
-- 照合結果は「条件が一致する候補」。相性100%・人格評価・容姿ランキングを表示しない。
-- AI導線は「任意：Personaと会話してみる」。シミュレーションを省略する選択も同じ画面から可能にする。
-- ENS・Arkiv・ZK・Swarmの詳細は「仕組みを見る」へ置く。実読取の表示は実際の確認状態に結び付ける。
-- 初見の参加者に「何をするアプリか／次の操作は何か／公開される情報とAIへ送る情報は何か」を聞き、理解できなかった箇所をT043で修正する。
+大会の動画範囲は2〜4分、EF-CROPSの上限は3分。共通動画を2〜3分に収める。実際に動く範囲だけを同じ収録で示す。映像の途中でUI・チェーン結果を別撮りにしたら編集点を明示し、処理待ちをカットした場合は開始と結果を同じ実行として残し実測待ち秒数を付ける。
+
+| 尺の目安 | 撮影するもの | 現時点の扱い |
+| --- | --- | --- |
+| 0:00–0:30 | キャッチコピー、課題、3段階 | 2・3段階は設計／別アプリ |
+| 0:30–1:30 | 本番URLでAlice/BobのENS→Arkiv検証を各1回、結果まで | 実接続。通信失敗ならその収録を成功例に使わない |
+| 1:30–2:10 | ENS権限とArkiv公開記録の役割、取引・独立CLI証拠 | 実証済みの資格範囲だけ |
+| 2:10–2:40 | 実装済み／未実装の境界と次の目標 | PSI・資金・親AIBot連携は未完了と明示 |
+
+収録後に埋める記録：
+
+- [ ] 動画URL、長さ、撮影日時、対象commit、本番URL、撮影ブラウザーを記入。
+- [ ] Alice/Bob各操作の開始・結果時刻、Sepoliaブロック、Arkivの参照先、RPC待ち実測を記入。
+- [ ] 実接続／合成／未接続の表示を映像・説明・READMEで一致させる。
+- [ ] EF-CROPS・ENS-V2・ARKIV-APPの主張を[応募判定](../specs/001-private-dating/prize-targets.md)と照合し、該当動画時刻をT036へ渡す。EF-RPC・ARKIV-SWARMは実証がある場合だけ追加する。
+- [ ] 別の初見参加者で[目的・主操作・送信範囲の観察](../specs/001-private-dating/evidence/ux.md)を記録し、120秒プレゼンを計時して修正する。
+
+公開資格は本人の誠実さ・相性・安全性を保証しない。AI会話は別同意でPersona・会話をAI処理先に送る。マッチング用の秘密入力が完成済みのUIに存在するかのように演出しない。

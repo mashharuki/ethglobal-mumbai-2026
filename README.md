@@ -2,6 +2,8 @@
 
 **Common ground before photos.** A hackathon prototype exploring private matching, verifiable participation, and an optional AI Persona conversation.
 
+**[Live demo](https://ethglobal-mumbai-2026.vercel.app/)** · [120-second pitch and recording plan](docs/demo-script.md)
+
 > Current state (7 November 2026): Alice and Bob have issuer-signed participation credentials on Arkiv Rabdi, referenced by separate ENSv2 names on Ethereum Sepolia. A browser verifier and independent CLI read those public records. Private matching, deposits, and the parent-app/AIBot handoff remain in development. The [landing page](apps/frontend/src/App.tsx) explains the journey; it is not a completed matching flow.
 
 ## The idea in 30 seconds
@@ -20,6 +22,8 @@ ENSv2 separates issuer control of the participation credential from participant 
 | Issuer-signed public participation credentials | Written and read back on Arkiv Rabdi | [Alice](specs/001-private-dating/evidence/arkiv-alice-publication.json) · [Bob](specs/001-private-dating/evidence/arkiv-bob-publication.json) |
 | ENS `app.credential` references to Arkiv entities | Written and read back on Sepolia | [Alice](specs/001-private-dating/evidence/ens-alice-reference.json) · [Bob](specs/001-private-dating/evidence/ens-bob-reference.json) |
 | Independent participation verification | Browser and CLI read ENSv2 and Arkiv without the Hono backend | [Browser source](apps/frontend/src/pages/Participation.tsx) · [CLI source](scripts/verify-participation.ts) · [comparison](specs/001-private-dating/evidence/ens.md#ブラウザーとcliの比較) |
+| SIWE session and private-operation read API | Implemented and tested locally; not deployed or connected to the live frontend | [Backend source](apps/backend/src/auth/session.ts) · [API contract](packages/api-specs/openapi.yaml) · [integration record](specs/001-private-dating/evidence/verification.md) |
+| In-person selective-disclosure preview | Synthetic local fixture only; not connected to a real registration or match | [UI source](apps/frontend/src/pages/InPerson.tsx) · [limit and tests](specs/001-private-dating/evidence/verification.md) |
 | Private preference matching and candidate selection | Design and implementation in progress | [Implementation plan](specs/001-private-dating/plan.md) |
 | Optional AI Persona conversation | Built in a teammate-owned [submodule](ethglobal-mumbai-2026-AIBot/); parent integration pending | [Inspection record](specs/001-private-dating/evidence/aibot-inspection.md) |
 
@@ -73,7 +77,7 @@ pnpm install --frozen-lockfile
 pnpm --filter frontend dev
 ```
 
-Open the URL printed by Vite. The public verifier needs no wallet or secrets and works with the Hono backend stopped; it sends the selected public ENS name to Sepolia and Arkiv RPCs. The Hono backend still serves only its starter route; participation issuance and issuer evidence checks currently run as scripts. The AIBot is a teammate-owned submodule with separate setup instructions. Do not put wallet keys, RPC access keys, or private profile data in the repository.
+Open the URL printed by Vite. The public verifier needs no wallet or secrets and works with the Hono backend stopped; it sends the selected public ENS name to Sepolia and Arkiv RPCs. The Hono backend has local SIWE authentication and a private-operation read route, but these are not connected to the live Vercel frontend. Participation issuance and issuer evidence checks currently run as scripts. The AIBot is a teammate-owned submodule with separate setup instructions. Do not put wallet keys, RPC access keys, or private profile data in the repository.
 
 ## CROPS
 
@@ -90,16 +94,16 @@ The current frontend source, HTML, Vite configuration, and public assets were se
 
 ## Prize targets and submission state
 
-We are preparing for **Ethereum Foundation (Best CROPS App)**, **ENS (Best Use of ENSv2)**, and **Arkiv (Build on Arkiv)**. The Arkiv + Swarm bonus remains conditional and is not demonstrated. The [official-condition mapping](specs/001-private-dating/prize-targets.md) lists each acceptance gate. The browser and CLI public reads support a partial ENS/Arkiv demonstration; they do not establish submission readiness for any prize. Suspension and recovery, Arkiv update/expiry, the CROPS end-to-end demo, final video, and live deployment still require verification.
+We are preparing for **Ethereum Foundation (Best CROPS App)**, **ENS (Best Use of ENSv2)**, and **Arkiv (Build on Arkiv)**. The Arkiv + Swarm bonus remains conditional and is not demonstrated. The [official-condition mapping](specs/001-private-dating/prize-targets.md) lists each acceptance gate. Alice/Bob's public credentials are the Arkiv prize demonstration: they were written on Rabdi and the live browser reads the current entities. Third-party reproduction and the final submission decision remain open. Suspension/recovery, Arkiv credential update/expiry, and the CROPS private-matching flow are unfinished product work; the EF-CROPS video is also unrecorded.
 
-The [Vercel project](https://ethglobal-mumbai-2026.vercel.app/) exists, but a fresh request to its production URL returned `404 NOT_FOUND` on 7 November 2026. Vercel marks its current production deployment Ready at main commit `0545316`; the frontend changes in this branch are not deployed to production. `apps/frontend/vercel.json` prepares the static client output for the next deployment, which still needs a live check before it can serve as submission evidence. The [two-minute in-person script](docs/demo-script.md) is a draft; the submission video is a separate 2–4 minute artifact.
+On 7 November 2026, a fresh request to the [production URL](https://ethglobal-mumbai-2026.vercel.app/) returned HTTP 200 with the Secret Tinder page. In a clean browser, the live Alice and Bob buttons independently returned `資格あり` (eligible), credential version 1 at Sepolia block `12080239`. An existing Chrome profile still showed the earlier Vite starter, consistent with its old PWA service worker caching the page. The Vercel-only worker retirement in this branch is prepared for a later deployment and has **not** been verified live. Until then, use a clean browser profile for the demo. The [two-minute in-person script](docs/demo-script.md) is separate from the required 2–3 minute submission video; neither has a recorded human rehearsal yet.
 
 ## Structure and provenance
 
 - `apps/frontend`: React/Vite/Void landing page and planned user flows.
 - `apps/backend`: Hono/Workers starter and participation issuance/evidence code.
 - `packages/shared`: credential schemas and EIP-712 signing format.
-- `packages/api-specs`: planned API contract.
+- `packages/api-specs`: OpenAPI HTTP contract; generated client is pending.
 - `apps/contract`: Hardhat starter, with deposit contracts planned.
 - `ethglobal-mumbai-2026-AIBot`: teammate-owned, separately implemented AI Persona app.
 - `specs/001-private-dating`: Spec Kit specification, plan, tasks, fixtures, and evidence.

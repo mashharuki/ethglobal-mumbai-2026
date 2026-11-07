@@ -108,7 +108,7 @@ function parseJson(value: string, error: string): unknown {
   }
 }
 
-async function fromNetwork<T>(
+export async function fromNetwork<T>(
   operation: () => Promise<T>,
   code: "ENS_UNAVAILABLE" | "ARKIV_UNAVAILABLE",
 ): Promise<T> {
@@ -335,7 +335,7 @@ async function checkPermissions(
   }
 }
 
-async function checkIssuance(
+export async function checkIssuance(
   credential: Credential,
   label: string,
   trust: Trust,
@@ -401,7 +401,7 @@ async function readPublication(reference: Reference, trust: Trust) {
   return { credential: parsed.data, issuanceId: row.issuance_id.value };
 }
 
-async function checkCredential(
+export async function checkCredential(
   credential: Credential,
   issuanceId: string,
   reference: Reference,
@@ -424,7 +424,10 @@ async function checkCredential(
   }
 }
 
-async function readCurrentRecords(label: string, requestedBlock?: bigint) {
+export async function readCurrentRecords(
+  label: string,
+  requestedBlock?: bigint,
+) {
   const trust = participationTrustSchema.parse(
     JSON.parse(await readFile(trustPath, "utf8")),
   );
@@ -489,31 +492,33 @@ async function verifyCurrent(label: string, requestedBlock?: bigint) {
   };
 }
 
-const label = process.argv[2];
-const blockValue = process.argv[3];
-if (
-  !label ||
-  !/^[a-z0-9-]+$/.test(label) ||
-  normalize(label) !== label ||
-  (blockValue && !/^[0-9]+$/.test(blockValue))
-) {
-  throw new Error(
-    "Usage: node scripts/verify-participation.ts <label> [sepolia-block]",
-  );
-}
-try {
-  process.stdout.write(
-    `${JSON.stringify(await verifyCurrent(label, blockValue ? BigInt(blockValue) : undefined))}\n`,
-  );
-} catch (error) {
-  const verdict =
-    error instanceof InvalidCredential ? "ineligible" : "unavailable";
-  const reason =
-    error instanceof InvalidCredential || error instanceof Unavailable
-      ? error.code
-      : "NETWORK_UNAVAILABLE";
-  process.stdout.write(
-    `${JSON.stringify({ verdict, reason, dnsName: `${label}.secrettinder.eth` })}\n`,
-  );
-  process.exitCode = 1;
+if (import.meta.main) {
+  const label = process.argv[2];
+  const blockValue = process.argv[3];
+  if (
+    !label ||
+    !/^[a-z0-9-]+$/.test(label) ||
+    normalize(label) !== label ||
+    (blockValue && !/^[0-9]+$/.test(blockValue))
+  ) {
+    throw new Error(
+      "Usage: node scripts/verify-participation.ts <label> [sepolia-block]",
+    );
+  }
+  try {
+    process.stdout.write(
+      `${JSON.stringify(await verifyCurrent(label, blockValue ? BigInt(blockValue) : undefined))}\n`,
+    );
+  } catch (error) {
+    const verdict =
+      error instanceof InvalidCredential ? "ineligible" : "unavailable";
+    const reason =
+      error instanceof InvalidCredential || error instanceof Unavailable
+        ? error.code
+        : "NETWORK_UNAVAILABLE";
+    process.stdout.write(
+      `${JSON.stringify({ verdict, reason, dnsName: `${label}.secrettinder.eth` })}\n`,
+    );
+    process.exitCode = 1;
+  }
 }
