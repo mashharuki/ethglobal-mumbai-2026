@@ -22,6 +22,22 @@ docker run --rm \
   --global-property=apiDocs=false,modelDocs=false,apiTests=false,modelTests=false
 ```
 
+Without a Docker daemon, install a Java 17 runtime first (the 7.26.0 JAR
+requires at least Java 11), then use the pinned official Maven artifact:
+
+```sh
+curl -fL \
+  https://repo1.maven.org/maven2/org/openapitools/openapi-generator-cli/7.26.0/openapi-generator-cli-7.26.0.jar \
+  -o /tmp/openapi-generator-cli-7.26.0.jar
+java -version
+java -jar /tmp/openapi-generator-cli-7.26.0.jar generate \
+  -i packages/api-specs/openapi.yaml \
+  -g typescript-fetch \
+  -o packages/shared/src/generated \
+  --additional-properties=importFileExtension=.js \
+  --global-property=apiDocs=false,modelDocs=false,apiTests=false,modelTests=false
+```
+
 `typescript-fetch` emits a multi-file client (API classes, models and runtime).
 Task T003 additionally calls for `packages/shared/src/generated/client.ts` as its
 entry point. That entry point, the generated output and their TypeScript checks
