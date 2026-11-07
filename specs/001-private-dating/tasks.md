@@ -37,7 +37,7 @@
 - [ ] T003 [P] API担当：[サービス契約](contracts/service.md)の全HTTP操作を `packages/api-specs/openapi.yaml` に定義する。認証、承諾digest/認証用封筒/受付証の形式、公開／本人専用の投影、202後の照会、冪等キー、409・422・429・503を含め、OpenAPI Generatorで `packages/shared/src/generated/client.ts` を再生成できるようにする。OpenAPI契約は定義済み。Generator clientと再生成手順は未完了。
 - [ ] T004 [P] ZK担当：T002後、`circuits/Nargo.toml` と `circuits/protocol.md` に属性・希望mask・許可趣味のルートと288座標の導出、役割・資格世代・辞書版・transcript、群/fieldの範囲、検証鍵の版を固定する。[照合契約](contracts/matching.md)の式と平文oracleが一致することを確認し、実証明の実装は段階A後に進める。平文oracleの12試験は成功。Nargo workspace、群/fieldと検証鍵の確定は未完了。
 - [ ] T005 資金担当：T003後、[精算契約](contracts/settlement.md)に沿って `apps/contract/test/fixtures/note-vectors.ts` に二者の署名対象、受付証と信頼する受付公開鍵/版、消費印、期限、受取先、各操作の公開値と期待配分を用意する。公開列にペアや申告項目の識別子を含めない。
-- [ ] T006 API担当：T003後、`apps/backend/src/auth/session.ts` と `apps/backend/src/index.ts` に単回署名チャレンジ、期限・Originの確認、共通エラー、本文を残さないログ、操作IDの照会を接続する。別人の非公開操作は取得不可にする。SIWEとDurable Objectの単回消費・本人別読取はローカル試験済み。実操作データでの別人拒否と公開Web接続は未完了。認証試験の通常CI登録は承認待ち。
+- [ ] T006 API担当：T003後、`apps/backend/src/auth/session.ts` と `apps/backend/src/index.ts` に単回署名チャレンジ、期限・Originの確認、共通エラー、本文を残さないログ、操作IDの照会を接続する。別人の非公開操作は取得不可にする。SIWEとDurable Objectの単回消費・本人別読取はローカル試験済み。認証試験は通常backend testに登録済み。実操作データでの別人拒否と公開Web接続は未完了。
 
 **着手条件**：T001・T002→T037で資格契約を先に固定する。T003〜T006の準備とT005→T010→T021の資金安全性は別担当で並行可。第一段階のENSはT007・T010・T014を待たない。製品結合はT013・T014・T015等を満たし、資金を使う公開導線はT021・T024も通す。
 
@@ -48,10 +48,10 @@
 ### 段階A：ENS資格を先に実証
 
 - [X] T037 [US1] API担当：T001・T002後、`packages/shared/src/participation/schema.ts` と `specs/001-private-dating/fixtures/participation.json` に[資格契約](contracts/participation.md)のschema、署名/digest形式、状態・エラー、権限表、信頼するnamespace/issuerを固定する。公式deployment版・ABI・実コード・発行世代の確認方法を照合し、実測した公開設定だけをfixtureへ記録する。
-- [ ] T038 [US1] API/Arkiv担当：T037後、`scripts/issue-participation.ts` と `apps/backend/src/participation/issuer.ts` に専用Resolver、非譲渡サブネーム、限定キー委任、署名付き公開資格のArkiv書込とENS参照更新・有限期限付き停止を実装する。審査停止は参照無効化で代替せず、基盤障害をunavailableとして区別する。`apps/contract/test/ParticipationPermissions.ts` で本人による資格/Resolver/LINK/UPGRADE/admin迂回、別参加者更新、失効鍵を拒否する。外部デプロイ・書込は必要な承認を得て実行し、ZK・入金とは依存させない。
+- [ ] T038 [US1] API/Arkiv担当：T037後、`scripts/issue-participation.ts` と `apps/backend/src/participation/issuer.ts` に専用Resolver、非譲渡サブネーム、限定キー委任、署名付き公開資格のArkiv書込とENS参照更新・有限期限付き停止を実装する。審査停止は参照無効化で代替せず、基盤障害をunavailableとして区別する。`apps/contract/test/ParticipationPermissions.ts` で本人による資格/Resolver/LINK/UPGRADE/admin迂回、別参加者更新、失効鍵を拒否する。外部デプロイ・書込は必要な承認を得て実行し、ZK・入金とは依存させない。有限停止のオフライン新版準備とSepolia固定ブロックの権限読取4試験は成功。実停止/回復の署名・書込・ENS更新、失効鍵の実検査は未完了。
 - [ ] T039 [US1] Web担当：T038後、`apps/frontend/src/pages/Participation.tsx` と `scripts/verify-participation.ts` に2つの独立読取実装を作る。共有はschema/fixtureまでとし、後者はWebのBFF・判定・検証関数を使わずENS/Arkivを読む。eligible/ineligible/unavailable、同一ブロック/版での一致、BFF停止、旧版/再発行/別発行者拒否を確認する。WebとCLIのAlice/Bob正常系は各同一Sepoliaブロック/版で一致し、Hono停止時のWeb動作を実測済み。旧版/別発行者/Arkiv読取障害の署名fixture負例は各実装で成功。実ネットワークでの停止・再発行とWeb画面負例は未完了。
 - [ ] T041 [US1] API担当：T037・T038・T006後、`apps/backend/src/participation/review.ts` と `apps/backend/src/participation/review.test.ts` に[審査契約](contracts/participation-review.md)の規則版、合成ケースの私的状態、審査/異議の役割、本人通知、有限停止の集約と有効な資格への反映、再発行時の主体継続、期限を実装する。受付だけで停止せず、無権限・利益相反・再送延長を拒否する。停止中も救済APIへ本人認証でアクセス可能にする。
-- [ ] T042 [US1] Web/検証担当：T039・T041後、`apps/frontend/src/pages/ParticipationReview.tsx` と `scripts/verify-participation.ts` に本人の根拠/期限/異議/ブロックと実効資格の確認を接続する。SC-007の署名付きtier更新と枠判定fixture、私的ブロック状態、取消/期限ちょうど/別停止が残る回復、古い版/他人アクセス拒否、公開漏えい0件を `specs/001-private-dating/evidence/participation-review.md` へ記録する。実割当への枠/ブロック反映はT040/T016、資金不変はT024で後段検証し、候補選択や入金をAの前提にしない。
+- [ ] T042 [US1] Web/検証担当：T039・T041後、`apps/frontend/src/pages/ParticipationReview.tsx` と `scripts/verify-participation.ts` に本人の根拠/期限/異議/ブロックと実効資格の確認を接続する。SC-007の署名付きtier更新と枠判定fixture、私的ブロック状態、取消/期限ちょうど/別停止が残る回復、古い版/他人アクセス拒否、公開漏えい0件を `specs/001-private-dating/evidence/participation-review.md` へ記録する。実割当への枠/ブロック反映はT040/T016、資金不変はT024で後段検証し、候補選択や入金をAの前提にしない。本人向け合成fixture UIと他人の私的表示拒否4試験は成功。本人認証/私的API・実資格更新・独立検証との接続は未完了。
 - [ ] T034 [US1] API担当：T042後、SC-005/007とENS-V2を実ネットワークで検証し、`specs/001-private-dating/evidence/ens.md` に役割・deployment/ABI・参照・ブロック/取引、独立検証、停止/回復、管理者への信頼を記録する。審査詳細はT042の非公開項目検査を参照する。合成の判断と実世界の不正検出を混同しない。段階Aの技術合格と公開資料/T036の提出可を分ける。
 
 ### 段階B/Cと製品結合
