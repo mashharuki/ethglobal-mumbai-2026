@@ -1,0 +1,872 @@
+openapi: 3.1.0
+info:
+  title: Secret Tinder API
+  version: 0.1.0
+  description: Proposed parent API contract; an operation here does not imply a deployed handler.
+servers:
+  - url: /v1
+tags:
+  - name: Authentication
+  - name: Registrations
+  - name: Search
+  - name: Invitations
+  - name: Deposits
+  - name: Review
+  - name: Simulation
+paths:
+  /auth/challenges:
+    post:
+      tags: [Authentication]
+      operationId: createAuthChallenge
+      summary: Issue a short-lived, single-use SIWE challenge.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/AuthChallengeRequest" }
+      responses:
+        "200":
+          description: Challenge to sign; this is not registration or settlement consent.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AuthChallenge" }
+        "422": { $ref: "#/components/responses/InvalidInput" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+        "503": { $ref: "#/components/responses/Unavailable" }
+  /auth/sessions:
+    post:
+      tags: [Authentication]
+      operationId: createAuthSession
+      summary: Consume a challenge and set a short-lived session cookie.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/AuthSessionRequest" }
+      responses:
+        "204":
+          description: Authenticated.
+          headers:
+            Set-Cookie:
+              description: HttpOnly; Secure; SameSite=Strict session cookie.
+              schema: { type: string }
+        "401": { $ref: "#/components/responses/Unauthenticated" }
+        "409": { $ref: "#/components/responses/Conflict" }
+        "422": { $ref: "#/components/responses/InvalidInput" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+        "503": { $ref: "#/components/responses/Unavailable" }
+  /registrations:
+    post:
+      tags: [Registrations]
+      operationId: createRegistration
+      summary: Accept a registration for asynchronous verification.
+      security: [{ browserSession: [] }]
+      parameters:
+        - { $ref: "#/components/parameters/OperationId" }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/RegistrationRequest" }
+      responses:
+        "202": { $ref: "#/components/responses/AcceptedOperation" }
+        "401": { $ref: "#/components/responses/Unauthenticated" }
+        "403": { $ref: "#/components/responses/Ineligible" }
+        "409": { $ref: "#/components/responses/Conflict" }
+        "422": { $ref: "#/components/responses/InvalidInput" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+        "503": { $ref: "#/components/responses/Unavailable" }
+  /operations/{id}:
+    get:
+      tags: [Registrations]
+      operationId: getOperation
+      summary: Read only an operation owned by the authenticated subject.
+      security: [{ browserSession: [] }]
+      parameters:
+        - { $ref: "#/components/parameters/Id" }
+      responses:
+        "200":
+          description: Private operation status.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PrivateOperation" }
+        "401": { $ref: "#/components/responses/Unauthenticated" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "503": { $ref: "#/components/responses/Unavailable" }
+  /registrations/{alias}:
+    get:
+      tags: [Registrations]
+      operationId: getPublicRegistration
+      summary: Read the current ENS-referenced public Arkiv registration.
+      parameters:
+        - { $ref: "#/components/parameters/Alias" }
+      responses:
+        "200":
+          description: Public registration, without private attributes or pair information.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PublicRegistration" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "422": { $ref: "#/components/responses/InvalidInput" }
+        "503": { $ref: "#/components/responses/Unavailable" }
+  /search-leases:
+    post:
+      tags: [Search]
+      operationId: createSearchLease
+      summary: Start a temporary candidate search after current eligibility checks.
+      security: [{ browserSession: [] }]
+      parameters:
+        - { $ref: "#/components/parameters/OperationId" }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/SearchLeaseRequest" }
+      responses:
+        "202":
+          description: Lease accepted; assignment is not a match.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/SearchLease" }
+        "401": { $ref: "#/components/responses/Unauthenticated" }
+        "403": { $ref: "#/components/responses/Ineligible" }
+        "409": { $ref: "#/components/responses/Conflict" }
+        "422": { $ref: "#/components/responses/InvalidInput" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+        "503": { $ref: "#/components/responses/Unavailable" }
+  /search-leases/{id}:
+    patch:
+      tags: [Search]
+      operationId: renewSearchLease
+      summary: Renew a live lease without resetting its round budget.
+      security: [{ browserSession: [] }]
+      parameters:
+        - { $ref: "#/components/parameters/Id" }
+        - { $ref: "#/components/parameters/OperationId" }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/SearchLeaseRenewal" }
+      responses:
+        "200":
+          description: Current lease.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/SearchLease" }
+        "401": { $ref: "#/components/responses/Unauthenticated" }
+        "403": { $ref: "#/components/responses/Ineligible" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "409": { $ref: "#/components/responses/Conflict" }
+        "422": { $ref: "#/components/responses/InvalidInput" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+        "503": { $ref: "#/components/responses/Unavailable" }
+    delete:
+      tags: [Search]
+      operationId: closeSearchLease
+      summary: Close a lease; pending ciphertext is discarded.
+      security: [{ browserSession: [] }]
+      parameters:
+        - { $ref: "#/components/parameters/Id" }
+        - { $ref: "#/components/parameters/OperationId" }
+      responses:
+        "204": { description: Lease closed. }
+        "401": { $ref: "#/components/responses/Unauthenticated" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "409": { $ref: "#/components/responses/Conflict" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+  /search-leases/{id}/channel:
+    get:
+      tags: [Search]
+      operationId: connectSearchChannel
+      summary: Upgrade a live authenticated lease to a ciphertext-only WebSocket.
+      security: [{ browserSession: [] }]
+      parameters:
+        - { $ref: "#/components/parameters/Id" }
+      responses:
+        "101":
+          description: WebSocket upgraded; messages follow SearchChannelMessage.
+        "401": { $ref: "#/components/responses/Unauthenticated" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "409": { $ref: "#/components/responses/Conflict" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+        "503": { $ref: "#/components/responses/Unavailable" }
+      x-websocket-message-schema: "#/components/schemas/SearchChannelMessage"
+  /invites:
+    post:
+      tags: [Invitations]
+      operationId: createInvite
+      summary: Relay an opaque invite and a private authorization envelope.
+      security: [{ browserSession: [] }]
+      parameters:
+        - { $ref: "#/components/parameters/OperationId" }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/InviteRequest" }
+      responses:
+        "202":
+          description: Accepted for private delivery; no match has been confirmed.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/InviteDelivery" }
+        "401": { $ref: "#/components/responses/Unauthenticated" }
+        "403": { $ref: "#/components/responses/Ineligible" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "409": { $ref: "#/components/responses/Conflict" }
+        "422": { $ref: "#/components/responses/InvalidInput" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+        "503": { $ref: "#/components/responses/Unavailable" }
+  /invites/{id}/decisions:
+    post:
+      tags: [Invitations]
+      operationId: decideInvite
+      summary: Accept or reject an invite; a signed receipt may follow two accepts.
+      security: [{ browserSession: [] }]
+      parameters:
+        - { $ref: "#/components/parameters/Id" }
+        - { $ref: "#/components/parameters/OperationId" }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/InviteDecision" }
+      responses:
+        "202":
+          description: Decision accepted, with optional fixed acceptance receipt.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/InviteDecisionResult" }
+        "401": { $ref: "#/components/responses/Unauthenticated" }
+        "403": { $ref: "#/components/responses/Ineligible" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "409": { $ref: "#/components/responses/Conflict" }
+        "422": { $ref: "#/components/responses/InvalidInput" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+        "503": { $ref: "#/components/responses/Unavailable" }
+  /deposits/{id}:
+    get:
+      tags: [Deposits]
+      operationId: getDeposit
+      summary: Read owner-only public deposit confirmation; never return a fund note.
+      security: [{ browserSession: [] }]
+      parameters:
+        - { $ref: "#/components/parameters/Id" }
+      responses:
+        "200":
+          description: Deposit confirmation.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/OwnerDeposit" }
+        "401": { $ref: "#/components/responses/Unauthenticated" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "503": { $ref: "#/components/responses/Unavailable" }
+  /review-cases:
+    post:
+      tags: [Review]
+      operationId: createReviewCase
+      summary: Submit a synthetic fixture case without suspending anyone.
+      security: [{ browserSession: [] }]
+      parameters:
+        - { $ref: "#/components/parameters/OperationId" }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ReviewCaseRequest" }
+      responses:
+        "202": { $ref: "#/components/responses/AcceptedOperation" }
+        "401": { $ref: "#/components/responses/Unauthenticated" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "409": { $ref: "#/components/responses/Conflict" }
+        "422": { $ref: "#/components/responses/InvalidInput" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+  /review-cases/{id}:
+    get:
+      tags: [Review]
+      operationId: getReviewCase
+      summary: Return a private case projection to a party or assigned reviewer.
+      security: [{ browserSession: [] }]
+      parameters:
+        - { $ref: "#/components/parameters/Id" }
+      responses:
+        "200":
+          description: Authorized private case projection.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PrivateReviewCase" }
+        "401": { $ref: "#/components/responses/Unauthenticated" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "503": { $ref: "#/components/responses/Unavailable" }
+  /review-cases/{id}/responses:
+    post:
+      tags: [Review]
+      operationId: respondToReviewCase
+      summary: Submit a synthetic rebuttal while preserving owner access.
+      security: [{ browserSession: [] }]
+      parameters:
+        - { $ref: "#/components/parameters/Id" }
+        - { $ref: "#/components/parameters/OperationId" }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ReviewResponseRequest" }
+      responses:
+        "202": { $ref: "#/components/responses/AcceptedOperation" }
+        "401": { $ref: "#/components/responses/Unauthenticated" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "409": { $ref: "#/components/responses/Conflict" }
+        "422": { $ref: "#/components/responses/InvalidInput" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+  /review-cases/{id}/appeals:
+    post:
+      tags: [Review]
+      operationId: appealReviewCase
+      summary: Request separate review without extending a suspension.
+      security: [{ browserSession: [] }]
+      parameters:
+        - { $ref: "#/components/parameters/Id" }
+        - { $ref: "#/components/parameters/OperationId" }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ReviewResponseRequest" }
+      responses:
+        "202": { $ref: "#/components/responses/AcceptedOperation" }
+        "401": { $ref: "#/components/responses/Unauthenticated" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "409": { $ref: "#/components/responses/Conflict" }
+        "422": { $ref: "#/components/responses/InvalidInput" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+  /review-cases/{id}/decisions:
+    post:
+      tags: [Review]
+      operationId: decideReviewCase
+      summary: Record an authorized finite decision; funds are unaffected.
+      security: [{ browserSession: [] }]
+      parameters:
+        - { $ref: "#/components/parameters/Id" }
+        - { $ref: "#/components/parameters/OperationId" }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ReviewDecisionRequest" }
+      responses:
+        "202": { $ref: "#/components/responses/AcceptedOperation" }
+        "401": { $ref: "#/components/responses/Unauthenticated" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "409": { $ref: "#/components/responses/Conflict" }
+        "422": { $ref: "#/components/responses/InvalidInput" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+  /blocks:
+    post:
+      tags: [Review]
+      operationId: createBlock
+      summary: Block one contact without changing that person's global credential.
+      security: [{ browserSession: [] }]
+      parameters:
+        - { $ref: "#/components/parameters/OperationId" }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/BlockRequest" }
+      responses:
+        "202": { $ref: "#/components/responses/AcceptedOperation" }
+        "401": { $ref: "#/components/responses/Unauthenticated" }
+        "409": { $ref: "#/components/responses/Conflict" }
+        "422": { $ref: "#/components/responses/InvalidInput" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+  /blocks/{id}:
+    delete:
+      tags: [Review]
+      operationId: deleteBlock
+      summary: Remove one owner-controlled contact block.
+      security: [{ browserSession: [] }]
+      parameters:
+        - { $ref: "#/components/parameters/Id" }
+        - { $ref: "#/components/parameters/OperationId" }
+      responses:
+        "204": { description: Block removed. }
+        "401": { $ref: "#/components/responses/Unauthenticated" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "409": { $ref: "#/components/responses/Conflict" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+  /simulation/identity:
+    post:
+      tags: [Simulation]
+      operationId: createSimulationIdentity
+      summary: Issue a short-lived assertion for a server-selected subject.
+      security: [{ browserSession: [] }]
+      parameters:
+        - { $ref: "#/components/parameters/OperationId" }
+      responses:
+        "200":
+          description: Private assertion for an AIBot handoff.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/SimulationIdentity" }
+        "401": { $ref: "#/components/responses/Unauthenticated" }
+        "409": { $ref: "#/components/responses/Conflict" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+        "503": { $ref: "#/components/responses/Unavailable" }
+  /matches/{matchId}:
+    get:
+      tags: [Simulation]
+      operationId: getAuthorizedMatch
+      summary: Return the current match and Persona authorization to AIBot only.
+      security: [{ aibotService: [] }]
+      parameters:
+        - { $ref: "#/components/parameters/MatchId" }
+        - { $ref: "#/components/parameters/PlayerSubject" }
+      responses:
+        "200":
+          description: Service-only authorization.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AuthorizedMatch" }
+        "401": { $ref: "#/components/responses/Unauthenticated" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "503": { $ref: "#/components/responses/Unavailable" }
+  /matches/{matchId}/simulation-consents/me:
+    put:
+      tags: [Simulation]
+      operationId: updateSimulationConsent
+      summary: Update the subject's separate AI participation and Persona-use consents.
+      security: [{ browserSession: [] }]
+      parameters:
+        - { $ref: "#/components/parameters/MatchId" }
+        - { $ref: "#/components/parameters/OperationId" }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/SimulationConsentRequest" }
+      responses:
+        "200":
+          description: Current private consent.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/SimulationConsent" }
+        "401": { $ref: "#/components/responses/Unauthenticated" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "409": { $ref: "#/components/responses/Conflict" }
+        "422": { $ref: "#/components/responses/InvalidInput" }
+        "503": { $ref: "#/components/responses/Unavailable" }
+  /date-requests:
+    post:
+      tags: [Simulation]
+      operationId: createDateRequest
+      summary: Record a pending request; sending is not the partner's acceptance.
+      security: [{ aibotService: [] }]
+      parameters:
+        - { $ref: "#/components/parameters/PlayerSubject" }
+        - { $ref: "#/components/parameters/IdempotencyKey" }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/DateRequestInput" }
+      responses:
+        "202":
+          description: Same game session and body replay the same request ID.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/DateRequest" }
+        "401": { $ref: "#/components/responses/Unauthenticated" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "409": { $ref: "#/components/responses/Conflict" }
+        "422": { $ref: "#/components/responses/InvalidInput" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+        "503": { $ref: "#/components/responses/Unavailable" }
+components:
+  securitySchemes:
+    browserSession:
+      type: apiKey
+      in: cookie
+      name: st_session
+      description: SIWE-backed, HttpOnly, Secure, SameSite=Strict short-lived session.
+    aibotService:
+      type: http
+      scheme: bearer
+      bearerFormat: opaque
+      description: Service-to-service token. Never expose it to a browser.
+  parameters:
+    Id:
+      name: id
+      in: path
+      required: true
+      schema: { type: string, minLength: 1, maxLength: 128 }
+    MatchId:
+      name: matchId
+      in: path
+      required: true
+      schema: { type: string, minLength: 1, maxLength: 128 }
+    Alias:
+      name: alias
+      in: path
+      required: true
+      schema: { type: string, minLength: 1, maxLength: 253 }
+    OperationId:
+      name: X-Operation-Id
+      in: header
+      required: true
+      description: Stable UUID for same-subject, same-content replay.
+      schema: { type: string, format: uuid }
+    IdempotencyKey:
+      name: Idempotency-Key
+      in: header
+      required: true
+      description: AIBot gameSessionId; reuse with different content returns 409.
+      schema: { type: string, minLength: 1, maxLength: 128 }
+    PlayerSubject:
+      name: X-Player-Subject
+      in: header
+      required: true
+      description: Subject authenticated by the AIBot service.
+      schema: { type: string, minLength: 1, maxLength: 128 }
+  responses:
+    AcceptedOperation:
+      description: Accepted asynchronous operation; poll /operations/{id}.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/AcceptedOperation" }
+    Unauthenticated:
+      description: Session or service authentication failed.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ApiError" }
+    Ineligible:
+      description: Current credential is invalid for new participation.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ApiError" }
+    NotFound:
+      description: Unknown ID or private resource owned by someone else.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ApiError" }
+    Conflict:
+      description: Idempotency conflict, stale version or wrong state.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ApiError" }
+    InvalidInput:
+      description: Valid JSON with invalid field values.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ApiError" }
+    RateLimited:
+      description: Rate or concurrency limit exceeded.
+      headers:
+        Retry-After:
+          schema: { type: integer, minimum: 1 }
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ApiError" }
+    Unavailable:
+      description: Current external or credential state cannot be verified.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ApiError" }
+  schemas:
+    ApiError:
+      type: object
+      additionalProperties: false
+      required: [code, message]
+      properties:
+        code:
+          type: string
+          enum: [UNAUTHENTICATED, INELIGIBLE, NOT_FOUND, CONFLICT, INVALID_INPUT, RATE_LIMITED, UNAVAILABLE]
+        message:
+          type: string
+          description: Generic public explanation; never echo signatures, tokens or private data.
+        operationId: { type: string, format: uuid }
+    Address:
+      type: string
+      pattern: "^0x[0-9a-fA-F]{40}$"
+    HexBytes:
+      type: string
+      pattern: "^0x([0-9a-fA-F]{2})+$"
+    Digest:
+      type: string
+      pattern: "^0x[0-9a-fA-F]{64}$"
+    OpaqueCiphertext:
+      type: string
+      contentEncoding: base64
+      description: Opaque encrypted bytes; the API must not decrypt them.
+    AssetAmount:
+      type: object
+      additionalProperties: false
+      required: [chainId, tokenAddress, amountBaseUnits]
+      properties:
+        chainId: { type: integer, const: 11155111 }
+        tokenAddress: { $ref: "#/components/schemas/Address" }
+        amountBaseUnits:
+          type: string
+          pattern: "^[0-9]+$"
+          description: Decimal integer in token minimal units; never a JSON number.
+    AuthChallengeRequest:
+      type: object
+      additionalProperties: false
+      required: [address]
+      properties:
+        address: { $ref: "#/components/schemas/Address" }
+    AuthChallenge:
+      type: object
+      additionalProperties: false
+      required: [message, expiresAt]
+      properties:
+        message:
+          type: string
+          description: SIWE message binding domain, URI, chainId 11155111, nonce and expiry.
+        expiresAt: { type: string, format: date-time }
+    AuthSessionRequest:
+      type: object
+      additionalProperties: false
+      required: [message, signature]
+      properties:
+        message: { type: string, minLength: 1, maxLength: 4096 }
+        signature: { $ref: "#/components/schemas/HexBytes" }
+    AcceptedOperation:
+      type: object
+      additionalProperties: false
+      required: [operationId, status]
+      properties:
+        operationId: { type: string, format: uuid }
+        status: { type: string, const: pending }
+    PrivateOperation:
+      type: object
+      additionalProperties: false
+      required: [operationId, kind, status, createdAt, updatedAt]
+      properties:
+        operationId: { type: string, format: uuid }
+        kind: { type: string, enum: [registration, invite, review, block, settlement] }
+        status: { type: string, enum: [pending, confirmed, failed] }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+        errorCode: { type: string, maxLength: 64 }
+    RegistrationRequest:
+      type: object
+      additionalProperties: false
+      required: [alias, version, commitment, proof, ownerSignature, depositRef]
+      properties:
+        alias: { type: string, minLength: 1, maxLength: 253 }
+        version: { type: integer, minimum: 1 }
+        commitment: { $ref: "#/components/schemas/Digest" }
+        proof: { $ref: "#/components/schemas/HexBytes" }
+        ownerSignature: { $ref: "#/components/schemas/HexBytes" }
+        depositRef: { type: string, minLength: 1, maxLength: 128 }
+    PublicRegistration:
+      type: object
+      additionalProperties: false
+      required: [alias, version, commitment, arkivEntityKey, expiresAt]
+      properties:
+        alias: { type: string, minLength: 1, maxLength: 253 }
+        version: { type: integer, minimum: 1 }
+        commitment: { $ref: "#/components/schemas/Digest" }
+        arkivEntityKey: { $ref: "#/components/schemas/Digest" }
+        expiresAt: { type: string, format: date-time }
+    SearchLeaseRequest:
+      type: object
+      additionalProperties: false
+      required: [ephemeralPublicKey, credentialGeneration, credentialVersion, registrationVersion, ownerSignature]
+      properties:
+        ephemeralPublicKey: { $ref: "#/components/schemas/HexBytes" }
+        credentialGeneration: { $ref: "#/components/schemas/Digest" }
+        credentialVersion: { type: integer, minimum: 1 }
+        registrationVersion: { type: integer, minimum: 1 }
+        ownerSignature: { $ref: "#/components/schemas/HexBytes" }
+    SearchLeaseRenewal:
+      type: object
+      additionalProperties: false
+      required: [ownerSignature]
+      properties:
+        ownerSignature: { $ref: "#/components/schemas/HexBytes" }
+    SearchLease:
+      type: object
+      additionalProperties: false
+      required: [leaseId, expiresAt]
+      properties:
+        leaseId: { type: string, minLength: 1, maxLength: 128 }
+        expiresAt: { type: string, format: date-time }
+    SearchChannelMessage:
+      type: object
+      additionalProperties: false
+      required: [roundId, assignmentId, sequence, ciphertext]
+      properties:
+        roundId: { type: string, minLength: 1, maxLength: 128 }
+        assignmentId: { type: string, minLength: 1, maxLength: 128 }
+        sequence: { type: integer, minimum: 0 }
+        ciphertext: { $ref: "#/components/schemas/OpaqueCiphertext" }
+    InviteEnvelope:
+      type: object
+      additionalProperties: false
+      required: [inviteId, leaseIds, operationId, chainId, contractAddress, inputDigest, acceptanceDeadline, subjectSignature]
+      properties:
+        inviteId: { type: string, minLength: 1, maxLength: 128 }
+        leaseIds:
+          type: array
+          minItems: 2
+          maxItems: 2
+          items: { type: string, minLength: 1, maxLength: 128 }
+        operationId: { type: string, format: uuid }
+        chainId: { type: integer, const: 11155111 }
+        contractAddress: { $ref: "#/components/schemas/Address" }
+        inputDigest: { $ref: "#/components/schemas/Digest" }
+        acceptanceDeadline: { type: string, format: date-time }
+        subjectSignature: { $ref: "#/components/schemas/HexBytes" }
+    InviteRequest:
+      type: object
+      additionalProperties: false
+      required: [registrationVersion, depositRef, ciphertext, envelope]
+      properties:
+        registrationVersion: { type: integer, minimum: 1 }
+        depositRef: { type: string, minLength: 1, maxLength: 128 }
+        ciphertext: { $ref: "#/components/schemas/OpaqueCiphertext" }
+        envelope: { $ref: "#/components/schemas/InviteEnvelope" }
+    InviteDelivery:
+      type: object
+      additionalProperties: false
+      required: [operationId, inviteId, deliveryStatus]
+      properties:
+        operationId: { type: string, format: uuid }
+        inviteId: { type: string, minLength: 1, maxLength: 128 }
+        deliveryStatus: { type: string, enum: [pending, delivered, failed] }
+    InviteDecision:
+      type: object
+      additionalProperties: false
+      required: [decision, envelopeDigest, signature]
+      properties:
+        decision: { type: string, enum: [accept, reject] }
+        envelopeDigest: { $ref: "#/components/schemas/Digest" }
+        signature: { $ref: "#/components/schemas/HexBytes" }
+    AcceptanceReceipt:
+      type: object
+      additionalProperties: false
+      required: [receiptId, operationId, inputDigest, expiresAt, issuerKeyVersion, issuerSignature]
+      description: Private, fixed receipt signed by a trusted coordinator key configured outside requests.
+      properties:
+        receiptId: { type: string, minLength: 1, maxLength: 128 }
+        operationId: { type: string, format: uuid }
+        inputDigest: { $ref: "#/components/schemas/Digest" }
+        expiresAt: { type: string, format: date-time }
+        issuerKeyVersion: { type: integer, minimum: 1 }
+        issuerSignature: { $ref: "#/components/schemas/HexBytes" }
+    InviteDecisionResult:
+      type: object
+      additionalProperties: false
+      required: [operationId, state]
+      properties:
+        operationId: { type: string, format: uuid }
+        state: { type: string, enum: [pending, rejected, ready] }
+        receipt: { $ref: "#/components/schemas/AcceptanceReceipt" }
+    OwnerDeposit:
+      type: object
+      additionalProperties: false
+      required: [id, asset, confirmationStatus, depositedAt, refundAvailableAt]
+      properties:
+        id: { type: string, minLength: 1, maxLength: 128 }
+        asset: { $ref: "#/components/schemas/AssetAmount" }
+        confirmationStatus: { type: string, enum: [pending, confirmed, failed] }
+        depositedAt: { type: string, format: date-time }
+        refundAvailableAt: { type: string, format: date-time }
+    ReviewCaseRequest:
+      type: object
+      additionalProperties: false
+      required: [contactCapability, fixtureId, policyVersion]
+      properties:
+        contactCapability: { type: string, minLength: 1, maxLength: 1024 }
+        fixtureId: { type: string, minLength: 1, maxLength: 128 }
+        policyVersion: { type: integer, minimum: 1 }
+    PrivateReviewCase:
+      type: object
+      additionalProperties: false
+      required: [caseId, policyVersion, state, revision, openedAt]
+      properties:
+        caseId: { type: string, minLength: 1, maxLength: 128 }
+        policyVersion: { type: integer, minimum: 1 }
+        state: { type: string, enum: [received, reviewing, decided, appealed, closed] }
+        revision: { type: integer, minimum: 1 }
+        openedAt: { type: string, format: date-time }
+        syntheticSummary: { type: string, maxLength: 1024 }
+        responseDeadline: { type: string, format: date-time }
+        appealDeadline: { type: string, format: date-time }
+        suspendedUntil: { type: string, format: date-time }
+    ReviewResponseRequest:
+      type: object
+      additionalProperties: false
+      required: [expectedRevision, fixtureId]
+      properties:
+        expectedRevision: { type: integer, minimum: 1 }
+        fixtureId: { type: string, minLength: 1, maxLength: 128 }
+    ReviewDecisionRequest:
+      type: object
+      additionalProperties: false
+      required: [expectedRevision, policyVersion, decision, fixtureId]
+      properties:
+        expectedRevision: { type: integer, minimum: 1 }
+        policyVersion: { type: integer, minimum: 1 }
+        decision: { type: string, enum: [dismiss, suspend, reverse] }
+        fixtureId: { type: string, minLength: 1, maxLength: 128 }
+        suspendedUntil: { type: string, format: date-time }
+    BlockRequest:
+      type: object
+      additionalProperties: false
+      required: [targetSubject]
+      properties:
+        targetSubject: { type: string, minLength: 1, maxLength: 128 }
+    SimulationIdentity:
+      type: object
+      additionalProperties: false
+      required: [assertion, expiresAt]
+      properties:
+        assertion:
+          type: string
+          description: HMAC-SHA256 assertion binding server-selected sub, aud and exp.
+        expiresAt: { type: string, format: date-time }
+    AuthorizedMatch:
+      type: object
+      additionalProperties: false
+      required: [matchId, agentPersonaId, playerSubject, simulationConsent, expiresAt]
+      properties:
+        matchId: { type: string, minLength: 1, maxLength: 128 }
+        agentPersonaId: { type: string, minLength: 1, maxLength: 128 }
+        playerSubject: { type: string, minLength: 1, maxLength: 128 }
+        simulationConsent: { type: boolean, const: true }
+        expiresAt: { type: string, format: date-time }
+    SimulationConsentRequest:
+      type: object
+      additionalProperties: false
+      required: [expectedVersion, participate, allowPersonaUse]
+      properties:
+        expectedVersion: { type: integer, minimum: 0 }
+        participate: { type: boolean }
+        allowPersonaUse: { type: boolean }
+    SimulationConsent:
+      type: object
+      additionalProperties: false
+      required: [version, participate, allowPersonaUse, updatedAt]
+      properties:
+        version: { type: integer, minimum: 1 }
+        participate: { type: boolean }
+        allowPersonaUse: { type: boolean }
+        updatedAt: { type: string, format: date-time }
+    DateRequestInput:
+      type: object
+      additionalProperties: false
+      required: [matchId, gameSessionId]
+      properties:
+        matchId: { type: string, minLength: 1, maxLength: 128 }
+        gameSessionId: { type: string, minLength: 1, maxLength: 128 }
+    DateRequest:
+      type: object
+      additionalProperties: false
+      required: [requestId, status]
+      properties:
+        requestId: { type: string, minLength: 1, maxLength: 128 }
+        status: { type: string, enum: [pending, accepted, rejected] }
