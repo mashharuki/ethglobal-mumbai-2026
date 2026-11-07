@@ -1,0 +1,8 @@
+[package]
+name = "matching"
+type = "bin"
+authors = ["Secret Tinder contributors"]
+compiler_version = "1.0.0"
+
+[dependencies]
+profile = { path = "../profile" }
