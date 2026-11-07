@@ -20,7 +20,7 @@ type AibotMetadataConfig = Pick<
   "AIBOT_ORIGIN" | "AIBOT_PARENT_SERVICE_TOKEN"
 >;
 type RouteContext = Context<{ Bindings: CloudflareBindings }>;
-type DateRequestWrite =
+export type DateRequestWrite =
   | { ok: true; data: { requestId: string; status: "pending" } }
   | { ok: false; error: "CONFLICT" };
 
