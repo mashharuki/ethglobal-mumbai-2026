@@ -1,0 +1,5 @@
+[package]
+name = "matching_result"
+type = "bin"
+authors = ["Secret Tinder contributors"]
+compiler_version = "1.0.0"
