@@ -1,47 +1,66 @@
-# Secret Tinder：120秒プレゼンと提出動画
+# Secret Tinder — 120-second pitch and submission video
 
-**Secret Tinder — common ground before photos.** この台本は2026-11-07の実装範囲に合わせた。対面120秒と提出動画2〜3分は別物。発話・画面操作を通した人間のリハーサルと動画収録は未実施で、T033は未完了。
+**Tagline:** Secret Tinder: common ground before photos.
 
-## 対面120秒：見せるのは実装済みの公開資格
+This is an English script, not a recording. As of 7 November 2026, no complete timed rehearsal, submission video or five first-time-viewer observations are recorded. The 120-second booth pitch is separate from ETHGlobal's 2–4 minute video; the [EF CROPS prize](https://ethglobal.com/events/mumbai/prizes/ethereum-foundation) requires its video to be **at most three minutes**. Target a 2:40 video, then replace every planned duration below with measured footage. [ETHGlobal video guidance](https://ethglobal.com/events/mumbai/info/details) permits editing unnecessary waits but forbids speeding footage up; use a human voice and at least 720p.
 
-開始前に[本番ページ](https://ethglobal-mumbai-2026.vercel.app/)を**新しいブラウザープロファイル**で開き、`#proof`、Alice/Bobの検証ボタン、ネットワーク接続を確認する。PR #5マージ後の英語本番でAlice/Bobとも`Eligible`・版1・Sepoliaブロック`12080445`を確認済み。`/sw.js`は移行WorkerとしてHTTP 200で配信され、旧Viteスターターが残ったChromeタブも再読込後に新画面へ移った。旧画面が出た場合は準備済みのクリーンプロファイルに切り替える。発表では画面に表示された今回のブロックを読む。
+## Claim labels to keep on screen
 
-| 時間 | 発話の要点 | 画面操作 |
+| Label | What can be shown | Boundary to say aloud |
 | --- | --- | --- |
-| 0–15秒 | 「Secret Tinder。写真より先に共通点から。」写真と大量の個人情報から始める課題 | ヒーローと主ボタン「See the live credential demo」 |
-| 15–35秒 | 条件を決める→非公開照合→任意のAI会話、という**開発中の**体験 | 3つのステップをスクロール。照合は完成と呼ばない |
-| 35–75秒 | 今日動く参加資格。ENSv2の名前と権限、Arkivの署名済み公開記録 | 主ボタンで`#proof`へ。Alice、続いてBobを検証し、結果を読む |
-| 75–100秒 | BFFを介さずブラウザーが両ネットワークを直接読む。ENSは現行参照と権限分離、Arkivは第三者が読める公開記録 | `Eligible`、版、Sepoliaブロックを指す。取引リンクは時間があれば開く |
-| 100–120秒 | 任意のPersona会話は別チームの単体アプリ。親アプリ接続は未完了。目標と限界を一文で締める | 未実装の明示へ戻す。賞の受賞・申請可は断言しない |
+| **LIVE TESTNET** | [Public verifier](https://ethglobal-mumbai-2026.vercel.app/) reads Alice/Bob ENSv2 names on Sepolia, follows the current `app.credential` reference, and reads their issuer-signed Arkiv Rabdi entities. Previous clean-browser checks returned `Eligible`, version 1; [ENS](../specs/001-private-dating/evidence/ens.md) and [Arkiv](../specs/001-private-dating/evidence/arkiv.md) record the transactions and independent CLI. | Read the **current** block and result from the screen. A credential proves the configured issuer signed a participation record, not identity, character, compatibility or a completed match. |
+| **LOCAL TECHNICAL TEST** | The Anon-RPC diagnostic read Sepolia block `12080644` through the official worker in a local browser. A separate synthetic Noir/BB fixture generated and verified matching proofs in the ZK worktree. | The public ENS/Arkiv verifier still uses direct RPC. The synthetic proof is not a two-device, live-profile private match. Check the final merged commit and rerun the local fixture before including either clip. |
+| **NOT CONNECTED** | Optional AI Persona conversation exists in the teammate-owned AIBot app; funding and private settlement are separate work. | No parent-app AI handoff, production match, deposit or refund path is demonstrated here. Never stage a fictional match as live. |
 
-### 英語で話す原稿
+## Booth pitch — planned 120 seconds
 
-> We’re building Secret Tinder: common ground before photos. Dating often starts with a face and a detailed profile. Our proposed journey starts with private preferences, checks mutual interests, then lets each person decide whether to talk. The private matching step is still in development, so let me show what works today.
->
-> Alice and Bob each have an ENSv2 name. The issuer controls the participation credential, while the participant has limited control of their own records. Each ENS name points to an issuer-signed public credential on Arkiv Rabdi. I’ll check Alice, then Bob. This browser reads ENS and Arkiv directly, without our backend. Both currently return eligible. ENS gives us a current reference and separate permissions. Arkiv gives other clients a public record they can inspect.
->
-> Our teammate also built an optional AI Persona conversation as a separate app. Connecting it to this matching flow is unfinished. Our goal is to let people start with common ground and choose what they share. Today’s live proof is the participation layer, not private matching or a guarantee of anyone’s character.
+Before approaching the mentor, open the [live page](https://ethglobal-mumbai-2026.vercel.app/) in a clean browser profile, find the proof section, and verify both buttons and the network. The previous English-page check was at Sepolia block `12080445`; that is historical evidence, **not** the block to read during the pitch. If a live read fails, say it is unavailable and show the [transaction and CLI record](../README.md#verify-it-yourself) as previous evidence, without calling that a live success.
 
-英語原稿は約160語。話速・クリック待機を含めた120秒の実測はまだない。RPC遅延・制限時は「通信を確認できない」と読み上げ、[ENS](../specs/001-private-dating/evidence/ens.md)と[Arkiv](../specs/001-private-dating/evidence/arkiv.md)の過去の読戻し証拠へ切り替える。その場合、録画内で現在のライブ検証が成功したとは言わない。審査員の前では成功済みブロックを固定値として読まず、画面の**今回の**ブロックと版を読む。
-
-## 提出動画：2〜3分の撮影表（未収録）
-
-大会の動画範囲は2〜4分、EF-CROPSの上限は3分。共通動画を2〜3分に収める。公式の動画条件に従い720p以上で録画し、早送り・AI音声・音楽と文字のみの映像・スマートフォンでの画面撮影を避ける。実際に動く範囲だけを同じ収録で示す。映像の途中でUI・チェーン結果を別撮りにしたら編集点を明示し、処理待ちをカットした場合は開始と結果を同じ実行として残し実測待ち秒数を付ける。
-
-| 尺の目安 | 撮影するもの | 現時点の扱い |
+| Planned time | Screen and action | Spoken point |
 | --- | --- | --- |
-| 0:00–0:30 | キャッチコピー、課題、3段階 | 2・3段階は設計／別アプリ |
-| 0:30–1:30 | 本番URLでAlice/BobのENS→Arkiv検証を各1回、結果まで | 実接続。通信失敗ならその収録を成功例に使わない |
-| 1:30–2:10 | ENS権限とArkiv公開記録の役割、取引・独立CLI証拠 | 実証済みの資格範囲だけ |
-| 2:10–2:40 | 実装済み／未実装の境界と次の目標 | PSI・資金・親AIBot連携は未完了と明示 |
+| 0:00–0:12 | Hero and “See the live credential demo.” | Hook: dating begins with too much personal data and snap judgments. |
+| 0:12–0:28 | Three-step overview. | The intended flow is private preferences → mutual check → optional conversation. Matching is still being built. |
+| 0:28–1:12 | Scroll to proof; click Alice, wait for the result, then Bob. Point to each current block and version. | This working layer checks public participation without trusting our Hono backend. |
+| 1:12–1:36 | Point to ENS name, `app.credential`, Arkiv entity and issuer in the UI/README. | ENSv2 separates the issuer's reference authority from participant keys; Arkiv holds the publicly readable signed record. |
+| 1:36–1:52 | Show the claim-label table, not a fabricated match screen. | A local Anon-RPC read and synthetic Noir proofs are technical tests; neither is the deployed private matching flow. |
+| 1:52–2:00 | Return to the hero. | AI conversation and funds remain unconnected. Invite feedback on this verified participation layer and the privacy direction. |
 
-収録後に埋める記録（担当者が実測して記入）：
+### English words to speak
 
-- [ ] 動画URL：________ ／長さ：________ ／撮影日時：________ ／対象commit：________ ／ブラウザー：________。本番URLと公開リポジトリへの匿名アクセスも録画前に再確認。
-- [ ] Alice/Bob各操作の開始・結果時刻、Sepoliaブロック、Arkivの参照先、RPC待ち実測を記入。
-- [ ] 実接続／合成／未接続の表示を映像・説明・READMEで一致させる。
-- [ ] EF-CROPS・ENS-V2・ARKIV-APPの主張を[応募判定](../specs/001-private-dating/prize-targets.md)と照合し、該当動画時刻をT036へ渡す。EF-RPC・ARKIV-SWARMは実証がある場合だけ追加する。
-- [ ] 別の初見参加者で[目的・主操作・送信範囲の観察](../specs/001-private-dating/evidence/ux.md)を記録。実測の120秒プレゼン時間：________、修正点：________。
-- [ ] [賞別提出判定](../specs/001-private-dating/evidence/prizes.md)に動画時刻・対象commit・Dashboardの選択/受付を記録。提出前に実装済みと計画中の言い方を再確認。
+> Secret Tinder: common ground before photos. Dating often starts with a face and a large personal profile. We want people to choose private preferences, check for mutual interest, and only then decide whether to talk. That matching journey is still in development.
+>
+> Here is what works on testnet. Alice and Bob have ENSv2 names. The issuer controls the credential reference, while participants have separate limited keys. Each current ENS reference points to an issuer-signed public credential on Arkiv Rabdi. I'll check Alice, then Bob. This browser reads both networks directly, without our backend. The result on screen is a participation check, not a claim about character or compatibility.
+>
+> We have also tested an Anon-RPC read locally and verified synthetic Noir matching proofs. The live verifier still uses direct RPC, and those proofs are not a live match between two people. Our teammate's optional AI Persona app and the funds flow are not connected here. We would value feedback on the verified ENS and Arkiv layer and where private matching should go next.
 
-公開資格は本人の誠実さ・相性・安全性を保証しない。AI会話は別同意でPersona・会話をAI処理先に送る。マッチング用の秘密入力が完成済みのUIに存在するかのように演出しない。
+This script is about 175 words. Its speaking time, two live network waits and total duration are **unmeasured**. Shorten the opening first if a human rehearsal exceeds 120 seconds; do not skip the “local” and “not connected” qualifiers.
+
+## Submission video — planned 2:40, under three minutes
+
+Use one clearly labeled recording sequence. Keep operation starts and their results from the same attempt visible. If editing removes an unnecessary wait, show the cut and record the uncut wait below. Do not use old successful output as if it came from a newly recorded click. The current site and source commit must be checked again immediately before filming.
+
+| Planned time | Shot | Spoken claim and label | Actual clip / wait |
+| --- | --- | --- | --- |
+| 0:00–0:18 | Hero, tagline and one-sentence problem. | “Common ground before photos.” The matching flow is the goal. | ________ |
+| 0:18–0:35 | Three steps and the single “See the live credential demo” action. | Mark private matching and optional AI as still in development. | ________ |
+| 0:35–1:15 | On the public URL, click Alice and Bob separately; show `Eligible`, version and the **current** Sepolia block for each. | **LIVE TESTNET:** ENS current reference → Arkiv entity → issuer signature. If either read fails, keep the failure and describe it honestly. | Alice ________ / Bob ________ |
+| 1:15–1:35 | README's issuer wallet, two Arkiv write transactions, indexed query and independent CLI. | **RECORDED TESTNET EVIDENCE:** indexed discovery and the browser's current-key read are distinct paths. | ________ |
+| 1:35–1:55 | Local Anon-RPC diagnostic only if rerun on the final commit. | **LOCAL TECHNICAL TEST:** worker-backed Sepolia read. The public credential page still uses direct RPC, so do not claim Anon-RPC is the default app route. | ________ |
+| 1:55–2:20 | Local synthetic Noir proof verification, with its command, beginning and result; include generation only if it fits at normal speed. | **LOCAL SYNTHETIC PROOF:** no live two-device matching, verified enrollment, lease or production privacy claim. | ________ |
+| 2:20–2:40 | Status/next step card with source links. | ENS/Arkiv participation works on testnet. AI handoff and funding/settlement are not connected. | ________ |
+
+The current live page is a public participation verifier. A synthetic Noir clip cannot satisfy EF-CROPS's requirement for the lead privacy property to work end to end. Do not say that any prize has been won or that a Hacker Dashboard application was accepted. Add EF-RPC or Arkiv + Swarm claims only after their separate end-to-end evidence exists.
+
+### Fill this from the actual recording
+
+| Operation in the final video | Start timestamp | Result timestamp | Uncut wait (s) | Same attempt and status shown? |
+| --- | --- | --- | --- | --- |
+| Alice ENS→Arkiv read | ________ | ________ | ________ | ________ |
+| Bob ENS→Arkiv read | ________ | ________ | ________ | ________ |
+| Local Anon-RPC worker ready → `eth_blockNumber` | ________ | ________ | ________ | ________ |
+| Synthetic Noir prove, if shown | ________ | ________ | ________ | ________ |
+| Synthetic Noir verify, if shown | ________ | ________ | ________ | ________ |
+
+Recording URL: ________ · Actual length: ________ · Resolution: ________ · Date/time: ________ · Live URL: ________ · Repository and target commit: ________ · Browser: ________ · Presenter: ________.
+
+Booth rehearsal duration: ________ · Presenter: ________ · Five first-time viewers tested: **no, pending** · What each understood about purpose, next action and data sent: [UX observation sheet](../specs/001-private-dating/evidence/ux.md) (blank until observed). Give the final clip timestamps and any failure or omitted shot to the [prize decision record](../specs/001-private-dating/evidence/prizes.md). Recording, rehearsal and those five observations have **not** happened yet.
