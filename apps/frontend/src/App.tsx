@@ -7,9 +7,7 @@ import "./App.css";
 const AnonRpcDiagnostics = import.meta.env.DEV
   ? lazy(() => import("./pages/AnonRpcDiagnostics.tsx"))
   : null;
-const Simulation = import.meta.env.DEV
-  ? lazy(() => import("./pages/Simulation.tsx"))
-  : null;
+const Simulation = lazy(() => import("./pages/Simulation.tsx"));
 const Registration = lazy(() => import("./pages/Registration.tsx"));
 
 const heroBackground =
@@ -58,6 +56,7 @@ function SiteHeader() {
             <a href="#journey">How it works</a>
             <a href="#proof">Live proof</a>
             <a href="#registration">ZK registration</a>
+            <a href="#simulation">AI demo</a>
           </Cluster>
         </Cluster>
       </Wrapper>
@@ -269,11 +268,13 @@ function Proof() {
   );
 }
 
-function subscribeToPath(): () => void {
-  return () => {};
+function subscribeToPath(onChange: () => void): () => void {
+  window.addEventListener("hashchange", onChange);
+  return () => window.removeEventListener("hashchange", onChange);
 }
 
 function getCurrentPath(): string {
+  if (window.location.hash === "#simulation") return "/simulation";
   return window.location.pathname;
 }
 
@@ -301,7 +302,7 @@ export default function App() {
       </Suspense>
     );
   }
-  if (import.meta.env.DEV && currentPath === "/simulation" && Simulation) {
+  if (currentPath === "/simulation") {
     return (
       <Suspense fallback={<p>Loading simulation preview...</p>}>
         <Simulation />
