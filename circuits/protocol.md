@@ -18,7 +18,7 @@ bb prove -b target/register.json -w target/register.gz --write_vk -o target/regi
 bb verify -p target/register-proof/proof -k target/register-proof/vk -i target/register-proof/public_inputs
 ```
 
-`apps/frontend/src/proofs/register.ts`は合成辞書の値域を確認し、OSの暗号用乱数から独立した項目saltを作り、BB.jsのPedersenでルートを計算してNoirJS/BB.jsで証明・検証する。戻り値は公開`publicProof`と、プロフィール・項目salt・主体/発行ID・版・ルートを含む端末専用`privateMaterial`に分ける。後者はクラスのprivate fieldに保持し、戻り値全体のJSON直列化には含めない。暗号化バックアップからの復元関数は値域とルートを再計算し、改変を拒否する。暗号化保存への結合自体は未実装であり、呼出側は`privateMaterial`だけを端末内の暗号化保存へ渡す必要がある。別の検証関数はpinしたBB.js検証鍵digest、主体、発行ID、版、ルートを8公開入力と照合する。`apps/frontend/scripts/register-integration.mjs`をNode 24で実行し、正例、再登録で別ルート、改変した主体・版・ルート・鍵・proof、辞書外値の拒否と秘密materialのJSON復元/改変拒否を確認した。これはNodeのBB.js実行系による試験であり、実ブラウザー・公開登録API・2端末通信への結合は未確認。ブラウザー用WASMは公式CRSの取得を必要とする。
+`apps/frontend/src/proofs/register.ts`は合成辞書の値域を確認し、OSの暗号用乱数から独立した項目saltを作り、BB.jsのPedersenでルートを計算してNoirJS/BB.jsで証明・検証する。戻り値は公開`publicProof`と、プロフィール・項目salt・主体/発行ID・版・ルートを含む端末専用`privateMaterial`に分ける。後者はクラスのprivate fieldに保持し、戻り値全体のJSON直列化には含めない。`apps/frontend/src/profile/registration-backup.ts`は秘密materialをAES-GCMバックアップへ渡し、復元時に値域とルートを再計算して改変を拒否する。保存・ダウンロード画面と実登録フローは未接続。別の検証関数はpinしたBB.js検証鍵digest、主体、発行ID、版、ルートを8公開入力と照合する。`apps/frontend/scripts/register-integration.mjs`をNode 24で実行し、正例、再登録で別ルート、改変した主体・版・ルート・鍵・proof、辞書外値の拒否、暗号化バックアップからの復元と誤ったパスフレーズの拒否を確認した。これはNodeのBB.js実行系による試験であり、実ブラウザー・公開登録API・2端末通信への結合は未確認。ブラウザー用WASMは公式CRSの取得を必要とする。
 
 ## 固定した座標と入力
 
