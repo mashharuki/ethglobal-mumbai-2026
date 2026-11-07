@@ -24,7 +24,9 @@ import {
   participationTrustSchema,
   verifyParticipationSignature,
 } from "../../../../packages/shared/src/index.ts";
-import trustRecord from "../../../../specs/001-private-dating/evidence/ens-trust.json";
+import trustRecord from "../../../../specs/001-private-dating/evidence/ens-trust.json" with {
+  type: "json",
+};
 
 const trustConfiguration = participationTrustSchema.parse(trustRecord);
 const registryAbi = parseAbi([
@@ -100,7 +102,7 @@ function parseJson(value: string, error: string): unknown {
   }
 }
 
-async function fromNetwork<T>(
+export async function fromNetwork<T>(
   operation: () => Promise<T>,
   code: "ENS_UNAVAILABLE" | "ARKIV_UNAVAILABLE",
 ): Promise<T> {
@@ -393,7 +395,7 @@ async function readPublication(reference: Reference, trust: Trust) {
   return { credential: parsed.data, issuanceId: row.issuance_id.value };
 }
 
-async function checkCredential(
+export async function checkCredential(
   credential: Credential,
   issuanceId: string,
   reference: Reference,
