@@ -10,6 +10,7 @@ const AnonRpcDiagnostics = import.meta.env.DEV
 const Simulation = import.meta.env.DEV
   ? lazy(() => import("./pages/Simulation.tsx"))
   : null;
+const Registration = lazy(() => import("./pages/Registration.tsx"));
 
 const heroBackground =
   "radial-gradient(circle at 85% 20%, color-mix(in srgb, var(--brand) 18%, transparent), transparent 40%), radial-gradient(circle at 10% 85%, color-mix(in srgb, var(--accent) 12%, transparent), transparent 45%)";
@@ -56,6 +57,7 @@ function SiteHeader() {
           <Cluster as="nav" aria-label="Page navigation" g="20">
             <a href="#journey">How it works</a>
             <a href="#proof">Live proof</a>
+            <a href="#registration">ZK registration</a>
           </Cluster>
         </Cluster>
       </Wrapper>
@@ -313,6 +315,9 @@ export default function App() {
         <Hero />
         <Journey />
         <Proof />
+        <Suspense fallback={<p>Loading registration...</p>}>
+          <Registration />
+        </Suspense>
       </main>
     </Lism>
   );
