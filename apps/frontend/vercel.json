@@ -1,5 +1,11 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "buildCommand": "VERCEL_STATIC_BUILD=1 pnpm build",
-  "outputDirectory": "dist/client"
+  "buildCommand": "VERCEL_STATIC_BUILD=1 pnpm build && cp sw-retire.js dist/client/sw.js",
+  "outputDirectory": "dist/client",
+  "headers": [
+    {
+      "source": "/sw.js",
+      "headers": [{ "key": "Cache-Control", "value": "no-store, max-age=0" }]
+    }
+  ]
 }
