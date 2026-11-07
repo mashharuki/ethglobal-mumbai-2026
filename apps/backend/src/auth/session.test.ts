@@ -73,6 +73,8 @@ test("should consume a SIWE challenge once under concurrent submissions", async 
       }),
     });
     assert.equal(invalidResponse.status, 401);
+    const invalidError = (await invalidResponse.json()) as { code: string };
+    assert.equal(invalidError.code, "UNAUTHENTICATED");
     const sessionRequest = () =>
       fetch(`${origin}/v1/auth/sessions`, {
         method: "POST",
@@ -114,6 +116,11 @@ test("should consume a SIWE challenge once under concurrent submissions", async 
         body: JSON.stringify({ address: account.address }),
       });
       assert.equal(response.status, index === 4 ? 429 : 200);
+      if (index === 4) {
+        assert.equal(response.headers.get("Retry-After"), "60");
+        const limitError = (await response.json()) as { code: string };
+        assert.equal(limitError.code, "RATE_LIMITED");
+      }
     }
   } finally {
     if (!hasExited) {

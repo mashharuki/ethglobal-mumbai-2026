@@ -15,12 +15,12 @@ import {
 
 type AppContext = Context<{ Bindings: CloudflareBindings }>;
 type ApiErrorCode =
-  | "invalid_input"
-  | "unauthenticated"
-  | "not_found"
-  | "conflict"
-  | "rate_limited"
-  | "unavailable";
+  | "INVALID_INPUT"
+  | "UNAUTHENTICATED"
+  | "NOT_FOUND"
+  | "CONFLICT"
+  | "RATE_LIMITED"
+  | "UNAVAILABLE";
 
 const app = new Hono<{ Bindings: CloudflareBindings }>();
 
@@ -36,7 +36,11 @@ function sendError(
   status: 401 | 404 | 409 | 422 | 429 | 503,
   code: ApiErrorCode,
 ): Response {
-  return c.json({ code, message: code.replaceAll("_", " ") }, status);
+  if (status === 429) c.header("Retry-After", "60");
+  return c.json(
+    { code, message: code.toLowerCase().replaceAll("_", " ") },
+    status,
+  );
 }
 
 function getRequestOrigin(c: AppContext): string | null {
@@ -73,16 +77,16 @@ app.use("*", async (c, next) => {
 
 app.post("/v1/auth/challenges", async (c) => {
   const origin = getRequestOrigin(c);
-  if (!origin) return sendError(c, 422, "invalid_input");
+  if (!origin) return sendError(c, 422, "INVALID_INPUT");
   const parsed = authChallengeRequestSchema.safeParse(await readJsonBody(c));
-  if (!parsed.success) return sendError(c, 422, "invalid_input");
+  if (!parsed.success) return sendError(c, 422, "INVALID_INPUT");
   const store = getAuthStore(c.env, getAddress(parsed.data.address));
   const result = await store.issueChallenge(parsed.data.address, origin);
   if (!result.ok) {
     return sendError(
       c,
       result.error === "rate_limited" ? 429 : 422,
-      result.error === "rate_limited" ? "rate_limited" : "invalid_input",
+      result.error === "rate_limited" ? "RATE_LIMITED" : "INVALID_INPUT",
     );
   }
   return c.json(result.data, 200);
@@ -90,12 +94,12 @@ app.post("/v1/auth/challenges", async (c) => {
 
 app.post("/v1/auth/sessions", async (c) => {
   const origin = getRequestOrigin(c);
-  if (!origin) return sendError(c, 422, "invalid_input");
+  if (!origin) return sendError(c, 422, "INVALID_INPUT");
   const parsed = authSessionRequestSchema.safeParse(await readJsonBody(c));
-  if (!parsed.success) return sendError(c, 422, "invalid_input");
+  if (!parsed.success) return sendError(c, 422, "INVALID_INPUT");
   const siwe = parseSiweMessage(parsed.data.message);
   if (!siwe.address || !isAddress(siwe.address, { strict: false })) {
-    return sendError(c, 401, "unauthenticated");
+    return sendError(c, 401, "UNAUTHENTICATED");
   }
   const store = getAuthStore(c.env, getAddress(siwe.address));
   const result = await store.createSession(
@@ -112,10 +116,10 @@ app.post("/v1/auth/sessions", async (c) => {
           : 401;
     const code =
       status === 429
-        ? "rate_limited"
+        ? "RATE_LIMITED"
         : status === 409
-          ? "conflict"
-          : "unauthenticated";
+          ? "CONFLICT"
+          : "UNAUTHENTICATED";
     return sendError(c, status, code);
   }
   setCookie(
@@ -135,15 +139,15 @@ app.post("/v1/auth/sessions", async (c) => {
 
 app.get("/v1/operations/:id", async (c) => {
   const operationId = operationIdSchema.safeParse(c.req.param("id"));
-  if (!operationId.success) return sendError(c, 404, "not_found");
+  if (!operationId.success) return sendError(c, 404, "NOT_FOUND");
   const cookie = parseSessionCookie(getCookie(c, "st_session"));
-  if (!cookie) return sendError(c, 401, "unauthenticated");
+  if (!cookie) return sendError(c, 401, "UNAUTHENTICATED");
   const store = getAuthStore(c.env, cookie.address);
   const tokenHash = await hashSessionToken(cookie.token);
   if (!(await store.hasSession(tokenHash)))
-    return sendError(c, 401, "unauthenticated");
+    return sendError(c, 401, "UNAUTHENTICATED");
   const operation = await store.getPrivateOperation(operationId.data);
-  if (!operation) return sendError(c, 404, "not_found");
+  if (!operation) return sendError(c, 404, "NOT_FOUND");
   return c.json(operation, 200);
 });
 
@@ -154,7 +158,7 @@ app.onError((_error, c) => {
       error: "unhandled",
     }),
   );
-  return sendError(c, 503, "unavailable");
+  return sendError(c, 503, "UNAVAILABLE");
 });
 
 export { AuthStore };

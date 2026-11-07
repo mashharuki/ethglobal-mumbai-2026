@@ -10,7 +10,8 @@ export const authSessionRequestSchema = z.strictObject({
   signature: z
     .string()
     .max(2048)
-    .refine((value) => isHex(value, { strict: true }), "Invalid hex signature"),
+    .regex(/^0x(?:[0-9a-fA-F]{2})+$/, "Invalid hex signature")
+    .refine(isHex),
 });
 
 export const operationIdSchema = z.uuid();
