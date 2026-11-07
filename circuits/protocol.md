@@ -53,6 +53,18 @@ BN254 Fr/Grumpkinと128-bit非零スカラーを採用した。BB.js v5.3.0に�
 
 同じA側合成入力をNode 24のNoirJS v1.0.0 + BB.js v5.3.0でも`apps/frontend/scripts/matching-bbjs-smoke.mjs matching`でprove/verifyした。実測約59秒、証明14,656 byte、公開入力12個、VK SHA-256は`12ea1b68e06613acdcb46abb3d3a6a8caf99f8ea25e44c86629cc32d3a57ea2f`で、CLI v6の鍵と異なる。B側も同じNode/WASMで約36秒、16公開入力、VK SHA-256は`4e61e813dc5777c41e087d4ac78eda234caaf68e2f624eee2d5c9277b055cd40`、結果側は約3秒、10公開入力、VK SHA-256は`6690b2bc2472a4856e47b0a9325b93d8af587550a964527ce7b83408470d9fde`だった。B側は公開CRSのローカルキャッシュに1,048,576点、圧縮G1 32 MiBを要した。この試験はNode/WASMであり、実ブラウザー内のメモリ、読み込み時間、2端末通信を示さない。
 
+### Chromeでの独立ローカル試験
+
+2026-11-07、macOS上のGoogle Chrome 156.0.8078.80で、`apps/frontend/scripts/browser-smoke/`のローカルViteページ（`127.0.0.1`のみ）を使った。対象は`both-unspecified`合成入力で、実ユーザーの秘密・ウォレット・ENS/Arkiv読取を含まない。NoirJS v1.0.0でwitnessを作り、BB.js v5.3.0のブラウザーWASM Workerで各回路を1回ずつprove/verifyした。公開CRSは公式Aztec CDNから事前取得した点をローカルで配信し、外部取得先をローカルへ写した。A/B回路ではBB.jsの既定SRS `2^19`点が不足して`MemBn254CrsFactory`エラーになったため、`srsSize: 2 ** 20`を明示した。圧縮G1は32 MiB。実測は次のとおり（ミリ秒、合計には検証鍵生成とverifyを含む）。
+
+| 回路 | witness | prove（CRS初期化を含む） | 合計 | 公開入力 | 証明 | 終了時JSヒープ |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| A側暗号化 | 441 | 108,296 | 134,112 | 12 | 14,656 B | 210,559,303 B |
+| B側選択 | 429 | 83,080 | 104,593 | 16 | 14,656 B | 225,395,574 B |
+| A側結果 | 168 | 8,524 | 12,134 | 10 | 14,656 B | 260,718,830 B |
+
+3回路のVK SHA-256は直前のNode/WASM試験と各々一致した。JSヒープはChromeの`performance.memory.usedJSHeapSize`を終了時に読んだ値であり、最大値でもWASM linear memoryを含む総プロセスメモリでもない。ブラウザー内の最大メモリとスマートフォン性能は未測定。合成witnessをページ内に読み込む試験であり、実プロフィールを同じ方法で読み込んではならない。2端末間の配送、現在の資格・登録・リース検査、SC-002全10例は未実証で、T012の完了条件には達していない。
+
 ## B側と結果の回路（合成fixture）
 
 `matching_b/src/main.nr`はBの登録ルートから全288座標を導出し、Aの全暗号文の順序付きdigestを再計算する。Bの1の座標だけを群の多重スカラー乗算で選び、非零128-bit maskで内積暗号文を乗算し、別の非零乱数でゼロを再暗号化する。Bの出力は暗号文2点であり、希望条件別の真偽や趣味数ではない。`matching_result/src/main.nr`はAの秘密鍵と一時公開鍵の対応を再検証し、Bの暗号文の2点が復号後に一致するかを**1ビットだけ**公開する。両回路の公開値はセッション、A暗号文digest、鍵、B出力点で接続する。無限遠点の内部表現に依存しないよう、復号点を生成して比較する代わりに`out2 == sk·out1`を証明する。
