@@ -10,15 +10,13 @@ type DiagnosticState =
   | { kind: "failure"; reason: string };
 
 function DiagnosticResult({ state }: { state: DiagnosticState }) {
-  if (state.kind === "idle") return <p>未実行です。</p>;
+  if (state.kind === "idle") return <p>Not run yet.</p>;
   if (state.kind === "running")
-    return <p>公式 Nox worker を起動し、Sepolia を読取中です…</p>;
+    return <p>Starting the official Nox worker and reading Sepolia...</p>;
   if (state.kind === "failure")
-    return <p>匿名読取は利用できません: {state.reason}</p>;
+    return <p>Anonymous reading is unavailable: {state.reason}</p>;
   return (
-    <p>
-      匿名経路から Sepolia block {state.blockNumber.toString()} を取得しました。
-    </p>
+    <p>Read Sepolia block {state.blockNumber.toString()} through the worker.</p>
   );
 }
 
@@ -54,12 +52,12 @@ export default function AnonRpcDiagnostics() {
   return (
     <Stack as="section" p="30" g="20" bgc="base-2" bdrs="20">
       <Lism as="h2" fz="xl">
-        Anon-RPC Sepolia 診断（開発環境のみ）
+        Anon-RPC Sepolia diagnostic (local development only)
       </Lism>
       <Lism as="p">
-        Nox の公式 worker を利用します。識別子取得と worker
-        配布は直接通信し、Sepolia の block
-        読取は匿名経路で行います。接続失敗時に通常 RPC へ迂回しません。
+        The official Nox worker reads the Sepolia block. Looking up the worker
+        identifier and delivering the worker still use direct requests. If the
+        anonymous route fails, this page does not fall back to ordinary RPC.
       </Lism>
       <Lism
         as="button"
@@ -73,7 +71,7 @@ export default function AnonRpcDiagnostics() {
         bdrs="99"
         fw="bold"
       >
-        匿名経路を確認
+        Check anonymous route
       </Lism>
       <Lism as="output" role="status" aria-live="polite">
         <DiagnosticResult state={state} />
