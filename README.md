@@ -22,6 +22,8 @@ ENSv2 separates issuer control of the participation credential from participant 
 | Issuer-signed public participation credentials | Written and read back on Arkiv Rabdi | [Alice](specs/001-private-dating/evidence/arkiv-alice-publication.json) · [Bob](specs/001-private-dating/evidence/arkiv-bob-publication.json) |
 | ENS `app.credential` references to Arkiv entities | Written and read back on Sepolia | [Alice](specs/001-private-dating/evidence/ens-alice-reference.json) · [Bob](specs/001-private-dating/evidence/ens-bob-reference.json) |
 | Independent participation verification | Browser and CLI read ENSv2 and Arkiv without the Hono backend | [Browser source](apps/frontend/src/pages/Participation.tsx) · [CLI source](scripts/verify-participation.ts) · [comparison](specs/001-private-dating/evidence/ens.md#ブラウザーとcliの比較) |
+| SIWE session and private-operation read API | Implemented and tested locally; not deployed or connected to the live frontend | [Backend source](apps/backend/src/auth/session.ts) · [API contract](packages/api-specs/openapi.yaml) · [integration record](specs/001-private-dating/evidence/verification.md) |
+| In-person selective-disclosure preview | Synthetic local fixture only; not connected to a real registration or match | [UI source](apps/frontend/src/pages/InPerson.tsx) · [limit and tests](specs/001-private-dating/evidence/verification.md) |
 | Private preference matching and candidate selection | Design and implementation in progress | [Implementation plan](specs/001-private-dating/plan.md) |
 | Optional AI Persona conversation | Built in a teammate-owned [submodule](ethglobal-mumbai-2026-AIBot/); parent integration pending | [Inspection record](specs/001-private-dating/evidence/aibot-inspection.md) |
 
@@ -75,7 +77,7 @@ pnpm install --frozen-lockfile
 pnpm --filter frontend dev
 ```
 
-Open the URL printed by Vite. The public verifier needs no wallet or secrets and works with the Hono backend stopped; it sends the selected public ENS name to Sepolia and Arkiv RPCs. The Hono backend still serves only its starter route; participation issuance and issuer evidence checks currently run as scripts. The AIBot is a teammate-owned submodule with separate setup instructions. Do not put wallet keys, RPC access keys, or private profile data in the repository.
+Open the URL printed by Vite. The public verifier needs no wallet or secrets and works with the Hono backend stopped; it sends the selected public ENS name to Sepolia and Arkiv RPCs. The Hono backend has local SIWE authentication and a private-operation read route, but these are not connected to the live Vercel frontend. Participation issuance and issuer evidence checks currently run as scripts. The AIBot is a teammate-owned submodule with separate setup instructions. Do not put wallet keys, RPC access keys, or private profile data in the repository.
 
 ## CROPS
 
@@ -101,7 +103,7 @@ On 7 November 2026, a fresh request to the [production URL](https://ethglobal-mu
 - `apps/frontend`: React/Vite/Void landing page and planned user flows.
 - `apps/backend`: Hono/Workers starter and participation issuance/evidence code.
 - `packages/shared`: credential schemas and EIP-712 signing format.
-- `packages/api-specs`: planned API contract.
+- `packages/api-specs`: OpenAPI HTTP contract; generated client is pending.
 - `apps/contract`: Hardhat starter, with deposit contracts planned.
 - `ethglobal-mumbai-2026-AIBot`: teammate-owned, separately implemented AI Persona app.
 - `specs/001-private-dating`: Spec Kit specification, plan, tasks, fixtures, and evidence.
