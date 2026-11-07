@@ -76,6 +76,7 @@ async function requestAnonymousRpc(
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ jsonrpc: "2.0", id: 1, method, params: [] }),
     cache: "no-store",
+    signal: AbortSignal.timeout(60_000),
   });
   if (!response.ok) return null;
   const payload: unknown = await response.json();

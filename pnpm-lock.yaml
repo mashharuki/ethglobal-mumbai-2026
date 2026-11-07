@@ -311,6 +311,9 @@ importers:
 
   apps/frontend:
     dependencies:
+      '@anon-rpc/browser-harness':
+        specifier: 0.4.0
+        version: 0.4.0
       '@arkiv-network/sdk':
         specifier: 1.0.1
         version: 1.0.1(typescript@7.0.2)(viem@2.57.16(typescript@7.0.2)(zod@4.6.7))
@@ -388,6 +391,12 @@ packages:
 
   '@adraffy/ens-normalize@1.11.1':
     resolution: {integrity: sha512-nhCBV3quEgesuf7c7KYfperqSS14T8bYuvJ8PcLJp6znkZpFc0AuW4qBtr8eKVyPPe/8RSr7sglCWPU5eaxwKQ==}
+
+  '@anon-rpc/browser-harness@0.4.0':
+    resolution: {integrity: sha512-9h+ks9lGmGTXE3fuFopowag+pLVJxhgmYG3SEBI1qk8ik7RGkxPT7Ub7RmbkDJ92/4VCa8gjT45BWoEnGynJYQ==}
+
+  '@anon-rpc/harness-core@0.4.0':
+    resolution: {integrity: sha512-ZFVeE0tkUgXPw1qu99s8JPKD4jFatHZ+nELisZ4WF+YMpCrBFIvpJe0qdCoLcmbhH1brbsC35qe8F1G3HxIbgA==}
 
   '@apideck/better-ajv-errors@0.3.7':
     resolution: {integrity: sha512-TajUJwGWbDwkCx/CZi7tRE8PVB7simCvKJfHUsSdvps+aTM/PDPP4gkLmKnc+x3CE//y9i/nj74GqdL/hwk7Iw==}
@@ -1881,6 +1890,12 @@ packages:
 
   '@jridgewell/trace-mapping@0.3.9':
     resolution: {integrity: sha512-3Belt6tdc8bPgAtbcmdtNJlirVoTmEb5e2gC94PnkwEW9jI6CAHUeoG85tjWP5WquqfavoMtMwiG4P926ZKKuQ==}
+
+  '@kpstreams/core@0.2.1':
+    resolution: {integrity: sha512-cx82IpcAG2OoteTrUbHECIm2jc5rJ0+O8qB7cKAXdvkN5oje4aOIiF8nb7nEk+LSMISz8Zz7znrj+gzSXEBKuw==}
+
+  '@kpstreams/webrtc-client@0.2.1':
+    resolution: {integrity: sha512-B4o0mN6QmSblhfaKy74xezV82LaIqp6tdZ05HBAuBV2sSw9wFsT3TY6xmMJeHOECWVwFJGnSit9k0RV6HnPPBw==}
 
   '@msgpackr-extract/msgpackr-extract-darwin-arm64@3.0.7':
     resolution: {integrity: sha512-2zPHLn+MuGJ6GP/5jDrwa9Jy0CI+D3Ibpvopf5SFfmc1G9gdofR4uB7YrJAAp4vodn/7iDOciyv8bgkRPLw7cA==}
@@ -5187,6 +5202,16 @@ snapshots:
 
   '@adraffy/ens-normalize@1.11.1': {}
 
+  '@anon-rpc/browser-harness@0.4.0':
+    dependencies:
+      '@anon-rpc/harness-core': 0.4.0
+      '@kpstreams/webrtc-client': 0.2.1
+      '@noble/hashes': 1.8.0
+
+  '@anon-rpc/harness-core@0.4.0':
+    dependencies:
+      '@noble/hashes': 1.8.0
+
   '@apideck/better-ajv-errors@0.3.7(ajv@8.20.0)':
     dependencies:
       ajv: 8.20.0
@@ -6518,6 +6543,12 @@ snapshots:
     dependencies:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.6.0
+
+  '@kpstreams/core@0.2.1': {}
+
+  '@kpstreams/webrtc-client@0.2.1':
+    dependencies:
+      '@kpstreams/core': 0.2.1
 
   '@msgpackr-extract/msgpackr-extract-darwin-arm64@3.0.7':
     optional: true
