@@ -194,7 +194,7 @@ RPC access keys or private profile data in the repository.
 
 ## CROPS
 
-These boundaries describe the deployed participation verifier and the proposed matching flow. End-to-end private matching is **not yet verified**. The [EF-CROPS conditions](https://ethglobal.com/events/mumbai/prizes/ethereum-foundation) also require a video of the lead property working end to end in at most three minutes; that video has not been recorded.
+These boundaries describe the deployed participation verifier and the proposed matching flow. End-to-end private matching is **not yet verified**. The [EF-CROPS conditions](https://ethglobal.com/events/mumbai/prizes/ethereum-foundation) also require a video of the lead property working end to end in at most three minutes; an ENS/Arkiv credential demo does not satisfy that requirement.
 
 | Letter | Current behavior and limit |
 | --- | --- |
