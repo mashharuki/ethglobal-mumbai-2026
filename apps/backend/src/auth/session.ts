@@ -7,6 +7,9 @@ import {
   verifyMessage,
 } from "viem";
 import { createSiweMessage, parseSiweMessage } from "viem/siwe";
+import type { RetainedMeasure, ReviewCase } from "../participation/review.ts";
+
+const REVIEW_RETENTION_SECONDS = 7 * 86_400;
 
 const CHALLENGE_LIFETIME_MS = 5 * 60_000;
 const SESSION_LIFETIME_MS = 15 * 60_000;
@@ -35,6 +38,12 @@ type ChallengeRow = {
 
 type SessionRow = { token_hash: string; expires_at: number };
 type OperationRow = { body: string };
+type ReviewRow = { body: string };
+type RetainedRow = {
+  stable_subject_id: string;
+  policy_version: number;
+  suspended_until: number;
+};
 
 function randomHex(byteCount: number): string {
   const bytes = crypto.getRandomValues(new Uint8Array(byteCount));
@@ -96,6 +105,24 @@ export function parseSessionCookie(value: string | undefined): {
   return { address: match[1], token: match[2] };
 }
 
+export function getAuthStore(
+  env: CloudflareBindings,
+  address: string,
+): DurableObjectStub<AuthStore> {
+  return env.AUTH_STORE.getByName(address.toLowerCase());
+}
+
+export async function getAuthenticatedAddress(
+  env: CloudflareBindings,
+  cookieValue: string | undefined,
+): Promise<string | null> {
+  const cookie = parseSessionCookie(cookieValue);
+  if (!cookie) return null;
+  const tokenHash = await hashSessionToken(cookie.token);
+  const isValid = await getAuthStore(env, cookie.address).hasSession(tokenHash);
+  return isValid ? cookie.address : null;
+}
+
 export class AuthStore extends DurableObject<CloudflareBindings> {
   constructor(ctx: DurableObjectState, env: CloudflareBindings) {
     super(ctx, env);
@@ -110,6 +137,15 @@ export class AuthStore extends DurableObject<CloudflareBindings> {
     );
     this.ctx.storage.sql.exec(
       "CREATE TABLE IF NOT EXISTS operations (operation_id TEXT PRIMARY KEY, body TEXT NOT NULL)",
+    );
+    this.ctx.storage.sql.exec(
+      "CREATE TABLE IF NOT EXISTS review_cases (case_id TEXT PRIMARY KEY, stable_subject_id TEXT NOT NULL, revision INTEGER NOT NULL, body TEXT NOT NULL)",
+    );
+    this.ctx.storage.sql.exec(
+      "CREATE INDEX IF NOT EXISTS review_cases_subject ON review_cases (stable_subject_id)",
+    );
+    this.ctx.storage.sql.exec(
+      "CREATE TABLE IF NOT EXISTS retained_measures (case_id TEXT PRIMARY KEY, stable_subject_id TEXT NOT NULL, policy_version INTEGER NOT NULL, suspended_until INTEGER NOT NULL)",
     );
   }
 
@@ -241,5 +277,138 @@ export class AuthStore extends DurableObject<CloudflareBindings> {
       operation.operationId,
       JSON.stringify(operation),
     );
+  }
+
+  getReviewCase(caseId: string): ReviewCase | null {
+    this.compactReviewCases(Math.floor(Date.now() / 1000));
+    const row = this.ctx.storage.sql
+      .exec<ReviewRow>(
+        "SELECT body FROM review_cases WHERE case_id = ?",
+        caseId,
+      )
+      .toArray()[0];
+    return row ? (JSON.parse(row.body) as ReviewCase) : null;
+  }
+
+  async putReviewCase(
+    review: ReviewCase,
+    expectedRevision: number,
+  ): Promise<boolean> {
+    if (review.revision !== expectedRevision + 1) return false;
+    const body = JSON.stringify(review);
+    let isStored = false;
+    if (expectedRevision === 0) {
+      const inserted = this.ctx.storage.sql.exec(
+        "INSERT OR IGNORE INTO review_cases (case_id, stable_subject_id, revision, body) VALUES (?, ?, ?, ?) RETURNING case_id",
+        review.caseId,
+        review.stableSubjectId,
+        review.revision,
+        body,
+      );
+      isStored = inserted.toArray().length === 1;
+    } else {
+      const updated = this.ctx.storage.sql.exec(
+        "UPDATE review_cases SET revision = ?, body = ? WHERE case_id = ? AND revision = ? AND stable_subject_id = ? RETURNING case_id",
+        review.revision,
+        body,
+        review.caseId,
+        expectedRevision,
+        review.stableSubjectId,
+      );
+      isStored = updated.toArray().length === 1;
+    }
+    if (!isStored || review.closedAt === null) return isStored;
+    const cleanupAt = Math.max(
+      Date.now() + 1_000,
+      (review.closedAt + REVIEW_RETENTION_SECONDS) * 1_000,
+    );
+    const scheduled = await this.ctx.storage.getAlarm();
+    if (scheduled === null || cleanupAt < scheduled)
+      await this.ctx.storage.setAlarm(cleanupAt);
+    return true;
+  }
+
+  getReviewsForSubject(stableSubjectId: string): ReviewCase[] {
+    this.compactReviewCases(Math.floor(Date.now() / 1000));
+    return this.ctx.storage.sql
+      .exec<ReviewRow>(
+        "SELECT body FROM review_cases WHERE stable_subject_id = ?",
+        stableSubjectId,
+      )
+      .toArray()
+      .map((row) => JSON.parse(row.body) as ReviewCase);
+  }
+
+  getRetainedMeasuresForSubject(stableSubjectId: string): RetainedMeasure[] {
+    this.compactReviewCases(Math.floor(Date.now() / 1000));
+    return this.ctx.storage.sql
+      .exec<RetainedRow>(
+        "SELECT stable_subject_id, policy_version, suspended_until FROM retained_measures WHERE stable_subject_id = ?",
+        stableSubjectId,
+      )
+      .toArray()
+      .map((row) => ({
+        stableSubjectId: row.stable_subject_id,
+        policyVersion: row.policy_version,
+        suspendedUntil: row.suspended_until,
+      }));
+  }
+
+  private compactReviewCases(now: number): void {
+    this.ctx.storage.transactionSync(() => {
+      const rows = this.ctx.storage.sql
+        .exec<ReviewRow>("SELECT body FROM review_cases")
+        .toArray();
+      for (const row of rows) {
+        const review = JSON.parse(row.body) as ReviewCase;
+        if (
+          review.closedAt === null ||
+          now < review.closedAt + REVIEW_RETENTION_SECONDS
+        )
+          continue;
+        const until = review.decision?.suspendedUntil;
+        if (
+          review.decision?.outcome === "suspend" &&
+          review.decisionNoticeAt !== null &&
+          !review.isReversed &&
+          until &&
+          until > now
+        ) {
+          this.ctx.storage.sql.exec(
+            "INSERT OR IGNORE INTO retained_measures (case_id, stable_subject_id, policy_version, suspended_until) VALUES (?, ?, ?, ?)",
+            review.caseId,
+            review.stableSubjectId,
+            review.policy.version,
+            until,
+          );
+        }
+        this.ctx.storage.sql.exec(
+          "DELETE FROM review_cases WHERE case_id = ?",
+          review.caseId,
+        );
+      }
+      this.ctx.storage.sql.exec(
+        "DELETE FROM retained_measures WHERE suspended_until <= ?",
+        now,
+      );
+    });
+  }
+
+  async alarm(): Promise<void> {
+    const now = Math.floor(Date.now() / 1000);
+    this.compactReviewCases(now);
+    const rows = this.ctx.storage.sql
+      .exec<ReviewRow>("SELECT body FROM review_cases")
+      .toArray();
+    const next = rows
+      .map((row) => (JSON.parse(row.body) as ReviewCase).closedAt)
+      .filter((value): value is number => value !== null)
+      .map((value) => (value + REVIEW_RETENTION_SECONDS) * 1_000)
+      .reduce(
+        (earliest, value) => Math.min(earliest, value),
+        Number.POSITIVE_INFINITY,
+      );
+    if (Number.isFinite(next))
+      await this.ctx.storage.setAlarm(Math.max(Date.now() + 1_000, next));
   }
 }

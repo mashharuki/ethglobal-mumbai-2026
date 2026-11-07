@@ -168,14 +168,19 @@ function recordMutation(review: ReviewCase, input: Mutation): ReviewCase {
 }
 
 function validPolicy(policy: ReviewPolicy): boolean {
+  const durations = [
+    policy.responseSeconds,
+    policy.appealSeconds,
+    policy.maxSuspensionSeconds,
+  ];
   return (
-    Number.isInteger(policy.version) &&
+    Number.isSafeInteger(policy.version) &&
     policy.version > 0 &&
     policy.prohibitedAct.length > 0 &&
     policy.fixtureIds.length > 0 &&
-    policy.responseSeconds > 0 &&
-    policy.appealSeconds > 0 &&
-    policy.maxSuspensionSeconds > 0 &&
+    durations.every(
+      (seconds) => Number.isSafeInteger(seconds) && seconds > 0,
+    ) &&
     policy.primaryReviewers.length >= 2 &&
     policy.appealReviewers.length >= 2
   );
@@ -195,6 +200,8 @@ export function receiveReviewCase(input: {
   const { contact, fixture, policy, now } = input;
   if (
     !validPolicy(policy) ||
+    !Number.isSafeInteger(now) ||
+    !Number.isSafeInteger(contact.expiresAt) ||
     fixture.summary.length > 1024 ||
     fixture.prohibitedAct !== policy.prohibitedAct ||
     !policy.fixtureIds.includes(fixture.id) ||
@@ -213,6 +220,8 @@ export function receiveReviewCase(input: {
     return duplicate.fixtureId === fixture.id
       ? { ok: true, data: duplicate }
       : fail("CONFLICT");
+  if (input.existingCases.some((review) => review.caseId === input.caseId))
+    return fail("CONFLICT");
   if (
     input.existingCases.some(
       (review) => review.operationFingerprints[input.operationId],
@@ -280,6 +289,7 @@ export function recordReviewNotice(
   if (
     review.state !== "reviewing" ||
     review.reviewNoticeAt !== null ||
+    !Number.isSafeInteger(deliveredAt) ||
     deliveredAt < review.openedAt
   )
     return fail("CONFLICT");
@@ -356,6 +366,7 @@ export function castPrimaryVote(
     choice.outcome === "suspend" &&
     (!review.supportsSuspension ||
       !choice.suspendedUntil ||
+      !Number.isSafeInteger(choice.suspendedUntil) ||
       choice.suspendedUntil <= now ||
       choice.suspendedUntil > now + review.policy.maxSuspensionSeconds)
   )
@@ -391,6 +402,7 @@ export function recordDecisionNotice(
   if (
     review.state !== "decided" ||
     review.decisionNoticeAt !== null ||
+    !Number.isSafeInteger(deliveredAt) ||
     deliveredAt < review.openedAt
   )
     return fail("CONFLICT");
@@ -512,7 +524,9 @@ export function getEffectiveSuspension(
       )
       .map((item) => item.suspendedUntil),
   );
-  return deadlines.length ? Math.max(...deadlines) : null;
+  return deadlines.length
+    ? deadlines.reduce((latest, deadline) => Math.max(latest, deadline), 0)
+    : null;
 }
 
 export function getPrivateReviewCase(

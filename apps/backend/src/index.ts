@@ -9,9 +9,10 @@ import { getAddress, isAddress } from "viem";
 import { parseSiweMessage } from "viem/siwe";
 import {
   AuthStore,
-  hashSessionToken,
-  parseSessionCookie,
+  getAuthenticatedAddress,
+  getAuthStore,
 } from "./auth/session.ts";
+import { reviewRoutes } from "./participation/review-routes.ts";
 
 type AppContext = Context<{ Bindings: CloudflareBindings }>;
 type ApiErrorCode =
@@ -23,13 +24,6 @@ type ApiErrorCode =
   | "UNAVAILABLE";
 
 const app = new Hono<{ Bindings: CloudflareBindings }>();
-
-function getAuthStore(
-  env: CloudflareBindings,
-  address: string,
-): DurableObjectStub<AuthStore> {
-  return env.AUTH_STORE.getByName(address.toLowerCase());
-}
 
 function sendError(
   c: AppContext,
@@ -140,16 +134,18 @@ app.post("/v1/auth/sessions", async (c) => {
 app.get("/v1/operations/:id", async (c) => {
   const operationId = operationIdSchema.safeParse(c.req.param("id"));
   if (!operationId.success) return sendError(c, 404, "NOT_FOUND");
-  const cookie = parseSessionCookie(getCookie(c, "st_session"));
-  if (!cookie) return sendError(c, 401, "UNAUTHENTICATED");
-  const store = getAuthStore(c.env, cookie.address);
-  const tokenHash = await hashSessionToken(cookie.token);
-  if (!(await store.hasSession(tokenHash)))
-    return sendError(c, 401, "UNAUTHENTICATED");
+  const address = await getAuthenticatedAddress(
+    c.env,
+    getCookie(c, "st_session"),
+  );
+  if (!address) return sendError(c, 401, "UNAUTHENTICATED");
+  const store = getAuthStore(c.env, address);
   const operation = await store.getPrivateOperation(operationId.data);
   if (!operation) return sendError(c, 404, "NOT_FOUND");
   return c.json(operation, 200);
 });
+
+app.route("/v1", reviewRoutes);
 
 app.onError((_error, c) => {
   console.error(
