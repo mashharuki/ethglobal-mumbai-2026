@@ -39,6 +39,18 @@ export const acceptanceReceiptTypes = {
   ],
 } as const;
 
+export const settlementConsentTypes = {
+  SettlementConsent: [
+    { name: "protocolVersion", type: "uint32" },
+    { name: "matchNonce", type: "bytes32" },
+    { name: "registrationVersion", type: "uint32" },
+    { name: "action", type: "string" },
+    { name: "recipient", type: "address" },
+    { name: "token", type: "address" },
+    { name: "amount", type: "uint256" },
+  ],
+} as const;
+
 export type SyntheticDeposit = {
   owner: Address;
   token: Address;
@@ -74,8 +86,16 @@ export function createNoteVectors(
   const alice = createDeposit("alice", aliceOwner, USDC, 100_000_000n);
   const bob = createDeposit("bob", bobOwner, EURC, 40_000_000n);
   const inputDigest = syntheticDigest("lock-input");
+  const matchNonce = syntheticDigest("match-nonce");
   const operationId = "ee49dd27-7d5c-40ca-936d-3d0eea326210";
   const acceptanceDeadline = BASE_TIME + 300;
+  const returnClaims = [alice, bob].map((deposit, index) => ({
+    commitment: syntheticDigest(`return-claim-${index}`),
+    nullifier: syntheticDigest(`return-claim-${index}:nullifier`),
+    recipient: deposit.owner,
+    token: deposit.token,
+    amount: deposit.amount,
+  }));
   return {
     chainId: CHAIN_ID,
     vault: VAULT,
@@ -100,6 +120,34 @@ export function createNoteVectors(
       commitments: [alice.commitment, bob.commitment],
       expiresAt: Math.min(alice.expiresAt, bob.expiresAt),
     },
+    settlementConsent: [alice, bob].map((deposit) => ({
+      protocolVersion: 2,
+      matchNonce,
+      registrationVersion: 1,
+      action: "settle",
+      recipient: deposit.owner,
+      token: deposit.token,
+      amount: deposit.amount,
+    })),
+    cancelPublic: [alice, bob].map((deposit, index) => ({
+      nullifier: deposit.nullifier,
+      outputCommitment: returnClaims[index].commitment,
+    })),
+    refundPublic: [alice, bob].map((deposit, index) => ({
+      nullifier: deposit.nullifier,
+      outputCommitment: returnClaims[index].commitment,
+      eligibleAt: deposit.expiresAt,
+    })),
+    settlePublic: {
+      nullifiers: [alice.nullifier, bob.nullifier],
+      outputCommitments: returnClaims.map((claim) => claim.commitment),
+    },
+    withdrawPublic: returnClaims.map((claim) => ({
+      nullifier: claim.nullifier,
+      recipient: claim.recipient,
+      token: claim.token,
+      amount: claim.amount,
+    })),
     settlePayouts: [
       { recipient: alice.owner, token: alice.token, amount: alice.amount },
       { recipient: bob.owner, token: bob.token, amount: bob.amount },

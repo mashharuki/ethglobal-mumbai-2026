@@ -9,6 +9,7 @@ import {
   createNoteVectors,
   lockConsentTypes,
   noteSignatureDomain,
+  settlementConsentTypes,
 } from "./note-vectors.ts";
 
 it("should preserve each original principal and the fixed seven-day deadline", () => {
@@ -33,6 +34,62 @@ it("should preserve each original principal and the fixed seven-day deadline", (
     "inputDigest",
     "nullifiers",
   ]);
+  assert.deepEqual(
+    vectors.withdrawPublic.map(({ recipient, token, amount }) => ({
+      recipient,
+      token,
+      amount,
+    })),
+    vectors.settlePayouts,
+  );
+  assert.deepEqual(
+    vectors.refundPublic.map((claim) => claim.eligibleAt),
+    vectors.deposits.map((deposit) => deposit.expiresAt),
+  );
+  for (const publicInput of [
+    vectors.lockPublic,
+    vectors.settlePublic,
+    ...vectors.cancelPublic,
+    ...vectors.refundPublic,
+    ...vectors.withdrawPublic,
+  ]) {
+    assert.equal(
+      /persona|profile|matchNonce|occupation|age/i.test(
+        Object.keys(publicInput).join(","),
+      ),
+      false,
+    );
+  }
+});
+
+it("should bind each settlement signature to its own unchanged principal", async () => {
+  const alice = privateKeyToAccount(generatePrivateKey());
+  const bob = privateKeyToAccount(generatePrivateKey());
+  const vectors = createNoteVectors(alice.address, alice.address, bob.address);
+  const message = vectors.settlementConsent[0];
+  const signature = await alice.signTypedData({
+    domain: noteSignatureDomain,
+    types: settlementConsentTypes,
+    primaryType: "SettlementConsent",
+    message,
+  });
+  const verify = (candidate: typeof message) =>
+    verifyTypedData({
+      address: alice.address,
+      domain: noteSignatureDomain,
+      types: settlementConsentTypes,
+      primaryType: "SettlementConsent",
+      message: candidate,
+      signature,
+    });
+  assert.equal(await verify(message), true);
+  assert.equal(
+    await verify({ ...message, amount: message.amount - 1n }),
+    false,
+  );
+  assert.equal(await verify({ ...message, recipient: bob.address }), false);
+  assert.equal(await verify({ ...message, protocolVersion: 1 }), false);
+  assert.equal(await verify({ ...message, action: "fee" }), false);
 });
 
 it("should bind each lock consent to chain, contract, note and deadline", async () => {

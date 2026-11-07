@@ -36,7 +36,7 @@
 
 - [x] T003 [P] API担当：[サービス契約](contracts/service.md)の全HTTP操作を `packages/api-specs/openapi.yaml` に定義する。認証、承諾digest/認証用封筒/受付証の形式、公開／本人専用の投影、202後の照会、冪等キー、409・422・429・503を含め、OpenAPI Generatorで `packages/shared/src/generated/client.ts` を再生成できるようにする。固定版Generator 7.26.0とSHA-256検査付き再生成スクリプトを追加し、44ファイルの実生成、共有型検査、Biome確認済み。APIの全操作が実装・公開された意味ではない。
 - [ ] T004 [P] ZK担当：T002後、`circuits/Nargo.toml` と `circuits/protocol.md` に属性・希望mask・許可趣味のルートと288座標の導出、役割・資格世代・辞書版・transcript、群/fieldの範囲、検証鍵の版を固定する。[照合契約](contracts/matching.md)の式と平文oracleが一致することを確認し、実証明の実装は段階A後に進める。平文oracleの12試験は成功。Nargo workspace、群/fieldと検証鍵の確定は未完了。
-- [ ] T005 資金担当：T003後、[精算契約](contracts/settlement.md)に沿って `apps/contract/test/fixtures/note-vectors.ts` に二者の署名対象、受付証と信頼する受付公開鍵/版、消費印、期限、受取先、各操作の公開値と期待配分を用意する。公開列にペアや申告項目の識別子を含めない。
+- [X] T005 資金担当：T003後、[精算契約](contracts/settlement.md)に沿って `apps/contract/test/fixtures/note-vectors.ts` に二者の署名対象、受付証と信頼する受付公開鍵/版、消費印、期限、受取先、各操作の公開値と期待配分を用意する。公開列にペアや申告項目の識別子を含めない。
 - [ ] T006 API担当：T003後、`apps/backend/src/auth/session.ts` と `apps/backend/src/index.ts` に単回署名チャレンジ、期限・Originの確認、共通エラー、本文を残さないログ、操作IDの照会を接続する。別人の非公開操作は取得不可にする。SIWEとDurable Objectの単回消費、審査の実操作IDを使った本人200・別人404はローカルWrangler統合試験済み。認証試験は通常backend testに登録済み。公開Webからの同一Origin BFF接続は未完了。
 
 **着手条件**：T001・T002→T037で資格契約を先に固定する。T003〜T006の準備とT005→T010→T021の資金安全性は別担当で並行可。第一段階のENSはT007・T010・T014を待たない。製品結合はT013・T014・T015等を満たし、資金を使う公開導線はT021・T024も通す。
