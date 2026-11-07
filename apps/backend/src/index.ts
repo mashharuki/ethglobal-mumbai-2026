@@ -14,6 +14,7 @@ import {
   getAuthStore,
 } from "./auth/session.ts";
 import { reviewRoutes } from "./participation/review-routes.ts";
+import { searchRoutes } from "./search/routes.ts";
 import {
   createSimulationAssertion,
   getMatchingIdentitySecret,
@@ -177,6 +178,7 @@ app.post("/v1/simulation/identity", async (c) => {
 });
 
 app.route("/v1", reviewRoutes);
+app.route("/v1", searchRoutes);
 
 app.onError((_error, c) => {
   console.error(

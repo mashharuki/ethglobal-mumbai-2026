@@ -108,6 +108,30 @@ test("should consume a SIWE challenge once under concurrent submissions", async 
       cookie ?? "",
       /^st_session=.*;.*HttpOnly;.*Secure;.*SameSite=Strict/i,
     );
+    const searchBody = JSON.stringify({
+      ephemeralPublicKey: "0x1234",
+      credentialGeneration: `0x${"22".repeat(32)}`,
+      credentialVersion: 1,
+      registrationVersion: 1,
+      ownerSignature: "0xabcd",
+    });
+    const searchHeaders = {
+      Origin: origin,
+      "Content-Type": "application/json",
+      "X-Operation-Id": crypto.randomUUID(),
+    };
+    const anonymousSearch = await fetch(`${origin}/v1/search-leases`, {
+      method: "POST",
+      headers: searchHeaders,
+      body: searchBody,
+    });
+    assert.equal(anonymousSearch.status, 401);
+    const gatedSearch = await fetch(`${origin}/v1/search-leases`, {
+      method: "POST",
+      headers: { ...searchHeaders, Cookie: cookie?.split(";")[0] ?? "" },
+      body: searchBody,
+    });
+    assert.equal(gatedSearch.status, 503);
     const operationId = crypto.randomUUID();
     const anonymous = await fetch(`${origin}/v1/operations/${operationId}`);
     assert.equal(anonymous.status, 401);
