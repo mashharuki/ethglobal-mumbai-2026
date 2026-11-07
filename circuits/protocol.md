@@ -18,6 +18,8 @@ bb prove -b target/register.json -w target/register.gz --write_vk -o target/regi
 bb verify -p target/register-proof/proof -k target/register-proof/vk -i target/register-proof/public_inputs
 ```
 
+`apps/frontend/src/proofs/register.ts`は合成辞書の値域を確認し、OSの暗号用乱数から独立した項目saltを作り、BB.jsのPedersenでルートを計算してNoirJS/BB.jsで証明・検証する。別の検証関数はpinしたBB.js検証鍵digest、主体、発行ID、版、ルートを8公開入力と照合する。`apps/frontend/scripts/register-integration.mjs`をNode 24で実行し、正例、再登録で別ルート、改変した主体・版・ルート・鍵・proof、辞書外値の拒否を確認した。これはNodeのBB.js実行系による試験であり、実ブラウザー・公開登録API・2端末通信への結合は未確認。ブラウザー用WASMは公式CRSの取得を必要とする。
+
 ## 固定した座標と入力
 
 - 辞書は `h1..h8`、`g1..g3`、`i1..i2` の合成ID。G/Iは実利用者向け分類ではない。
@@ -31,7 +33,7 @@ bb verify -p target/register-proof/proof -k target/register-proof/vk -i target/r
 
 登録ルートはNoir標準のBN254 `pedersen_hash`を用いる。各項目を`H(tag, schemaVersion, dictionaryVersion, ownerSubject, credentialIssuance, profileVersion, itemValue, itemSalt)`で別々にコミットし、固定順の項目コミット列と登録ドメインタグをもう一度`H`で束ねる。配列項目の値は辞書順の全ビットを固定長で入力する。タグ・版・主体は公開の正準field符号化を使い、32-byte IDをfieldへ単純還元せず128-bit limbsに分ける。項目saltは本人端末で独立に生成し、非零かつ十分なエントロピーを要求する。`pedersen_hash`の引数長は固定し、異なる種類の項目ではタグを先頭に入れる。実装したハッシュ式と公開入力順を証明の生成・検証側で共有し、署名済み資格の現在性は別途ENS/Arkivで確認する。
 
-現在の登録回路の公開入力は`schemaVersion`、辞書版、主体の128-bit limbs、発行世代の128-bit limbs、プロフィール版、ルート。秘密入力は上記の値と項目salt。合成登録証明の検証鍵ファイルSHA-256は`8ed4807f85d25489818b523f67599fd2762fea398c85282d61202495e5693afa`、BBの`vk_hash`は`1d5e6fdd8c518b9ef545e8b460edcbe3a6e99ae68ebb2002f7ddcafea74b9f61`。これはsynthetic-1登録回路の実測値であり、公開登録のメタデータへは未結合。登録証明はルートと値域を拘束するが、自己申告の真実性は証明しない。照合証明は登録ルートを再計算して同じ登録値から288座標のビットを導く予定である。登録時・照合時で別の値を入力すれば証明が失敗する形を実装・検証するまでは結合済みと扱わない。
+現在の登録回路の公開入力は`schemaVersion`、辞書版、主体の128-bit limbs、発行世代の128-bit limbs、プロフィール版、ルート。秘密入力は上記の値と項目salt。合成登録証明のBB CLI v6.0.0検証鍵ファイルSHA-256は`8ed4807f85d25489818b523f67599fd2762fea398c85282d61202495e5693afa`、BBの`vk_hash`は`1d5e6fdd8c518b9ef545e8b460edcbe3a6e99ae68ebb2002f7ddcafea74b9f61`。ブラウザー候補のNoirJS v1.0.0とBB.js v5.3.0のWASMでは同じ合成登録回路のprove/verifyが成功し、検証鍵SHA-256は`a43ba027d8548eb19f4e45f15d83fa50d293481d751a640aee9d9d9292c239d7`。公開入力はCLI版と一致したが、BB CLI v6.0.0ではBB.js v5.3.0の証明を検証できなかった。**2版の鍵と証明は混用しない**。これらはsynthetic-1登録回路の実測値であり、公開登録のメタデータへは未結合。登録証明はルートと値域を拘束するが、自己申告の真実性は証明しない。照合証明は登録ルートを再計算して同じ登録値から288座標のビットを導く予定である。登録時・照合時で別の値を入力すれば証明が失敗する形を実装・検証するまでは結合済みと扱わない。
 
 照合transcriptは、固定タグ`secret-tinder/matching/synthetic-1`とchain、A/Bの順序付き主体・発行世代・資格版・登録ルート・プロフィール版・検索リース世代・一時公開鍵、288暗号文の順序付きdigest、チャレンジを含む。A/Bを入れ替える、どちらかの版を古くする、暗号文の一つを並べ替える、別セッションの証明を再送する場合はdigestが変わり拒否する。Aの暗号文証明、Bの再ランダム化証明、Aの復号結果証明を同じtranscriptへ拘束する。最終公開値は候補真偽の1ビットだけで、共通趣味数や条件別ビットは返さない。
 
