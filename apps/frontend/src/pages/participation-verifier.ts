@@ -465,6 +465,7 @@ async function checkHistoryRow(
   return {
     version: parsed.data.credentialVersion,
     status: parsed.data.status,
+    suspendedUntil: parsed.data.suspendedUntil,
     isCurrent:
       row.$key.toLowerCase() === reference.arkivEntityKey.toLowerCase(),
   };

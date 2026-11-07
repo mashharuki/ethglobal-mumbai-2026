@@ -89,8 +89,10 @@ function HistoryOutput({
   if (!result.ok) {
     return (
       <Lism as="p" role="alert" c="text-2" fz="s">
-        Public version history is temporarily unavailable or inconsistent. The
-        eligibility verdict above is unchanged.
+        {result.error === "HISTORY_UNAVAILABLE"
+          ? "Public version history is temporarily unavailable."
+          : "A public version failed credential verification."}{" "}
+        The eligibility verdict above is unchanged.
       </Lism>
     );
   }
@@ -107,6 +109,9 @@ function HistoryOutput({
         {result.data.versions.map((entry) => (
           <Lism as="li" key={entry.version}>
             Version {entry.version}: declared {entry.status}
+            {entry.suspendedUntil
+              ? ` until ${new Date(entry.suspendedUntil * 1000).toISOString()}`
+              : ""}
             {entry.isCurrent ? " · Current ENS reference" : " · Historical"}
           </Lism>
         ))}
