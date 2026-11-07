@@ -35,3 +35,10 @@ find "$target_dir" -type f -name '*.ts' -delete
 cp -R "$generated_dir/apis" "$generated_dir/models" "$target_dir/"
 cp "$generated_dir/runtime.ts" "$target_dir/runtime.ts"
 cp "$generated_dir/index.ts" "$target_dir/client.ts"
+find "$target_dir" -type f -name '*.ts' -print0 | xargs -0 node -e '
+  const fs = require("node:fs");
+  for (const file of process.argv.slice(1)) {
+    const source = fs.readFileSync(file, "utf8");
+    fs.writeFileSync(file, source.replace(/[ \t]+$/gm, "").replace(/\n+$/, "\n"));
+  }
+'
