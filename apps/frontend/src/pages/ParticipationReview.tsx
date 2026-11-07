@@ -259,35 +259,55 @@ export function LiveParticipationReview() {
         in the URL or public credential. Only synthetic fixture IDs are
         accepted.
       </Lism>
-      <button
+      <Lism
+        as="button"
         type="button"
+        set="plain"
+        bgc="brand"
+        c="base"
+        p="15"
+        bdrs="99"
+        fw="bold"
         disabled={isBusy}
         onClick={() => void connectWallet()}
       >
         {walletAddress ? "Renew wallet session" : "Sign in with Sepolia wallet"}
-      </button>
+      </Lism>
       {walletAddress ? (
         <Stack g="10">
           <Lism as="p">Wallet: {walletAddress}</Lism>
           <label htmlFor="private-case-id">Private case ID</label>
-          <input
+          <Lism
+            as="input"
             id="private-case-id"
             value={caseId}
             maxLength={128}
+            p="10"
+            bgc="base"
+            c="text"
+            bdrs="10"
             disabled={isBusy}
             onChange={(event) => {
-              setCaseId(event.target.value);
+              if (!(event.currentTarget instanceof HTMLInputElement)) return;
+              setCaseId(event.currentTarget.value);
               setFixtureId("");
               setReview(null);
             }}
           />
-          <button
+          <Lism
+            as="button"
             type="button"
+            set="plain"
+            bgc="brand"
+            c="base"
+            p="15"
+            bdrs="99"
+            fw="bold"
             disabled={isBusy || !caseId.trim()}
             onClick={() => void loadCase()}
           >
             Open my case
-          </button>
+          </Lism>
         </Stack>
       ) : null}
       {review ? (
@@ -296,29 +316,51 @@ export function LiveParticipationReview() {
           {review.state === "reviewing" || review.state === "decided" ? (
             <>
               <label htmlFor="review-fixture-id">Synthetic fixture ID</label>
-              <input
+              <Lism
+                as="input"
                 id="review-fixture-id"
                 value={fixtureId}
                 maxLength={128}
+                p="10"
+                bgc="base"
+                c="text"
+                bdrs="10"
                 disabled={isBusy}
-                onChange={(event) => setFixtureId(event.target.value)}
+                onChange={(event) => {
+                  if (event.currentTarget instanceof HTMLInputElement)
+                    setFixtureId(event.currentTarget.value);
+                }}
               />
               {review.state === "reviewing" ? (
-                <button
+                <Lism
+                  as="button"
                   type="button"
+                  set="plain"
+                  bgc="brand"
+                  c="base"
+                  p="15"
+                  bdrs="99"
+                  fw="bold"
                   disabled={isBusy || !fixtureId.trim()}
                   onClick={() => void submit("response")}
                 >
                   Submit response
-                </button>
+                </Lism>
               ) : (
-                <button
+                <Lism
+                  as="button"
                   type="button"
+                  set="plain"
+                  bgc="brand"
+                  c="base"
+                  p="15"
+                  bdrs="99"
+                  fw="bold"
                   disabled={isBusy || !fixtureId.trim()}
                   onClick={() => void submit("appeal")}
                 >
                   Submit appeal
-                </button>
+                </Lism>
               )}
             </>
           ) : null}

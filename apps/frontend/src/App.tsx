@@ -1,5 +1,7 @@
 import { Cluster, Columns, Lism, Stack, Wrapper } from "lism-css/react";
+import { useSyncExternalStore } from "react";
 import Participation from "./pages/Participation.tsx";
+import { LiveParticipationReview } from "./pages/ParticipationReview.tsx";
 import "./App.css";
 
 const heroBackground =
@@ -258,7 +260,27 @@ function Proof() {
   );
 }
 
+function subscribeToPath(): () => void {
+  return () => {};
+}
+
+function getPrivateReviewPath(): boolean {
+  return window.location.pathname === "/review";
+}
+
+function getServerReviewPath(): boolean {
+  return false;
+}
+
 export default function App() {
+  const isPrivateReviewPath = useSyncExternalStore(
+    subscribeToPath,
+    getPrivateReviewPath,
+    getServerReviewPath,
+  );
+  if (import.meta.env.DEV && isPrivateReviewPath) {
+    return <LiveParticipationReview />;
+  }
   return (
     <Lism isContainer className="c--landing" c="text" bgc="base">
       <SiteHeader />

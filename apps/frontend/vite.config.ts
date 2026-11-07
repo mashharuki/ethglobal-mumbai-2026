@@ -7,6 +7,11 @@ const isVercelStaticBuild = process.env.VERCEL_STATIC_BUILD === "1";
 
 // https://vite.dev/config/
 export default defineConfig({
+  server: {
+    proxy: {
+      "/v1": { target: "http://127.0.0.1:8787", changeOrigin: false },
+    },
+  },
   plugins: [
     voidPlugin(),
     react(),
