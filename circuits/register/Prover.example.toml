@@ -1,0 +1,17 @@
+# Synthetic fixture only. The small salts and IDs must never be used for real people.
+accepts_gender = [0, 1, 0]
+accepts_intent = [0, 1]
+age_band = 301
+dictionary_version = 1
+gender = [1, 0, 0]
+hobbies = [1, 1, 0, 0, 0, 0, 0, 0]
+intent = [1, 0]
+issuance_hi = 0
+issuance_lo = 51
+job = 201
+profile_version = 1
+root = "0x105c14d1f8f4dc5e31a9277a47489ed9dac4fc16515c6f3eefdf16ebd6f9cc2d"
+salts = [11, 12, 13, 14, 15, 16, 17]
+schema_version = 1
+subject_hi = 0
+subject_lo = 41

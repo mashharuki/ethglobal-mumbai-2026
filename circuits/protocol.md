@@ -1,6 +1,6 @@
 # 二者照合の平文oracleと証明実装ゲート
 
-この文書は[二者照合契約](../specs/001-private-dating/contracts/matching.md)の合成辞書 `synthetic-1` に対する実装メモである。[平文oracle](oracle.ts)、[fixture試験](oracle.test.ts)、[合成登録回路](register/src/main.nr)のNargo checkと4件の実行試験は動く。暗号化通信、照合回路、証明鍵、登録ルートのブラウザー実装、実ユーザーのマッチングは未実装であり、T004・段階Bの合格を意味しない。
+この文書は[二者照合契約](../specs/001-private-dating/contracts/matching.md)の合成辞書 `synthetic-1` に対する実装メモである。[平文oracle](oracle.ts)、[fixture試験](oracle.test.ts)、[合成登録回路](register/src/main.nr)と[288座標導出](profile/src/lib.nr)のNargo check・18件の試験は動く。[合成Prover入力](register/Prover.example.toml)から`nargo execute --package register`でACIRとwitnessの生成も確認した。暗号化通信、照合回路、証明鍵、登録ルートのブラウザー実装、実ユーザーのマッチングは未実装であり、T004・段階Bの合格を意味しない。
 
 ## 固定するツールチェーンと群
 
