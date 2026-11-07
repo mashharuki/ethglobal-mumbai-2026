@@ -335,7 +335,7 @@ async function checkPermissions(
   }
 }
 
-async function checkIssuance(
+export async function checkIssuance(
   credential: Credential,
   label: string,
   trust: Trust,
@@ -424,7 +424,10 @@ export async function checkCredential(
   }
 }
 
-async function readCurrentRecords(label: string, requestedBlock?: bigint) {
+export async function readCurrentRecords(
+  label: string,
+  requestedBlock?: bigint,
+) {
   const trust = participationTrustSchema.parse(
     JSON.parse(await readFile(trustPath, "utf8")),
   );

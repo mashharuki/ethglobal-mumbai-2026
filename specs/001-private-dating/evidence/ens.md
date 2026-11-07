@@ -60,9 +60,15 @@ Honoバックエンドを起動せず、Viteのローカル画面から`Particip
 
 `apps/contract/test/ParticipationPermissions.ts`は固定block`12078653`の既存ENSv2デプロイに対し、**読取専用**の`eth_call`で権限と実行可否を検査する。`RUN_ENS_PERMISSION_TESTS=1 node --test apps/contract/test/ParticipationPermissions.ts`は4件合格した。Aliceの`app.endpoint`/`app.key`更新は成功し、本人・Bobの資格キー更新、BobによるAliceのendpoint更新、AliceのResolver差替え・safe transfer・権限再付与はrevertした。CI通常実行では外部RPCに依存しないよう、この実ネットワーク試験はskipする。委任鍵失効と実署名取引は未検査。
 
+### 発行者側の停止・回復計画
+
+`scripts/plan-participation-revision.ts`は`draft`→`publication`→`reference`の順に、外部書込なしで計画を生成する。入力JSONは`label`、`action: {"type":"suspend","until":<Unix秒>}`または`{"type":"restore"}`。`publication`には新版の`signedRevisionPath`、`reference`にはさらにArkiv書込後の`arkivEntityKey`を指定する。`draft`では現行ENS/Arkivを直接読み、現行参照の版・digest、所有者、登録receiptとresourceを照合してEIP-712署名用データを出す。`publication`はそのドラフトと新版署名を照合してArkivの読取専用entity作成値を出す。`reference`は指定entityをArkivから読み戻し、発行者・所有者・不変属性・版・digest・署名を確認した場合だけ、ENSの`app.credential`更新calldataを出す。各段階の出力には観測ENS blockと更新前参照を含める。取引送信や署名操作はしない。
+
+実Aliceの現行公開状態をblock`12080307`で読み、有限停止期限`1794503600`を指定した`draft`は資格版`2`、`status=suspended`、EIP-712 message digest `0x98a196785a10cf94e44d6fdd9a10e44d498e76f96fe5e558719809a2cd212d6f`を生成した。既存版`1`のAlice署名済み資格を`publication`入力として再利用した場合は`ineligible/REVISION_MISMATCH`で終了し、書込計画を出さなかった。Sepolia RPCを到達不能URLにした`draft`は`unavailable/ENS_UNAVAILABLE`で終了した。`apps/backend/src/participation/revision-flow.test.ts`の6件を含めBackendは27件合格。新版の実署名・Arkiv書込・ENS更新は行っていない。
+
 ## 残る合格条件
 
-- T038: 有限停止のドラフトと既存デプロイに対する権限の読取専用試験は追加済み。新版の発行者署名・Arkiv書込・ENS参照更新、委任鍵の発行/失効と失効後の拒否、本人ウォレットからの限定キー実更新は未実施。
+- T038: 有限停止/回復の発行者側オフライン計画と既存デプロイに対する権限の読取専用試験は追加済み。新版の発行者署名・Arkiv書込・ENS参照更新、委任鍵の発行/失効と失効後の拒否、本人ウォレットからの限定キー実更新は未実施。
 - T039: Web/CLIの正常系比較とBFF停止時のWeb動作は上記の通り実測済み。旧版・別発行者・Arkiv行ID不一致・障害分類は両実装の自動テストで確認済み。再発行後の実ENSイベント照合、Web画面での障害/停止表示、有限停止の両実装での実演は未完了。
 - T041/T042/T034: 審査停止・異議・回復、SC-005/007の総合判定と提出用証拠。
 
