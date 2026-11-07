@@ -17,4 +17,4 @@ ETHGlobal Mumbai 2026 hackathon monorepo. Existing private-dating proposal and S
 - CI and completion checks: `mem:task_completion`.
 - Memory structure/update policy: `mem:memory_maintenance`.
 
-`packages/api-specs/openapi.yaml` is the intended machine-readable HTTP contract but is empty; `packages/shared` has no shared implementation. Their test scripts are failing placeholders. Installed skills are support code, not application implementation. Current source/config and explicit user decisions override stale memories.
+`packages/api-specs/openapi.yaml` is still empty. `packages/shared/src/participation/` now contains qualification schemas and signature logic; see `mem:participation/core`. Package scripts and current source override older template notes. Installed skills are support code, not application implementation.
