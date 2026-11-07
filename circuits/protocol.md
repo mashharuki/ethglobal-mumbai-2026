@@ -1,6 +1,6 @@
 # 二者照合の平文oracleと証明実装ゲート
 
-この文書は[二者照合契約](../specs/001-private-dating/contracts/matching.md)の合成辞書 `synthetic-1` に対する実装メモである。[平文oracle](oracle.ts)、[fixture試験](oracle.test.ts)、[合成登録回路](register/src/main.nr)と[288座標導出](profile/src/lib.nr)のNargo check・18件の試験は動く。[合成Prover入力](register/Prover.example.toml)から`nargo execute --package register`でACIRとwitnessの生成も確認した。暗号化通信、照合回路、証明鍵、登録ルートのブラウザー実装、実ユーザーのマッチングは未実装であり、T004・段階Bの合格を意味しない。
+この文書は[二者照合契約](../specs/001-private-dating/contracts/matching.md)の合成辞書 `synthetic-1` に対する実装メモである。[平文oracle](oracle.ts)、[fixture試験](oracle.test.ts)、[合成登録回路](register/src/main.nr)と[288座標導出](profile/src/lib.nr)のNargo check・20件の試験は動く。[合成Prover入力](register/Prover.example.toml)から`nargo execute --package register`でACIRとwitnessの生成も確認した。暗号化通信、照合回路、証明鍵、登録ルートのブラウザー実装、実ユーザーのマッチングは未実装であり、T004・段階Bの合格を意味しない。
 
 ## 固定するツールチェーンと群
 
@@ -17,11 +17,11 @@
 
 ## 登録値と証明入力の符号化
 
-`synthetic-1`では趣味`[u8; 8]`、自己申告gender`[u8; 3]`、intent`[u8; 2]`、相手への許容gender`[u8; 3]`、intent`[u8; 2]`を辞書順のビット列とする。各要素を0/1へ制約し、趣味と両許容maskは非空、二つの自己申告はそれぞれ和1とする。`*`は許容maskの全ビット1へ正規化する。職業・年齢帯は別の本人選択開示項目としてルートへ含め、相性ベクトルへは入れない。合成辞書外のgender/intent/hobby IDはクライアントで拒否し、回路では対応するビット列の長さ・和・値域を検査する。
+`synthetic-1`では趣味`[u8; 8]`、自己申告gender`[u8; 3]`、intent`[u8; 2]`、相手への許容gender`[u8; 3]`、intent`[u8; 2]`を辞書順のビット列とする。各要素を0/1へ制約し、趣味と両許容maskは非空、二つの自己申告はそれぞれ和1とする。`*`は許容maskの全ビット1へ正規化する。職業・年齢帯は別の本人選択開示項目としてルートへ含め、相性ベクトルへは入れない。合成fixtureの職業IDは201〜203、年齢帯IDは301〜303の`u16`。合成辞書外のgender/intent/hobby IDはクライアントで拒否し、回路では対応するビット列の長さ・和・値域と職業・年齢帯IDの範囲を検査する。
 
 登録ルートはNoir標準のBN254 `pedersen_hash`を用いる。各項目を`H(tag, schemaVersion, dictionaryVersion, ownerSubject, credentialIssuance, profileVersion, itemValue, itemSalt)`で別々にコミットし、固定順の項目コミット列と登録ドメインタグをもう一度`H`で束ねる。配列項目の値は辞書順の全ビットを固定長で入力する。タグ・版・主体は公開の正準field符号化を使い、32-byte IDをfieldへ単純還元せず128-bit limbsに分ける。項目saltは本人端末で独立に生成し、非零かつ十分なエントロピーを要求する。`pedersen_hash`の引数長は固定し、異なる種類の項目ではタグを先頭に入れる。実装したハッシュ式と公開入力順を証明の生成・検証側で共有し、署名済み資格の現在性は別途ENS/Arkivで確認する。
 
-登録証明の公開入力は`schemaVersion`、辞書版、主体、発行世代、プロフィール版、ルート、検証鍵版。秘密入力は上記の値と項目salt。登録証明はルートと値域を拘束するが、自己申告の真実性は証明しない。照合証明は登録ルートを再計算して同じ登録値から288座標のビットを導く。登録時・照合時で別の値を入力すれば証明が失敗する。
+現在の登録回路の公開入力は`schemaVersion`、辞書版、主体の128-bit limbs、発行世代の128-bit limbs、プロフィール版、ルート。秘密入力は上記の値と項目salt。検証鍵版は実証明と鍵digestの確定後に公開登録のメタデータへ固定する。登録証明はルートと値域を拘束するが、自己申告の真実性は証明しない。照合証明は登録ルートを再計算して同じ登録値から288座標のビットを導く予定である。登録時・照合時で別の値を入力すれば証明が失敗する形を実装・検証するまでは結合済みと扱わない。
 
 照合transcriptは、固定タグ`secret-tinder/matching/synthetic-1`とchain、A/Bの順序付き主体・発行世代・資格版・登録ルート・プロフィール版・検索リース世代・一時公開鍵、288暗号文の順序付きdigest、チャレンジを含む。A/Bを入れ替える、どちらかの版を古くする、暗号文の一つを並べ替える、別セッションの証明を再送する場合はdigestが変わり拒否する。Aの暗号文証明、Bの再ランダム化証明、Aの復号結果証明を同じtranscriptへ拘束する。最終公開値は候補真偽の1ビットだけで、共通趣味数や条件別ビットは返さない。
 

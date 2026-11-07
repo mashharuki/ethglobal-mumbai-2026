@@ -31,8 +31,8 @@ fn registration_root(
     intent: [u8; 2],
     accepts_gender: [u8; 3],
     accepts_intent: [u8; 2],
-    job: Field,
-    age_band: Field,
+    job: u16,
+    age_band: u16,
     salts: [Field; 7],
     context: [Field; 7],
 ) -> Field {
@@ -41,8 +41,9 @@ fn registration_root(
     let intent_commitment = item_commitment(103, bit_hash(intent), salts[2], context);
     let gender_mask_commitment = item_commitment(104, bit_hash(accepts_gender), salts[3], context);
     let intent_mask_commitment = item_commitment(105, bit_hash(accepts_intent), salts[4], context);
-    let job_commitment = item_commitment(106, pedersen_hash([job]), salts[5], context);
-    let age_commitment = item_commitment(107, pedersen_hash([age_band]), salts[6], context);
+    let job_commitment = item_commitment(106, pedersen_hash([job as Field]), salts[5], context);
+    let age_commitment =
+        item_commitment(107, pedersen_hash([age_band as Field]), salts[6], context);
     pedersen_hash([
         9001,
         hobby_commitment,
@@ -61,15 +62,15 @@ fn main(
     intent: [u8; 2],
     accepts_gender: [u8; 3],
     accepts_intent: [u8; 2],
-    job: Field,
-    age_band: Field,
+    job: u16,
+    age_band: u16,
     salts: [Field; 7],
     schema_version: pub Field,
     dictionary_version: pub Field,
-    subject_lo: pub Field,
-    subject_hi: pub Field,
-    issuance_lo: pub Field,
-    issuance_hi: pub Field,
+    subject_lo: pub u128,
+    subject_hi: pub u128,
+    issuance_lo: pub u128,
+    issuance_hi: pub u128,
     profile_version: pub Field,
     root: pub Field,
 ) {
@@ -78,8 +79,8 @@ fn main(
     assert(profile_version != 0, "profile version must be positive");
     assert((subject_lo != 0) | (subject_hi != 0));
     assert((issuance_lo != 0) | (issuance_hi != 0));
-    assert(job != 0);
-    assert(age_band != 0);
+    assert((job >= 201) & (job <= 203), "job outside synthetic dictionary");
+    assert((age_band >= 301) & (age_band <= 303), "age band outside synthetic dictionary");
     assert(count_bits(hobbies) > 0, "hobbies must be nonempty");
     assert(count_bits(gender) == 1, "gender must be one-hot");
     assert(count_bits(intent) == 1, "intent must be one-hot");
@@ -89,10 +90,10 @@ fn main(
     let context = [
         schema_version,
         dictionary_version,
-        subject_lo,
-        subject_hi,
-        issuance_lo,
-        issuance_hi,
+        subject_lo as Field,
+        subject_hi as Field,
+        issuance_lo as Field,
+        issuance_hi as Field,
         profile_version,
     ];
     let computed = registration_root(
@@ -394,5 +395,49 @@ fn should_accept_unspecified_preference_mask() {
         0,
         1,
         root,
+    );
+}
+
+#[test(should_fail_with = "job outside synthetic dictionary")]
+fn should_reject_unknown_job() {
+    main(
+        [1, 1, 0, 0, 0, 0, 0, 0],
+        [1, 0, 0],
+        [1, 0],
+        [0, 1, 0],
+        [0, 1],
+        999,
+        301,
+        [11, 12, 13, 14, 15, 16, 17],
+        1,
+        1,
+        41,
+        0,
+        51,
+        0,
+        1,
+        1,
+    );
+}
+
+#[test(should_fail_with = "age band outside synthetic dictionary")]
+fn should_reject_unknown_age_band() {
+    main(
+        [1, 1, 0, 0, 0, 0, 0, 0],
+        [1, 0, 0],
+        [1, 0],
+        [0, 1, 0],
+        [0, 1],
+        201,
+        999,
+        [11, 12, 13, 14, 15, 16, 17],
+        1,
+        1,
+        41,
+        0,
+        51,
+        0,
+        1,
+        1,
     );
 }
