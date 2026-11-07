@@ -11,8 +11,10 @@
       "**",
       "!**/src/api/generated",
       "!.claude",
+      "!.agents",
       "!.serena",
       "!.codegraph",
+      "!ethglobal-mumbai-2026-AIBot",
       "!docs/architecture/diagrams/aws-icons"
     ]
   },
