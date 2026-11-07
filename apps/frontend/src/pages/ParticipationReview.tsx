@@ -7,19 +7,19 @@ import {
 } from "./participation-review-preview.ts";
 
 const caseStateText = {
-  received: "受付済み",
-  reviewing: "審査中",
-  decided: "判断済み",
-  appealed: "異議審査中",
-  closed: "終了",
+  received: "Received",
+  reviewing: "Under review",
+  decided: "Decided",
+  appealed: "Appeal under review",
+  closed: "Closed",
 } as const;
 
 function Deadline({ label, value }: { label: string; value: string }) {
   return (
     <Lism as="p">
-      {label}：
+      {label}:{" "}
       <time dateTime={value}>
-        {new Date(value).toLocaleString("ja-JP", { timeZone: "Asia/Kolkata" })}{" "}
+        {new Date(value).toLocaleString("en-IN", { timeZone: "Asia/Kolkata" })}{" "}
         IST
       </time>
     </Lism>
@@ -31,18 +31,22 @@ function ParticipationState({ view }: { view: OwnedReviewPreview }) {
   return (
     <Stack as="article" p="20" g="10" bgc="base" bdrs="10">
       <Lism as="h4" fz="l">
-        公開資格の状態（合成）
+        Participation status (synthetic)
       </Lism>
       <Lism as="p">
-        {participation.status === "suspended" ? "停止中" : "資格あり"} · 利用枠
-        {participation.accessTier === "new" ? "新規" : "通常"} · 規則版
-        {participation.policyVersion}
+        {participation.status === "suspended" ? "Suspended" : "Eligible"} ·
+        Access tier {participation.accessTier === "new" ? "New" : "Standard"} ·
+        Policy version {participation.policyVersion}
       </Lism>
       {participation.suspendedUntil ? (
-        <Deadline label="停止期限" value={participation.suspendedUntil} />
+        <Deadline
+          label="Suspension ends"
+          value={participation.suspendedUntil}
+        />
       ) : null}
       <Lism as="p" c="text-2" fz="s">
-        利用枠は信用点数ではありません。異議中でも停止を自動解除しません。
+        The access tier is not a credit score. An appeal does not automatically
+        lift a suspension.
       </Lism>
     </Stack>
   );
@@ -53,21 +57,24 @@ function PrivateNotice({ view }: { view: OwnedReviewPreview }) {
   return (
     <Stack as="article" p="20" g="10" bgc="base" bdrs="10">
       <Lism as="h4" fz="l">
-        本人だけの審査通知（合成）
+        Your private review notice (synthetic)
       </Lism>
       <Lism as="p">
-        状態：{caseStateText[notice.state]} · 規則：{notice.rule}
+        Status: {caseStateText[notice.state]} · Rule: {notice.rule}
       </Lism>
-      <Lism as="p">理由：{notice.reasonSummary}</Lism>
-      <Lism as="p">根拠の要約：{notice.evidenceSummary}</Lism>
-      <Deadline label="反証の期限" value={notice.responseDeadline} />
-      <Deadline label="異議の期限" value={notice.appealDeadline} />
+      <Lism as="p">Reason: {notice.reasonSummary}</Lism>
+      <Lism as="p">Evidence summary: {notice.evidenceSummary}</Lism>
+      <Deadline label="Response deadline" value={notice.responseDeadline} />
+      <Deadline label="Appeal deadline" value={notice.appealDeadline} />
       <Lism as="p">
-        反証：{notice.responseState === "submitted" ? "提出済み" : "未提出"} ·
-        異議：{notice.appealState === "submitted" ? "提出済み" : "未提出"}
+        Response:{" "}
+        {notice.responseState === "submitted" ? "Submitted" : "Not submitted"} ·
+        Appeal:{" "}
+        {notice.appealState === "submitted" ? "Submitted" : "Not submitted"}
       </Lism>
       <Lism as="p" c="text-2" fz="s">
-        本人認証付きAPIの接続前のため、ここから送信はできません。無回答を同意と扱いません。
+        You cannot submit from this preview until the authenticated private API
+        is connected. Silence is not consent.
       </Lism>
     </Stack>
   );
@@ -77,17 +84,20 @@ function RemedyBoundary({ view }: { view: OwnedReviewPreview }) {
   return (
     <Stack as="article" p="20" g="10" bgc="base" bdrs="10">
       <Lism as="h4" fz="l">
-        本人ブロックと救済
+        Contact block and remedies
       </Lism>
       <Lism as="p">
-        相手との連絡：
-        {view.contactBlock.isActive ? "ブロック中" : "ブロックなし"}
+        Contact with the other person:{" "}
+        {view.contactBlock.isActive ? "Blocked" : "Not blocked"}
       </Lism>
       <Lism as="p" c="text-2" fz="s">
-        本人ブロックは新規の連絡・招待に限り、他人の資格や既存の返却権を変えません。
+        A personal block applies to new contact and invitations. It does not
+        change the other person&apos;s credential or existing refund rights.
       </Lism>
       <Lism as="p" c="text-2" fz="s">
-        停止・異議中も本人の根拠確認、反証・異議、既存資金の復元・返却へ進める設計です。このプレビューは資金操作に接続していません。
+        The design keeps evidence, responses, appeals, and recovery of existing
+        funds available during suspension or appeal. This preview is not
+        connected to fund operations.
       </Lism>
     </Stack>
   );
@@ -100,16 +110,19 @@ export default function ParticipationReview({
 }) {
   const view = selectOwnedReviewPreview(fixture);
   if (!view) {
-    return <Lism as="section">この本人向けの審査情報は表示できません。</Lism>;
+    return (
+      <Lism as="section">This private review information is unavailable.</Lism>
+    );
   }
   return (
     <Stack as="section" p="30" g="20" bgc="base-2" bdrs="20">
       <Stack g="10">
         <Lism as="h3" fz="xl">
-          参加状態と救済
+          Participation and remedies
         </Lism>
         <Lism as="p" c="text-2" fz="s">
-          合成fixtureの独立プレビューです。本人認証・私的API・新版資格の実ネットワーク確認には未接続です。
+          This is an isolated preview with synthetic data. It is not connected
+          to authentication, the private API, or live credential updates.
         </Lism>
       </Stack>
       <ParticipationState view={view} />

@@ -20,9 +20,10 @@ const fixture = {
   notice: {
     subject: "synthetic-a",
     state: "appealed",
-    rule: "合成ルール: 禁止した勧誘",
-    reasonSummary: "合成の一次判断があり、異議を審査中です。",
-    evidenceSummary: "架空の接触ログの要約。実在者の記録ではありません。",
+    rule: "Synthetic rule: prohibited solicitation",
+    reasonSummary: "A synthetic initial decision is under appeal.",
+    evidenceSummary:
+      "Summary of fictional contact logs; no real person is involved.",
     responseDeadline: "2026-11-07T03:00:00Z",
     appealDeadline: "2026-11-07T05:00:00Z",
     responseState: "submitted",
@@ -34,7 +35,7 @@ const fixture = {
 it("should show the owner's rule, summary, deadlines and separate block", () => {
   const view = selectOwnedReviewPreview(fixture);
   assert.ok(view);
-  assert.equal(view.notice.rule, "合成ルール: 禁止した勧誘");
+  assert.equal(view.notice.rule, "Synthetic rule: prohibited solicitation");
   assert.equal(view.notice.appealState, "submitted");
   assert.equal(view.participation.status, "suspended");
   assert.equal(view.contactBlock.isActive, true);
@@ -45,7 +46,10 @@ it("should return no private data for another viewer", () => {
   const otherViewer = { ...fixture, viewerSubject: "synthetic-b" };
   const view = selectOwnedReviewPreview(otherViewer);
   assert.equal(view, null);
-  assert.doesNotMatch(JSON.stringify(view), /接触ログ|勧誘|appealed/);
+  assert.doesNotMatch(
+    JSON.stringify(view),
+    /contact logs|solicitation|appealed/,
+  );
 });
 
 it("should reject a mixed-subject notice or block", () => {
