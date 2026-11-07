@@ -79,7 +79,7 @@ T009/T040でN=10/50、K=3、同時上限1、各10ラウンドを実行する。�
 | --- | --- | --- |
 | EF-CROPS / Web・ZK | 独立2端末の実照合→第三者Cの公開照会→通信・ログ・公開記録を観察。CROPS4項目とトラッカーを確認し、資金を実演する場合はT024の制約も照合 | `evidence/ef-crops.md`、T017・T031・T035 |
 | ENS-V2 / API・Web | 発行→2実装の独立検証→本人用キー更新→合成の根拠通知・停止・異議/期限回復→旧版拒否。BFF停止中も別ツールで確認 | `evidence/ens.md`と`evidence/participation-review.md`、T037〜T039・T041・T042・T034、SC-005/007 |
-| ARKIV-APP / Arkiv・Web | 現行テストネットへの書込確定→索引反映→登録画面の実読取→更新・失効後の現行版判定→第三者による同じクエリの再現 | `evidence/arkiv.md`と`arkiv/`の5資料、T014・T015・T032 |
+| ARKIV-APP / Arkiv・Web | Rabdiへの署名付き公開資格の書込確定→索引反映→公開検証画面のentity実読取→第三者による同じクエリの再現。公開登録・更新/失効は未実装として分離 | `evidence/arkiv.md`と`arkiv/`の5資料、T037〜T039・T032。製品登録はT014・T015 |
 | EF-RPC / Web | 通常操作の読取経路を確認→Anon-RPC停止時に黙って通常RPCへ切り替わらないことを確認→対象外通信と理由を記録 | `evidence/anon-rpc.md`、T008・T035。追加応募だけを判定 |
 
 T033の2〜3分の共通動画には同じ実行の証拠を使い、T036で`evidence/prizes.md`に3目標と追加EF-RPC・ARKIV-SWARMの判断、対象コミット、動画時刻、公開URLを対応させる。第三者がREADME・指定資料・ライブデモを開けることを確認してから、チームがDashboardで提出する。

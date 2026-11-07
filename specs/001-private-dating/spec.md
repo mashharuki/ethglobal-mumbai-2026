@@ -25,7 +25,7 @@ Ethereum Foundation・ENS・Arkivの3提供元を正式な応募目標とする�
 | --- | --- | --- |
 | EF-CROPS — Best CROPS App | Web/ZK担当 | 2端末の非公開照合と第三者が得る情報を検証する。T017・T031・T035 |
 | ENS-V2 — Best Use of ENSv2 | API担当 | 資格と本人用キーの権限分離・独立検証・失効を示す。T037〜T039・T041・T042・T034。製品登録への結合はT014・T015 |
-| ARKIV-APP — Build on Arkiv (from scratch) | Arkiv担当（API領域） | 公開登録の書込から利用者画面の実読取までを示す。T014・T015・T032 |
+| ARKIV-APP — Build on Arkiv (from scratch) | Arkiv担当（API領域） | Alice/Bobの署名付き公開資格をArkiv Rabdiへ書き、公開画面の実読取と索引クエリを示す。T037〜T039・T032。公開プロフィール登録は後段のT014・T015 |
 
 提出担当はT036で3件を個別判定する。EF内の追加応募EF-RPCとArkiv内の追加候補ARKIV-SWARMは実証時のみ選択でき、正式な3提供元は変わらない。詳細な技術条件と提出物は別紙に集約する。
 

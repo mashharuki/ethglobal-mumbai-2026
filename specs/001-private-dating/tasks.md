@@ -23,7 +23,7 @@
 | --- | --- | --- | --- |
 | EF-CROPS | T008・T012・T016・T017。資金を実演する場合はT024 | T035 Web/ZK担当 | T031・T033 → T036 |
 | ENS-V2 | T037〜T039・T041・T042。製品登録への結合はT014・T015 | T034 API担当（段階Aで実行） | T031・T033 → T036 |
-| ARKIV-APP | T014・T015 | T032 Arkiv担当（API領域） | T031・T033 → T036 |
+| ARKIV-APP | T037〜T039の公開資格書込・実読取 | T032 Arkiv担当（API領域） | T031・T033 → T036。公開プロフィール登録は後段のT014・T015 |
 | EF-RPC（EF枠内の追加応募） | T008 | T035内でWeb担当が別判定 | 未達でもEF-CROPSの必須条件にはしない。T036で選択を記録 |
 | ARKIV-SWARM（Arkiv枠内の追加候補） | T044 | T044内でArkiv/Web担当が証拠を作成 | 未達なら追加を見送り、本賞の提出を遅らせない。T036で別判定 |
 
@@ -63,7 +63,7 @@
 - [ ] T011 [US1] ZK担当：T007後、`circuits/matching/src/main.nr` に全288座標の登録値からの導出・暗号化、マスク内積、真偽復号の証明を実装する。[照合契約](contracts/matching.md)の群・スカラー・役割・希望mask・順序付きtranscript・資格/登録/辞書/リース版を拘束し、中間の条件別真偽を返さない。不正点・ゼロマスク・旧版を拒否する。
 - [ ] T012 [US1] Web/ZK担当：T011後、`apps/frontend/src/search/match-session.ts` を独立2端末の合成入力・テスト鍵・配送で動かす。SC-002の10例を実証明で通し、条件別結果・件数・秘密入力を出さない。時間・通信量・反復や限定希望による推測を `specs/001-private-dating/evidence/matching.md` に先行記録する。安全性/性能が未達ならBを未達とし、模擬照合で置き換えない。
 - [ ] T013 [US1] 資金/ZK担当：T005・T010後、`circuits/lock/src/main.nr` と `apps/contract/contracts/NoteLock.sol` に両noteの個別証明、同じ拘束digestへの双方承諾、調整用APIの受付署名/ID/期限を検証する原子的拘束を実装する。受付期限切れ・差替え・使用済みnoteを拒否し、返却用秘密を署名前に保持する。
-- [ ] T014 [US1] API担当：T038・T006・T007・T010後、`apps/backend/src/registrations/registry.ts` に現行参加資格、プロフィール登録証明、許可USDC/EURCの確定預託、Arkiv公開登録版の書込/読取を結合する。資格とprofileの版を混同せず、停止・旧版・読取不能では新規検索を許可しない。T032へ実証材料を渡す。
+- [ ] T014 [US1] API担当：T038・T006・T007・T010後、`apps/backend/src/registrations/registry.ts` に現行参加資格、プロフィール登録証明、許可USDC/EURCの確定預託、Arkiv公開登録版の書込/読取を結合する。資格とprofileの版を混同せず、停止・旧版・読取不能では新規検索を許可しない。製品登録の後段実証材料として残し、公開資格によるT032の賞提出判定を妨げない。
 - [ ] T015 [US1] Web担当：T008・T010・T014後、`apps/frontend/src/pages/Registration.tsx` と `apps/frontend/src/pages/PublicRegistration.tsx` にSepolia上のUSDC・EURCの二択、預託前の数量・期限計算・配分・送金相関の説明、入金後の確定期限表示、確認中からの再開、仮名別の公開確認を実装する。実装は先行可だが、公開資金導線の有効化はT021・T024合格後とする。
 - [ ] T016 [US1] 結合担当：T008・T012〜T015・T040後、`apps/frontend/src/pages/Search.tsx` と `apps/frontend/src/App.tsx` に資格・希望・候補割当を結合する。双方承諾の受付で資格を検証し、ID/digest/期限付き受付証を得る。停止前の同一受付が期限内に拘束確定した場合だけ既存マッチとして成立させ、新規受付/差替え/期限切れを拒否する。本人ブロックの割当/接触除外と、停止/異議中の救済/返却を分離する。公開資金導線はT021・T024合格後に有効化する。
 - [ ] T017 [US1] 検証担当：T016後、`specs/001-private-dating/evidence/matching.md` にT012の先行記録を保ったままSC-001の5人、SC-002の10例、現行資格の再検証、第三者観察を追記する。SC-005/006はT034/T040を参照し、模擬負荷と実暗号を分離する。対面提示はT024から参照する。
@@ -98,7 +98,7 @@
 
 - [ ] T030 [P] 品質担当：`specs/001-private-dating/quickstart.md` の手順を第三者環境で再現し、Biome、frontend lint/build、Workers dry-run、Hardhat format/build/test、Noirの正負例と実証明を確認する。既存エラーと新規失敗を区別し、実測結果を `specs/001-private-dating/evidence/verification.md` に残す。
 - [ ] T031 [P] 提出担当：`README.md` に起動手順、見出し`CROPS`と各項目、トラッカーの検査、公開ライセンス、ライブデモ、3目標と条件付き追加ARKIV-SWARMを記す。Classic / From Scratchの新作範囲と再利用スターター、コミット履歴、AI支援箇所とチームの貢献、仕様・プロンプト・計画への参照を確認する。賞別証拠の最終リンクとArkiv書込アドレス・クエリはT036で反映する。
-- [ ] T032 [P] Arkiv担当：T014・T015後、ARKIV-APPの実書込→索引反映→第三者の公開登録画面での実読取、更新・失効を実演し、`specs/001-private-dating/evidence/arkiv.md` にチェーン、書込ウォレット、取引／エンティティキー、再現クエリと画面の対応を残す。`arkiv/schema.md`、`arkiv/friction.md`、`arkiv/reach.md`、`arkiv/why-arkiv.md`、`arkiv/how-you-use-arkiv.md` を実測根拠で揃え、README用の書込アドレス・クエリをT036へ渡す。秘密・ペア・相性結果を公開せず、ログ書込のみでは完了にしない。公開索引CLIとローカルWebの実読取、指定5資料の初稿は確認済み。第三者公開画面、更新・失効、提出資料の最終照合は未完了。
+- [ ] T032 [P] Arkiv担当：T037〜T039の署名付き公開資格をArkiv Rabdiへ実書込し、receipt→entity読戻し→索引反映→公開ライブ画面でのENS参照先entity実読取を確認する。`specs/001-private-dating/evidence/arkiv.md` にチェーン、書込ウォレット、取引／エンティティキー、再現クエリと画面の対応を残す。`arkiv/schema.md`、`arkiv/friction.md`、`arkiv/reach.md`、`arkiv/why-arkiv.md`、`arkiv/how-you-use-arkiv.md` を実測根拠で揃え、README用の書込アドレス・クエリをT036へ渡す。秘密・ペア・相性結果を公開せず、ログ書込のみでは完了にしない。公開資格の書込・索引CLI・ライブWeb実読取は確認済み。第三者からの再現、指定5資料と公開Git/ライブURLの最終照合は残る。公開プロフィール登録と資格新版/失効の実演は後段であり、公式必須条件とはしない。
 - [ ] T033 デモ担当：T031・T043と実演可能な結果を受け、`docs/demo-script.md` を120秒の対面プレゼンへ仕上げる。キャッチコピー→利用者操作→スポンサーの役割を示し、リハーサル実測を残す。別途2〜3分の提出動画に実演箇所・対象コミット・実接続/合成/未接続・公開リンクを記録する。証明生成/取引確定待ちのカットは実測秒数を添え、同じ実行の開始/結果を残す。EF-RPC/ARKIV-SWARMは実証時のみ追加し、T036へ渡す。
 - [ ] T035 [P] Web/ZK担当：T008・T016・T017・T031後、API・資金担当とEF-CROPSの情報境界とCROPS4項目を確認し、`specs/001-private-dating/evidence/ef-crops.md` に2端末の実照合、第三者観察、トラッカー検査、秘密の所在、運営依存・残る推測可能性を記す。資金経路を主張する場合はT024も照合する。Web担当は追加賞EF-RPCを `specs/001-private-dating/evidence/anon-rpc.md` で別判定し、標準読取の成功・対象範囲・例外の理由・障害時の挙動を記録する。
 - [ ] T036 提出担当：T030〜T035・T043の結果とT044の実施/見送り判断（未達を含む）を集め、`specs/001-private-dating/evidence/prizes.md` にEF-CROPS・ENS-V2・ARKIV-APPと追加EF-RPC・ARKIV-SWARMの判定を個別に記録する。公式条件を再確認し、証拠・README・動画・ライブデモの主張を照合する。`README.md` に賞別証拠、Arkiv書込ウォレットと再現クエリを反映し、第三者アクセスを確認する。提出可・未達・再確認待ちの理由、担当・対象コミットを残し、チームがDashboardで選択・提出した後に選択結果と受付を記録する。資料作成だけで応募完了にしない。
@@ -107,7 +107,7 @@
 
 US1のA→B→Cを優先し、資金の取消・返却は独立に並行する。US3の追加は3段階と賞別証拠の不足解消後。最終確認はT034・T012・T040・T017・T024・T029の結果に基づき、未達も記録する。T021・T024では資格停止/失効/ENS読取不能でも既存の返却権が妨げられないことを追加確認する。
 
-賞の証拠は先にT039・T041→T042→T034、後段でT014・T015→T032、T008・T016・T017・T031→T035とする。T031はREADME、各賞担当は証拠を別ファイルで編集し、T033の動画と合わせてT036が最終集約する。US3が未達であることだけを3賞共通の応募不可条件にはしない。
+賞の証拠は先にT037〜T039→T032、T039・T041→T042→T034を並行で進め、T008・T016・T017・T031→T035を確認する。T014・T015は公開プロフィール登録として後段に残す。T031はREADME、各賞担当は証拠を別ファイルで編集し、T033の動画と合わせてT036が最終集約する。US3が未達であることだけを3賞共通の応募不可条件にはしない。
 
 | ストーリー | 並行作業の例 | 結合条件 |
 | --- | --- | --- |
