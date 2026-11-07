@@ -4,10 +4,17 @@
   "main": "src/index.ts",
   "compatibility_date": "2026-11-05",
   "durable_objects": {
-    "bindings": [{ "name": "AUTH_STORE", "class_name": "AuthStore" }]
+    "bindings": [
+      { "name": "AUTH_STORE", "class_name": "AuthStore" },
+      { "name": "SEARCH_COORDINATOR", "class_name": "SearchCoordinator" }
+    ]
   },
   "migrations": [
-    { "tag": "auth-store-v1", "new_sqlite_classes": ["AuthStore"] }
+    { "tag": "auth-store-v1", "new_sqlite_classes": ["AuthStore"] },
+    {
+      "tag": "search-coordinator-v1",
+      "new_sqlite_classes": ["SearchCoordinator"]
+    }
   ]
   // "compatibility_flags": [
   //   "nodejs_compat"

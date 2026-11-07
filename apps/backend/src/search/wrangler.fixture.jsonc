@@ -1,0 +1,17 @@
+{
+  "$schema": "../../node_modules/wrangler/config-schema.json",
+  "name": "search-coordinator-fixture",
+  "main": "fixture-worker.ts",
+  "compatibility_date": "2026-11-05",
+  "durable_objects": {
+    "bindings": [
+      { "name": "SEARCH_COORDINATOR", "class_name": "SearchCoordinator" }
+    ]
+  },
+  "migrations": [
+    {
+      "tag": "search-coordinator-v1",
+      "new_sqlite_classes": ["SearchCoordinator"]
+    }
+  ]
+}

@@ -25,6 +25,7 @@ export type SelectionInput = {
   leases: readonly CandidateLease[];
   blockedPairs: readonly (readonly [string, string])[];
   state: CoordinatorState;
+  maxBySubject?: Readonly<Record<string, 1 | 3>>;
   random?: () => number;
 };
 
@@ -62,7 +63,8 @@ function rankLeases(input: SelectionInput): CandidateLease[] {
         lease.expiresAt > input.now &&
         lease.joinedAt <= input.now &&
         !active.has(lease.subjectId) &&
-        (input.state.spentBySubject[lease.subjectId] ?? 0) < 3,
+        (input.state.spentBySubject[lease.subjectId] ?? 0) <
+          (input.maxBySubject?.[lease.subjectId] ?? 3),
     )
     .map((lease) => ({ lease, tie: random() }))
     .sort(
