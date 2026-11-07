@@ -191,4 +191,5 @@ app.onError((_error, c) => {
 });
 
 export { AuthStore };
+export { SearchCoordinator } from "./search/room.ts";
 export default app;
