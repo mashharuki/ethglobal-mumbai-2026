@@ -10,6 +10,11 @@ export const authChallengeRequestSchema = z.strictObject({
     ),
 });
 
+export const authChallengeResponseSchema = z.strictObject({
+  message: z.string().min(1).max(4096),
+  expiresAt: z.iso.datetime({ offset: true }),
+});
+
 export const authSessionRequestSchema = z.strictObject({
   message: z.string().min(1).max(4096),
   signature: z
