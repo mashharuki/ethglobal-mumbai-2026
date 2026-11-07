@@ -18,7 +18,7 @@ bb prove -b target/register.json -w target/register.gz --write_vk -o target/regi
 bb verify -p target/register-proof/proof -k target/register-proof/vk -i target/register-proof/public_inputs
 ```
 
-`apps/frontend/src/proofs/register.ts`は合成辞書の値域を確認し、OSの暗号用乱数から独立した項目saltを作り、BB.jsのPedersenでルートを計算してNoirJS/BB.jsで証明・検証する。別の検証関数はpinしたBB.js検証鍵digest、主体、発行ID、版、ルートを8公開入力と照合する。`apps/frontend/scripts/register-integration.mjs`をNode 24で実行し、正例、再登録で別ルート、改変した主体・版・ルート・鍵・proof、辞書外値の拒否を確認した。これはNodeのBB.js実行系による試験であり、実ブラウザー・公開登録API・2端末通信への結合は未確認。ブラウザー用WASMは公式CRSの取得を必要とする。
+`apps/frontend/src/proofs/register.ts`は合成辞書の値域を確認し、OSの暗号用乱数から独立した項目saltを作り、BB.jsのPedersenでルートを計算してNoirJS/BB.jsで証明・検証する。戻り値は公開`publicProof`と、プロフィール・項目salt・主体/発行ID・版・ルートを含む端末専用`privateMaterial`に分ける。後者はクラスのprivate fieldに保持し、戻り値全体のJSON直列化には含めない。暗号化バックアップからの復元関数は値域とルートを再計算し、改変を拒否する。暗号化保存への結合自体は未実装であり、呼出側は`privateMaterial`だけを端末内の暗号化保存へ渡す必要がある。別の検証関数はpinしたBB.js検証鍵digest、主体、発行ID、版、ルートを8公開入力と照合する。`apps/frontend/scripts/register-integration.mjs`をNode 24で実行し、正例、再登録で別ルート、改変した主体・版・ルート・鍵・proof、辞書外値の拒否と秘密materialのJSON復元/改変拒否を確認した。これはNodeのBB.js実行系による試験であり、実ブラウザー・公開登録API・2端末通信への結合は未確認。ブラウザー用WASMは公式CRSの取得を必要とする。
 
 ## 固定した座標と入力
 
@@ -50,6 +50,8 @@ BN254 Fr/Grumpkinと128-bit非零スカラーを採用した。BB.js v5.3.0に�
 `matching/src/main.nr`はAの登録ルートを再計算し、`profile`ライブラリで全288座標を導出する。Aの非零128-bit秘密鍵からGrumpkin公開鍵を検証し、各座標の非零128-bit乱数によるElGamal暗号文`(rG, bit·G + rPK)`を拘束する。暗号文全288件を固定順でPedersenの連鎖digestに束ね、公開`session_digest`、鍵、登録root、主体/発行ID/版に結び付ける。受信者は実際に届いた暗号文全件から同じdigestを計算し、証明の公開値と照合する必要がある。ここでは`session_digest`自体を署名済みのチェーン・資格・リース文脈から導出するクライアント処理はまだない。
 
 合成fixtureはBB.jsの実Grumpkin演算と独立の平文oracleから生成した。Noir v1.0.0でwitness生成、BB CLI v6.0.0でUltraHonk prove/verify成功、暗号文の最初のx座標を1変更したwitnessは失敗し、公開digestを1 bit変更したverifyも失敗した。A側VKファイルSHA-256は`629107f9a38859e0460efe80439e93a979f1e1dd105ba0f584c3557775ddecf1`。公開入力12個、証明14,656 byte、暗号文の生座標だけで36,864 byte。ACIRは15,688 opcodes。初回proveコマンドは27.5秒、再実行は5.6秒、BBのメモリ表示は最大約1.67 GiBだった。計測機はmacOS arm64で、ブラウザーの処理時間・メモリとは異なる。`matching`が登録ルート式を複製しているため、登録回路との合成root一致試験を維持する。
+
+同じA側合成入力をNode 24のNoirJS v1.0.0 + BB.js v5.3.0でも`apps/frontend/scripts/matching-bbjs-smoke.mjs matching`でprove/verifyした。実測約59秒、証明14,656 byte、公開入力12個、VK SHA-256は`12ea1b68e06613acdcb46abb3d3a6a8caf99f8ea25e44c86629cc32d3a57ea2f`で、CLI v6の鍵と異なる。公開CRSのローカルキャッシュは8 MiBの圧縮G1を要した。この試験はNode/WASMであり、実ブラウザー内のメモリ、読み込み時間、2端末通信を示さない。
 
 ## B側と結果の回路（合成fixture）
 
