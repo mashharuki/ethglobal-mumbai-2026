@@ -1,7 +1,10 @@
 # API client generation
 
-`openapi.yaml` is the source of truth for the proposed `/v1` HTTP contract. The
-contract does not imply that every operation has a deployed handler.
+`openapi.yaml` is the source of truth for the proposed parent `/v1` HTTP
+contract. Its `GET /api/personas/{personaId}/metadata` operation has its own
+AIBot server URL: AIBot would serve that private endpoint to the parent, so it
+is not a parent BFF or browser route. The contract does not imply that every
+operation has a deployed handler.
 
 The planned shared client uses [OpenAPI Generator 7.26.0](https://openapi-generator.tech/docs/installation/)
 with the [`typescript-fetch` generator](https://openapi-generator.tech/docs/generators/typescript-fetch/).
