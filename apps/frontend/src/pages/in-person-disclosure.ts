@@ -37,8 +37,8 @@ export type DisclosureResult =
     };
 
 const fieldLabels: Record<DisclosureField, string> = {
-  job: "職業",
-  ageBand: "年齢帯",
+  job: "Occupation",
+  ageBand: "Age range",
 };
 
 async function hashField(

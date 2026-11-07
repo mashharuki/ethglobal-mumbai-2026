@@ -8,21 +8,21 @@ const heroBackground =
 const steps = [
   {
     number: "01",
-    title: "自分の条件を決める",
+    title: "Set your preferences",
     detail:
-      "何を重視するかは、まず自分の端末で選ぶ。写真や詳細なプロフィールの公開から始めない。",
+      "Choose what matters on your own device. You would not need a public photo or detailed profile to begin.",
   },
   {
     number: "02",
-    title: "共通点を確かめる",
+    title: "Check for mutual fit",
     detail:
-      "互いの希望と共通の趣味を照合し、相手に伝えるのは全体の結果だけ。条件別の答えは見せない。",
+      "Private matching would compare both people's preferences and shared interests. Only an overall result would be revealed.",
   },
   {
     number: "03",
-    title: "話すかどうか選ぶ",
+    title: "Choose whether to talk",
     detail:
-      "希望すれば、承認したPersonaとのAI会話を試せる。AIへ送る情報には別の同意が必要。",
+      "An optional AI conversation uses an approved Persona. Sending information to AI requires separate consent.",
   },
 ] as const;
 
@@ -44,9 +44,9 @@ function SiteHeader() {
               tinder
             </Lism>
           </Lism>
-          <Cluster as="nav" aria-label="ページ内ナビゲーション" g="20">
-            <a href="#journey">体験の流れ</a>
-            <a href="#proof">公開検証</a>
+          <Cluster as="nav" aria-label="Page navigation" g="20">
+            <a href="#journey">How it works</a>
+            <a href="#proof">Live proof</a>
           </Cluster>
         </Cluster>
       </Wrapper>
@@ -61,16 +61,16 @@ function HeroMessage() {
         A NEW WAY TO MEET
       </Lism>
       <Lism as="h1" fz={["3xl", null, "5xl"]} lh="s">
-        写真より先に、
+        Before photos,
         <br />
         <Lism as="span" c="brand">
-          共通点
+          common ground
         </Lism>
-        から。
+        {" comes first."}
       </Lism>
       <Lism as="p" fz={["l", null, "xl"]} c="text-2" max-sz="m">
-        Secret
-        Tinderは、条件を非公開で照合し、話すかどうかを自分で選ぶ出会いのアイディアです。
+        Secret Tinder is a dating concept that privately compares preferences
+        and lets people choose whether to start a conversation.
       </Lism>
     </Stack>
   );
@@ -94,7 +94,7 @@ function HeroActions() {
         px="30"
         bdrs="99"
       >
-        公開資格の実演を見る <span aria-hidden="true">↗</span>
+        See the live credential demo <span aria-hidden="true">↗</span>
       </Lism>
     </Cluster>
   );
@@ -115,7 +115,8 @@ function Hero() {
           <HeroMessage />
           <HeroActions />
           <Lism as="p" fz="s" c="text-2">
-            現在は参加資格の実ネットワーク検証まで実装。非公開照合と製品連携は開発中です。
+            Today, live network verification of participation credentials works.
+            Private matching and product integration are still in development.
           </Lism>
         </Stack>
       </Wrapper>
@@ -157,7 +158,7 @@ function Journey() {
               THE JOURNEY
             </Lism>
             <Lism as="h2" fz={["2xl", null, "3xl"]}>
-              出会うまでの、3つの選択。
+              Three choices on the way to a conversation.
             </Lism>
           </Stack>
           <Columns cols={[1, null, 3]} g="20">
@@ -166,7 +167,8 @@ function Journey() {
             ))}
           </Columns>
           <Lism as="p" c="text-2" fz="s">
-            条件照合は設計・実装中です。AI会話は別チームの単体アプリで実演できますが、マッチングアプリとの接続は未完了です。
+            Private matching is still being built. AI conversations work in a
+            separate teammate app, but the two apps are not connected yet.
           </Lism>
         </Stack>
       </Wrapper>
@@ -200,7 +202,7 @@ function ProofCard({
         {participant.name}
       </Lism>
       <Lism as="p" c="text-2" fz="s">
-        ENS → Arkiv資格を読戻し確認済み
+        ENS → Arkiv credential readback verified
       </Lism>
       <Cluster g="20">
         <a
@@ -208,14 +210,14 @@ function ProofCard({
           target="_blank"
           rel="noopener noreferrer"
         >
-          ENS取引 ↗
+          ENS transaction ↗
         </a>
         <a
           href={`https://explorer.rabdi.arkiv.network/tx/${participant.arkivTx}`}
           target="_blank"
           rel="noopener noreferrer"
         >
-          Arkiv取引 ↗
+          Arkiv transaction ↗
         </a>
       </Cluster>
     </Stack>
@@ -232,11 +234,11 @@ function Proof() {
               LIVE PROOF
             </Lism>
             <Lism as="h2" fz={["2xl", null, "3xl"]}>
-              参加資格を、公開ネットワークで確認する。
+              Verify participation on public networks.
             </Lism>
             <Lism as="p" c="text-2" max-sz="l">
-              AliceとBobの参加資格をArkiv
-              Rabdiへ公開し、それぞれのENS名から現行の資格を参照できるようにしました。
+              Alice and Bob each have an issuer-signed participation credential
+              on Arkiv Rabdi. Their ENS names point to the current records.
             </Lism>
           </Stack>
           <Columns cols={[1, null, 2]} g="20">
@@ -246,7 +248,9 @@ function Proof() {
           </Columns>
           <Participation />
           <Lism as="p" c="text-2" fz="s">
-            実証したのは資格発行と公開参照です。恋愛相性、本人の誠実さ、資金の安全性をこの資格だけで保証するものではありません。
+            This demo proves credential issuance and public lookup. It does not
+            prove compatibility, anyone&apos;s intentions, or the safety of
+            funds.
           </Lism>
         </Stack>
       </Wrapper>
