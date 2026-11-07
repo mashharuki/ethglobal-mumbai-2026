@@ -1,0 +1,6 @@
+[package]
+name = "register"
+type = "bin"
+authors = ["Secret Tinder"]
+
+[dependencies]

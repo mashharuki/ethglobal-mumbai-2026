@@ -1,0 +1,6 @@
+[package]
+name = "profile"
+type = "lib"
+authors = ["Secret Tinder"]
+
+[dependencies]

@@ -1,0 +1,5 @@
+[package]
+name = "curve_probe"
+type = "lib"
+authors = ["Secret Tinder contributors"]
+compiler_version = "1.0.0"
