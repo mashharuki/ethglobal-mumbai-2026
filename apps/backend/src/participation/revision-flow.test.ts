@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { describe, it } from "node:test";
+import { fileURLToPath, URL } from "node:url";
 
 import { bytes, str, u64 } from "@arkiv-network/sdk/schema";
 import {
@@ -20,7 +21,9 @@ const evidenceRoot = new URL(
   import.meta.url,
 );
 function loadEvidence(filename: string): unknown {
-  return JSON.parse(readFileSync(new URL(filename, evidenceRoot), "utf8"));
+  return JSON.parse(
+    readFileSync(fileURLToPath(new URL(filename, evidenceRoot)), "utf8"),
+  );
 }
 
 const signedEvidence = loadEvidence("ens-alice-credential-signed.json");
