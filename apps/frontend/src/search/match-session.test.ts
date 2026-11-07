@@ -197,6 +197,40 @@ describe("two-client match session", () => {
     assert.deepEqual(result, { ok: false, error: "PROOF_INVALID" });
   });
 
+  it("should reject an old A profile before creating the B proof", async () => {
+    const context = makeContext();
+    const original = await proofEngine().createFirst(context);
+    const message: MatchMessage = {
+      kind: "first",
+      sender: context.first.subjectId,
+      sessionDigest: getMatchSessionDigest(context),
+      data: {
+        ...original,
+        publicInputs: original.publicInputs.map((value, index) =>
+          index === 6 ? value + 1n : value,
+        ),
+      },
+    };
+    let hasCreatedSecond = false;
+    const engine: MatchProofEngine = {
+      ...proofEngine(),
+      createSecond: async () => {
+        hasCreatedSecond = true;
+        throw new Error("should not create B proof");
+      },
+    };
+    const result = await runSecondClient({
+      context,
+      transport: { send: async () => {}, receive: async () => message },
+      guard: replayGuard(),
+      proofs: engine,
+      nowSeconds: () => 1_900_000_000,
+      signal: new AbortController().signal,
+    });
+    assert.deepEqual(result, { ok: false, error: "PROOF_INVALID" });
+    assert.equal(hasCreatedSecond, false);
+  });
+
   it("should reject expired leases at their exact deadline", async () => {
     const result = await runFirstClient({
       context: makeContext(),

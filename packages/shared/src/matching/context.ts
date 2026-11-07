@@ -136,6 +136,20 @@ function matchesParticipant(
   );
 }
 
+export function checkMatchParticipantPublicInputs(
+  context: MatchContext,
+  role: "first" | "second",
+  inputs: readonly bigint[],
+): boolean {
+  return matchesParticipant(
+    inputs,
+    context[role],
+    context,
+    getMatchSessionDigest(context),
+    role === "first" ? 12 : 16,
+  );
+}
+
 export function checkMatchProofContext(
   candidate: unknown,
   inputs: MatchProofInputs,

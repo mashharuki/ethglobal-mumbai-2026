@@ -1,4 +1,5 @@
 import {
+  checkMatchParticipantPublicInputs,
   checkMatchProofContext,
   getMatchSessionDigest,
   type MatchContext,
@@ -153,6 +154,11 @@ export async function runFirstClient(
     const ready = prepared.data;
     const first = await options.proofs.createFirst(ready.context);
     if (
+      !checkMatchParticipantPublicInputs(
+        ready.context,
+        "first",
+        first.publicInputs,
+      ) ||
       first.ciphertexts.length !== 288 ||
       !(await options.proofs.verifyFirst(ready.context, first))
     ) {
@@ -177,7 +183,14 @@ export async function runFirstClient(
       return { ok: false, error: "PROOF_INVALID" };
     }
     const second = received.data;
-    if (!(await options.proofs.verifySecond(ready.context, first, second)))
+    if (
+      !checkMatchParticipantPublicInputs(
+        ready.context,
+        "second",
+        second.publicInputs,
+      ) ||
+      !(await options.proofs.verifySecond(ready.context, first, second))
+    )
       return { ok: false, error: "PROOF_INVALID" };
     const result = await options.proofs.createResult(
       ready.context,
@@ -229,12 +242,24 @@ export async function runSecondClient(
     }
     const first = received.data;
     if (
+      !checkMatchParticipantPublicInputs(
+        ready.context,
+        "first",
+        first.publicInputs,
+      ) ||
       first.ciphertexts.length !== 288 ||
       !(await options.proofs.verifyFirst(ready.context, first))
     )
       return { ok: false, error: "PROOF_INVALID" };
     const second = await options.proofs.createSecond(ready.context, first);
-    if (!(await options.proofs.verifySecond(ready.context, first, second)))
+    if (
+      !checkMatchParticipantPublicInputs(
+        ready.context,
+        "second",
+        second.publicInputs,
+      ) ||
+      !(await options.proofs.verifySecond(ready.context, first, second))
+    )
       return { ok: false, error: "PROOF_INVALID" };
     await options.transport.send({
       kind: "second",
