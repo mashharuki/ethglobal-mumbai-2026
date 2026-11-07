@@ -6,7 +6,8 @@
   "durable_objects": {
     "bindings": [
       { "name": "AUTH_STORE", "class_name": "AuthStore" },
-      { "name": "SEARCH_COORDINATOR", "class_name": "SearchCoordinator" }
+      { "name": "SEARCH_COORDINATOR", "class_name": "SearchCoordinator" },
+      { "name": "SIMULATION_DATE_REQUESTS", "class_name": "SimulationDateRequestStore" }
     ]
   },
   "migrations": [
@@ -14,6 +15,10 @@
     {
       "tag": "search-coordinator-v1",
       "new_sqlite_classes": ["SearchCoordinator"]
+    },
+    {
+      "tag": "simulation-date-requests-v1",
+      "new_sqlite_classes": ["SimulationDateRequestStore"]
     }
   ]
   // "compatibility_flags": [

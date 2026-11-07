@@ -192,4 +192,5 @@ app.onError((_error, c) => {
 
 export { AuthStore };
 export { SearchCoordinator } from "./search/room.ts";
+export { SimulationDateRequestStore } from "./simulation/date-request-store.ts";
 export default app;
