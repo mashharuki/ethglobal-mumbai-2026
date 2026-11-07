@@ -6,13 +6,15 @@
 People choose preferences without publishing a detailed profile. ENSv2 and Arkiv make each
 person's participation credential publicly verifiable, without exposing what they are looking for.
 
-[![Concept replay: two private profiles exchange ciphertext through a relay; ENS gives pseudonyms and Arkiv holds public records. Two-party ZK and private settlement are unverified.](docs/assets/private-dating-overview.gif)](https://ethglobal-mumbai-2026.vercel.app/)
+[![Concept replay: two private profiles exchange ciphertext through a relay; ENS gives pseudonyms and Arkiv holds public records. Two-party ZK and private settlement are unverified.](docs/assets/private-dating-overview.gif)](https://mashharuki.github.io/ethglobal-mumbai-2026/overview.html)
 
-**[▶ Try the live verifier](https://ethglobal-mumbai-2026.vercel.app/)**
+**[▶ Watch the animated overview · 32 seconds · EN/日本語](https://mashharuki.github.io/ethglobal-mumbai-2026/overview.html)**
+ · **[Try the live verifier](https://ethglobal-mumbai-2026.vercel.app/)**
  · **[120-second pitch](docs/demo-script.md)**
  · **[日本語の概要](#日本語の概要)**
 
-<sub>The animation is a concept replay. Two-party ZK matching, deposits and private settlement are
+<sub>The animation and the [overview page](https://mashharuki.github.io/ethglobal-mumbai-2026/overview.html)
+are a design concept with a fixed success path. Two-party ZK matching, deposits and private settlement are
 **not yet verified**. What runs today is the public ENSv2 + Arkiv participation credential and its
 independent verifiers.</sub>
 
@@ -57,6 +59,7 @@ Secret Tinderは、詳しいプロフィールを公開せずに条件を選び�
 - **実証：** Alice/BobのArkiv公開資格とSepoliaのENS参照を書き込み、ブラウザーと独立CLIが同じブロックで`eligible`を返すことを確認。
 - **未完了：** 秘密の条件照合、預託金、停止/回復、AIBotとの結合は開発中です。
 - **AI会話：** 承認済みPersonaとのAI会話は任意で、別の同意が必要です。
+- **概要アニメーション：** [32秒の説明ページ](https://mashharuki.github.io/ethglobal-mumbai-2026/overview.html)（日英切替）。固定の成功例による設計イメージで、取引や証明の実行を示すものではありません。
 
 </details>
 
