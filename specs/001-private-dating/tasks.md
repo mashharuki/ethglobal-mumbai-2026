@@ -35,7 +35,7 @@
 ## Phase 2 — 担当間で先に固定する契約
 
 - [x] T003 [P] API担当：[サービス契約](contracts/service.md)の全HTTP操作を `packages/api-specs/openapi.yaml` に定義する。認証、承諾digest/認証用封筒/受付証の形式、公開／本人専用の投影、202後の照会、冪等キー、409・422・429・503を含め、OpenAPI Generatorで `packages/shared/src/generated/client.ts` を再生成できるようにする。固定版Generator 7.26.0とSHA-256検査付き再生成スクリプトを追加し、44ファイルの実生成、共有型検査、Biome確認済み。APIの全操作が実装・公開された意味ではない。
-- [ ] T004 [P] ZK担当：T002後、`circuits/Nargo.toml` と `circuits/protocol.md` に属性・希望mask・許可趣味のルートと288座標の導出、役割・資格世代・辞書版・transcript、群/fieldの範囲、検証鍵の版を固定する。[照合契約](contracts/matching.md)の式と平文oracleが一致することを確認し、実証明の実装は段階A後に進める。平文oracleの12試験は成功。Nargo workspace、群/fieldと検証鍵の確定は未完了。
+- [X] T004 [P] ZK担当：T002後、`circuits/Nargo.toml` と `circuits/protocol.md` に属性・希望mask・許可趣味のルートと288座標の導出、役割・資格世代・辞書版・transcript、群/fieldの範囲、検証鍵の版を固定する。[照合契約](contracts/matching.md)の式と平文oracleが一致することを確認し、実証明の実装は段階A後に進める。Noir workspaceとBN254/Grumpkin・128-bit非零スカラー・CLI/BB.js別検証鍵を固定し、平文oracleの12試験、Nargo workspaceの27試験と合成回路の実証明を確認。実際の資格・リース文脈からtranscriptを拘束する結合と2端末通信はT011/T012に残す。
 - [X] T005 資金担当：T003後、[精算契約](contracts/settlement.md)に沿って `apps/contract/test/fixtures/note-vectors.ts` に二者の署名対象、受付証と信頼する受付公開鍵/版、消費印、期限、受取先、各操作の公開値と期待配分を用意する。公開列にペアや申告項目の識別子を含めない。
 - [ ] T006 API担当：T003後、`apps/backend/src/auth/session.ts` と `apps/backend/src/index.ts` に単回署名チャレンジ、期限・Originの確認、共通エラー、本文を残さないログ、操作IDの照会を接続する。別人の非公開操作は取得不可にする。SIWEとDurable Objectの単回消費、審査の実操作IDを使った本人200・別人404はローカルWrangler統合試験済み。認証試験は通常backend testに登録済み。公開Webからの同一Origin BFF接続は未完了。
 
@@ -67,7 +67,7 @@
 - [ ] T015 [US1] Web担当：T008・T010・T014後、`apps/frontend/src/pages/Registration.tsx` と `apps/frontend/src/pages/PublicRegistration.tsx` にSepolia上のUSDC・EURCの二択、預託前の数量・期限計算・配分・送金相関の説明、入金後の確定期限表示、確認中からの再開、仮名別の公開確認を実装する。実装は先行可だが、公開資金導線の有効化はT021・T024合格後とする。
 - [ ] T016 [US1] 結合担当：T008・T012〜T015・T040後、`apps/frontend/src/pages/Search.tsx` と `apps/frontend/src/App.tsx` に資格・希望・候補割当を結合する。双方承諾の受付で資格を検証し、ID/digest/期限付き受付証を得る。停止前の同一受付が期限内に拘束確定した場合だけ既存マッチとして成立させ、新規受付/差替え/期限切れを拒否する。本人ブロックの割当/接触除外と、停止/異議中の救済/返却を分離する。公開資金導線はT021・T024合格後に有効化する。
 - [ ] T017 [US1] 検証担当：T016後、`specs/001-private-dating/evidence/matching.md` にT012の先行記録を保ったままSC-001の5人、SC-002の10例、現行資格の再検証、第三者観察を追記する。SC-005/006はT034/T040を参照し、模擬負荷と実暗号を分離する。対面提示はT024から参照する。
-- [ ] T040 [US1] API/検証担当：T009後、`apps/backend/src/search/coordinator.test.ts` と `specs/001-private-dating/evidence/scheduling.md` でSC-006のN=10/50、K=3、同時上限1、各10ラウンドを再現する。新規枠1・ブロック除外を追加例で確認する。自己照合/重複/失効リース/上限超過を0件とし、待ち時間・割当偏り・再接続・通信量を記録する。合成の認可・暗号処理を明示し、実暗号の性能はT012だけを根拠にする。
+- [ ] T040 [US1] API/検証担当：T009後、`apps/backend/src/search/coordinator.test.ts` と `specs/001-private-dating/evidence/scheduling.md` でSC-006のN=10/50、K=3、同時上限1、各10ラウンドを再現する。新規枠1・ブロック除外を追加例で確認する。自己照合/重複/失効リース/上限超過を0件とし、待ち時間・割当偏り・再接続・通信量を記録する。合成の認可・暗号処理を明示し、実暗号の性能はT012だけを根拠にする。ローカルDOのN=10/50×10ラウンド、K/同時枠/ブロック/再起動7試験と計測は成功。実SIWE・資格・預託・暗号配送・署名受付証はT009未接続のため未完了。
 
 ## Phase 4 — US2：合意終了と固定期限の元本返却（P1）
 
