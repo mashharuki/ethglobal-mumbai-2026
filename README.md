@@ -52,8 +52,8 @@ data is also the only party that can vouch for who is a genuine participant.
 | **Problem** | Dating apps judge by photos first and accumulate huge amounts of intimate data in one place, while still asking you to trust them about who is real. |
 | **Product** | Private matching where secrets stay on the device and only the overall result is revealed, plus publicly verifiable, pseudonymous participation. An AI Persona conversation is optional and needs separate consent. |
 | **Technical edge** | ENSv2 separates the issuer's control of the credential reference from the participant's own keys. Arkiv holds the issuer-signed credential, readable by any client without our backend. |
-| **Working proof** | Alice and Bob have issuer-signed credentials on **Arkiv Rabdi**, referenced from **`alice.secrettinder.eth` / `bob.secrettinder.eth`** on Ethereum Sepolia. A browser verifier and an independent CLI both return `eligible` at the same block. |
-| **Not yet** | Private preference matching, deposits, suspension/recovery and the parent-app ↔ AIBot handoff are in development. |
+| **Working proof** | Alice and Bob have issuer-signed credentials on **Arkiv Rabdi**, referenced from **`alice.secrettinder.eth` / `bob.secrettinder.eth`** on Ethereum Sepolia. A browser verifier and an independent CLI agree at the same block. Alice's finite suspension (version 2) and issuer-led recovery (version 3) were written and independently verified on both networks. |
+| **Not yet** | Private preference matching, deposits, review-triggered credential updates and the parent-app ↔ AIBot handoff are in development. |
 | **License** | Parent repository: [MIT](LICENSE). |
 
 ### What makes the combination valuable
@@ -87,7 +87,8 @@ Secret Tinderは、この課題を**ブロックチェーンと暗号技術**で
 - **本物の参加者か：** ENSv2の仮名に発行者署名つきの参加資格をArkivで結びつけ、誰でもAPIやDBを信用せずに検証できる（テストネットで動作）。
 - **権限の分離：** 発行者は資格参照だけ、本人は自分の限定キーだけを更新できる。サーバーではなくENSv2のロールで強制。
 - **実証：** Alice/BobのArkiv公開資格とSepoliaのENS参照を書き込み、ブラウザーと独立CLIが同じブロックで`eligible`を返すことを確認。
-- **未完了：** 秘密の条件照合、預託金、停止/回復、AIBotとの結合は開発中です。
+- **実証済み：** Aliceの期限付き停止版2と回復版3をRabdiとSepoliaへ書き込み、公開Webと独立CLIで同一ブロックの判定一致を確認。審査APIからの自動反映ではありません。
+- **未完了：** 秘密の条件照合、預託金、審査決定からの資格更新、AIBotとの結合は開発中です。
 - **AI会話：** 承認済みPersonaとのAI会話は任意で、別の同意が必要です。
 - **概要アニメーション：** [32秒の説明ページ](https://mashharuki.github.io/ethglobal-mumbai-2026/overview.html)（日英切替）。固定の成功例による設計イメージで、取引や証明の実行を示すものではありません。
 
@@ -211,7 +212,7 @@ static source check, not a network audit of the deployment or the AIBot.
 
 | Target | State |
 |---|---|
-| **ENS — Best Use of ENSv2** | Alice/Bob credentials and role separation demonstrated on Sepolia. The live demo is the public qualification verifier; real suspension/recovery remains unfinished. [Official conditions](https://ethglobal.com/events/mumbai/prizes/ens) · [evidence](specs/001-private-dating/evidence/ens.md) |
+| **ENS — Best Use of ENSv2** | Scoped resolver roles and Alice/Bob credentials are live on Sepolia. Alice's signed finite suspension and recovery were written through Arkiv and ENS and independently checked against the live browser. Review-triggered updates and live delegated-key revocation remain unverified. [Official conditions](https://ethglobal.com/events/mumbai/prizes/ens) · [evidence](specs/001-private-dating/evidence/ens.md) |
 | **Arkiv — Build on Arkiv (from scratch)** | Alice/Bob credentials written on Rabdi; the live browser reads the current entities. From Scratch eligibility and third-party reproduction still need confirmation. [Official conditions](https://ethglobal.com/events/mumbai/prizes/arkiv) · [schema](arkiv/schema.md) · [friction](arkiv/friction.md) · [reach](arkiv/reach.md) · [why Arkiv](arkiv/why-arkiv.md) · [how we use Arkiv](arkiv/how-you-use-arkiv.md) |
 | **Ethereum Foundation — Best CROPS App** | The [CROPS boundaries](#crops) are documented; end-to-end private matching and the required video are **not done**. [Official conditions](https://ethglobal.com/events/mumbai/prizes/ethereum-foundation) |
 | Arkiv + Swarm bonus | Conditional; not demonstrated. |
@@ -265,7 +266,7 @@ the team's registration. We do not claim From Scratch eligibility from the commi
 |---|---|
 | New project-specific work shown in this repository | Secret Tinder concept/specification, ENSv2 Alice/Bob subnames and scoped resolvers, issuer-signed Arkiv credentials, indexed Arkiv query, independent browser/CLI verification, and the animated explanation. Local SIWE/review/simulation work is separate from the public verifier. Use `git log --reverse --format='%h %aI %s'` to inspect the sequence. |
 | Reused material | The frontend/backend/contract starter scaffolding, open-source package dependencies, Spec Kit tooling and the separately authored [AIBot git submodule](ethglobal-mumbai-2026-AIBot/) are not presented as newly built matching or settlement features. The submodule has its own history, setup and author. |
-| Still proposed | Private preference matching, deposits/refunds, public profile registration, real credential suspension/recovery and the authenticated parent-to-AIBot handoff have no end-to-end live demonstration. |
+| Still proposed | Private preference matching, deposits/refunds, public profile registration, review-triggered credential updates and the authenticated parent-to-AIBot handoff have no end-to-end live demonstration. Alice's manual issuer-led suspension/recovery is separately verified on testnet. |
 
 ### AI assistance and team contribution
 
