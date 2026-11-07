@@ -3,6 +3,7 @@ import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { Barretenberg } from "@aztec/bb.js";
+import { checkMatchProofContext } from "../../../packages/shared/src/matching/context.ts";
 
 const VK_HASHES = {
   a: "629107f9a38859e0460efe80439e93a979f1e1dd105ba0f584c3557775ddecf1",
@@ -10,11 +11,11 @@ const VK_HASHES = {
   result: "b7cbf302fac9e7ebd45a92bed7b285c6759bda9aad571ae49c195cf7a16999d0",
 };
 
-const [bbBinary, aDirectory, bDirectory, resultDirectory] =
+const [bbBinary, aDirectory, bDirectory, resultDirectory, contextPath] =
   process.argv.slice(2);
 if (!bbBinary || !aDirectory || !bDirectory || !resultDirectory) {
   throw new Error(
-    "Usage: node verify-matching.mjs <bb-v6-bin> <A-proof-dir> <B-proof-dir> <result-proof-dir>",
+    "Usage: node verify-matching.mjs <bb-v6-bin> <A-proof-dir> <B-proof-dir> <result-proof-dir> [trusted-context.json]",
   );
 }
 
@@ -63,6 +64,16 @@ for (let index = 0; index < 4; index += 1) {
 }
 if (result[9] !== 0n && result[9] !== 1n)
   throw new Error("Result is not one bit");
+if (contextPath) {
+  const context = JSON.parse(readFileSync(contextPath, "utf8"));
+  const checked = checkMatchProofContext(
+    context,
+    { a, b, result },
+    Math.floor(Date.now() / 1000),
+  );
+  if (!checked.ok)
+    throw new Error(`Matching context rejected: ${checked.error}`);
+}
 
 const api = await Barretenberg.new({ skipSrsInit: true });
 try {
@@ -79,5 +90,5 @@ try {
 }
 
 process.stdout.write(
-  `Verified matching result: ${result[9] === 1n ? "compatible" : "incompatible"}\n`,
+  `Verified ${contextPath ? "provided-context" : "synthetic unbound"} matching result: ${result[9] === 1n ? "compatible" : "incompatible"}\n`,
 );

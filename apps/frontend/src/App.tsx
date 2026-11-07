@@ -7,9 +7,9 @@ import "./App.css";
 const AnonRpcDiagnostics = import.meta.env.DEV
   ? lazy(() => import("./pages/AnonRpcDiagnostics.tsx"))
   : null;
-const Simulation = import.meta.env.DEV
-  ? lazy(() => import("./pages/Simulation.tsx"))
-  : null;
+const Simulation = lazy(() => import("./pages/Simulation.tsx"));
+const Registration = lazy(() => import("./pages/Registration.tsx"));
+const RestoreBackup = lazy(() => import("./pages/RestoreBackup.tsx"));
 
 const heroBackground =
   "radial-gradient(circle at 85% 20%, color-mix(in srgb, var(--brand) 18%, transparent), transparent 40%), radial-gradient(circle at 10% 85%, color-mix(in srgb, var(--accent) 12%, transparent), transparent 45%)";
@@ -56,6 +56,8 @@ function SiteHeader() {
           <Cluster as="nav" aria-label="Page navigation" g="20">
             <a href="#journey">How it works</a>
             <a href="#proof">Live proof</a>
+            <a href="#registration">ZK registration</a>
+            <a href="#simulation">AI demo</a>
           </Cluster>
         </Cluster>
       </Wrapper>
@@ -267,11 +269,14 @@ function Proof() {
   );
 }
 
-function subscribeToPath(): () => void {
-  return () => {};
+function subscribeToPath(onChange: () => void): () => void {
+  window.addEventListener("hashchange", onChange);
+  return () => window.removeEventListener("hashchange", onChange);
 }
 
 function getCurrentPath(): string {
+  if (window.location.hash === "#simulation") return "/simulation";
+  if (window.location.hash === "#restore") return "/restore";
   return window.location.pathname;
 }
 
@@ -299,10 +304,17 @@ export default function App() {
       </Suspense>
     );
   }
-  if (import.meta.env.DEV && currentPath === "/simulation" && Simulation) {
+  if (currentPath === "/simulation") {
     return (
       <Suspense fallback={<p>Loading simulation preview...</p>}>
         <Simulation />
+      </Suspense>
+    );
+  }
+  if (currentPath === "/restore") {
+    return (
+      <Suspense fallback={<p>Loading backup restoration...</p>}>
+        <RestoreBackup />
       </Suspense>
     );
   }
@@ -313,6 +325,9 @@ export default function App() {
         <Hero />
         <Journey />
         <Proof />
+        <Suspense fallback={<p>Loading registration...</p>}>
+          <Registration />
+        </Suspense>
       </main>
     </Lism>
   );

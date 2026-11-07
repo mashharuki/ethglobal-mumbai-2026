@@ -98,7 +98,7 @@ Secret Tinderは、この課題を**ブロックチェーンと暗号技術**で
 
 | What to inspect | Evidence | Scope |
 |---|---|---|
-| **Alice and Bob are verifiable participants** | [Live verifier](https://ethglobal-mumbai-2026.vercel.app/) · [browser vs CLI comparison](specs/001-private-dating/evidence/ens.md#ブラウザーとcliの比較) | Both returned `eligible`, credential version 1. Sepolia + Arkiv Rabdi testnets. |
+| **Alice and Bob are verifiable participants** | [Live verifier](https://ethglobal-mumbai-2026.vercel.app/) · [browser vs CLI comparison](specs/001-private-dating/evidence/ens.md#ブラウザーとcliの比較) | Alice's current credential is version 3 (`eligible` after a finite suspension); Bob's is version 1 (`eligible`). Sepolia + Arkiv Rabdi testnets. |
 | **ENSv2 names, resolvers and role separation** | [ENS transaction and permission evidence](specs/001-private-dating/evidence/ens.md) | Real Sepolia transactions signed by the issuer. |
 | **Signed credentials live on Arkiv** | [Alice](specs/001-private-dating/evidence/arkiv-alice-publication.json) · [Bob](specs/001-private-dating/evidence/arkiv-bob-publication.json) · [read evidence](specs/001-private-dating/evidence/arkiv.md) | Written, read back and found by indexed query. |
 | **ENS points to the Arkiv entity** | [Alice](specs/001-private-dating/evidence/ens-alice-reference.json) · [Bob](specs/001-private-dating/evidence/ens-bob-reference.json) | `app.credential` written and read back on Sepolia. |
@@ -133,24 +133,25 @@ the parent name and Registry is not a decentralized guarantee.
 
 ## Verify it yourself
 
-| Participant | ENS name | Arkiv entity key | ENS reference tx |
+| Participant | ENS name | Arkiv entity at latest verification | ENS reference tx |
 |---|---|---|---|
-| Alice | `alice.secrettinder.eth` | `0x628a86b2b8d2ee96d9b91b92a9013f10ce67421e4792bf7911c46234d92ab5d6` | [Sepolia](https://sepolia.etherscan.io/tx/0xf95064e137e787ef2e8f16ee9d7a0b582be4e6f31afae1504e0b26a422df9b5a) |
+| Alice | `alice.secrettinder.eth` | `0xe71e5fc6e6da0cfc338f8ca32a304947bcb98a7af0245a09638a101bcb4cbe0e` (version 3) | [Sepolia](https://sepolia.etherscan.io/tx/0x536871ba2a6f9bf6116b0ec4c80a6638765172c4ffdf2c03d9ef70b465817f34) |
 | Bob | `bob.secrettinder.eth` | `0x4e253c8b29d21b401d99a970bfe8624d0d27bd835e49962006e8c1440d39c151` | [Sepolia](https://sepolia.etherscan.io/tx/0xc798656879bcb49a22eacae9bd3beb46e28911bf9e8ec6ea9e1c333b8f4e16a5) |
 
-Arkiv write transactions: [Alice](https://explorer.rabdi.arkiv.network/tx/0x9f5788fd0e4c5dc326c838bf5d5dd19a80a21503c7f3e92bde1ea3578b206399) · [Bob](https://explorer.rabdi.arkiv.network/tx/0x331de4e344cd021bbdc3b6d6bae95a1ab6fc6b5c78afe0a67a95d4c0fb214cbd).
+Arkiv write transactions: [Alice version 1](https://explorer.rabdi.arkiv.network/tx/0x9f5788fd0e4c5dc326c838bf5d5dd19a80a21503c7f3e92bde1ea3578b206399) · [Alice version 2](https://explorer.rabdi.arkiv.network/tx/0xd0d7b896dfcda8cf1bf5e886136630278fa77513a58228a2abac0e2c2a702f3b) · [Alice version 3](https://explorer.rabdi.arkiv.network/tx/0x466822cef9d77438c5912d8cd7a5c4ef1eff69c63f0f8bfa126fe35f9cb00f77) · [Bob version 1](https://explorer.rabdi.arkiv.network/tx/0x331de4e344cd021bbdc3b6d6bae95a1ab6fc6b5c78afe0a67a95d4c0fb214cbd).
 
 ```sh
 git submodule update --init --recursive
 pnpm install --frozen-lockfile
 
 # Independent read-only verifier: ENSv2 + Arkiv only, no backend code
-pnpm exec node scripts/verify-participation.ts alice 12080090
-pnpm exec node scripts/verify-participation.ts bob 12080090
+pnpm exec node scripts/verify-participation.ts alice 12080771
+pnpm exec node scripts/verify-participation.ts bob 12080771
 ```
 
-**Both names returned `eligible` at Sepolia block `12080090` with credential version `1`** on
-7 November 2026. The CLI checks registry and resolver provenance, scoped permissions, the Arkiv
+**At Sepolia block `12080771`, Alice returned `eligible` with version `3`, and Bob returned
+`eligible` with version `1`** on 7 November 2026. The CLI checks registry and resolver provenance,
+scoped permissions, the Arkiv
 entity and issuer signature, registration events, current owner and expiry. `ineligible` and
 `unavailable` are reported separately. Arkiv reads use its current state, so a historical Sepolia
 block is not an atomic cross-chain snapshot.
@@ -199,7 +200,7 @@ These boundaries describe the deployed participation verifier and the proposed m
 | Letter | Current behavior and limit |
 | --- | --- |
 | **C — Censorship resistant** | Public ENS/Arkiv verification works without our Hono backend. The Vercel page, Sepolia/Arkiv RPCs and issuer-controlled parent name remain dependencies; RPC failure is shown as unavailable. |
-| **O — Open source** | This parent repository is [MIT licensed](LICENSE) and can be built with the commands above. The separately authored AIBot's license and submission rights are unconfirmed, so the complete proposed product cannot yet be reproduced from this repository alone. |
+| **O — Open source** | This parent repository is [MIT licensed](LICENSE) and can be built with the commands above. The team confirms permission to include the separately authored AIBot in the submission and reports MIT as its license. The AIBot repository still needs a published license notice and independently reproducible parent integration. |
 | **P — Private** | RPC providers see the selected public ENS name and network metadata; public names, addresses and transaction timing remain linkable. Private-match inputs staying on devices is still a design goal; the standalone AIBot sends separately consented Persona/conversation data to its AI provider. |
 | **S — Secure** | Issuer EIP-712 signatures and scoped ENSv2 permissions protect the current public credential path. The issuer, parent-name controller, wallet keys and RPCs remain trust assumptions; private matching, deposits and review recovery lack end-to-end proof. |
 
@@ -213,21 +214,23 @@ static source check, not a network audit of the deployment or the AIBot.
 | Target | State |
 |---|---|
 | **ENS — Best Use of ENSv2** | Scoped resolver roles and Alice/Bob credentials are live on Sepolia. Alice's signed finite suspension and recovery were written through Arkiv and ENS and independently checked against the live browser. Review-triggered updates and live delegated-key revocation remain unverified. [Official conditions](https://ethglobal.com/events/mumbai/prizes/ens) · [evidence](specs/001-private-dating/evidence/ens.md) |
-| **Arkiv — Build on Arkiv (from scratch)** | Alice/Bob credentials are written on Rabdi; Alice's signed version 1→2→3 history is indexed and the live browser follows the current ENS reference to the Arkiv entity. From Scratch eligibility and third-party reproduction still need confirmation. [Official conditions](https://ethglobal.com/events/mumbai/prizes/arkiv) · [schema](arkiv/schema.md) · [friction](arkiv/friction.md) · [reach](arkiv/reach.md) · [why Arkiv](arkiv/why-arkiv.md) · [how we use Arkiv](arkiv/how-you-use-arkiv.md) |
-| **Ethereum Foundation — Best CROPS App** | The [CROPS boundaries](#crops) are documented; end-to-end private matching and the required video are **not done**. [Official conditions](https://ethglobal.com/events/mumbai/prizes/ethereum-foundation) |
+| **Arkiv — Build on Arkiv (from scratch)** | Alice/Bob credentials are written on Rabdi; Alice's signed version 1→2→3 history is indexed and the live browser follows the current ENS reference to the Arkiv entity. The team confirms that its Dashboard category is From Scratch; award eligibility and third-party reproduction still await independent confirmation. [Official conditions](https://ethglobal.com/events/mumbai/prizes/arkiv) · [schema](arkiv/schema.md) · [friction](arkiv/friction.md) · [reach](arkiv/reach.md) · [why Arkiv](arkiv/why-arkiv.md) · [how we use Arkiv](arkiv/how-you-use-arkiv.md) |
+| **Ethereum Foundation — Best CROPS App** | The [CROPS boundaries](#crops) are documented. A 150-second ENS/Arkiv credential demo was recorded locally but has not been uploaded; it does **not** demonstrate end-to-end private matching, so the lead-property video requirement remains unmet. [Official conditions](https://ethglobal.com/events/mumbai/prizes/ethereum-foundation) |
 | Arkiv + Swarm bonus | Conditional; not demonstrated. |
 
 The [official-condition mapping](specs/001-private-dating/prize-targets.md) lists each acceptance
 gate. Third-party reproduction and the final submission decision remain open.
 
-After PR #5 merged on 7 November 2026, the [production URL](https://ethglobal-mumbai-2026.vercel.app/)
-served the English Secret Tinder page. In a clean browser, Alice and Bob both returned `Eligible`,
-credential version 1 at Sepolia block `12080445`. The deployed `/sw.js` serves the retirement
-worker. An older Chrome tab that had shown the Vite starter changed to Secret Tinder after reload;
-use a fresh browser tab for a predictable live demo. The [public GitHub repository](https://github.com/mashharuki/ethglobal-mumbai-2026)
-is accessible anonymously, but an independent third party has not repeated the verifier or Arkiv
-query. The [120-second pitch](docs/demo-script.md) and separate 2–3 minute submission video still
-need a recorded human rehearsal.
+After [PR #7](https://github.com/mashharuki/ethglobal-mumbai-2026/pull/7) merged on 7 November
+2026, the [production URL](https://ethglobal-mumbai-2026.vercel.app/) served the English Secret
+Tinder page. In an isolated browser, Alice returned `Eligible`, credential version 3 at Sepolia
+block `12080822`; Bob returned `Eligible`, version 1 at block `12080823`. The deployed `/sw.js`
+serves the retirement worker. Use a fresh browser tab for a predictable live demo. The
+[public GitHub repository](https://github.com/mashharuki/ethglobal-mumbai-2026) is accessible
+anonymously, but an independent third party has not repeated the verifier or Arkiv query. The
+[120-second pitch](docs/demo-script.md) still needs a recorded human rehearsal. A separate
+150-second, silent, English-captioned credential demo exists locally; it is not a public video
+link, has not been uploaded to the Dashboard and does not show private matching.
 
 ## What we will not claim
 
@@ -255,12 +258,13 @@ need a recorded human rehearsal.
 ### Classic / From Scratch provenance
 
 The [Mumbai rules](https://ethglobal.com/events/mumbai/info/details) require Classic work to start
-after the event officially begins, and the Arkiv target is specifically **from scratch**. This
+after the event officially begins, and the Arkiv target is specifically **from scratch**. The team
+reports **From Scratch** as its selected Hacker Dashboard category. This
 repository's first commit, `14128aa` (5 November 2026, 21:08 IST), contained only a two-line
 README; later setup commits added the Vite/Void frontend, Hono backend, Hardhat Counter sample,
-pnpm/Turbo configuration and Spec Kit tooling. The event start time, chosen submission track and
-whether each setup item qualifies as permitted starter material have **not been confirmed** against
-the team's registration. We do not claim From Scratch eligibility from the commit dates alone.
+pnpm/Turbo configuration and Spec Kit tooling. The event start time and whether each setup item
+qualifies as permitted starter material have **not been independently confirmed**. We do not
+claim award eligibility from the selected category or commit dates alone.
 
 | Scope | Provenance and current status |
 |---|---|
@@ -277,11 +281,11 @@ exclusive authorship of every line. The project concept and sponsor feedback cam
 the issuer's live wallet signatures were explicitly approved and signed by a human. A teammate built
 the standalone AIBot, which is a separate repository and is not evidence of parent integration.
 
-**TODO before submission:** verify the Classic/From Scratch track and event start against the team
-registration; document which human reviewed and authored each submitted component; confirm the
-AIBot author's license and permission to submit it; identify the exact AI-assisted files/assets and
-include any project-specific prompts required by the event rules. The public parent code is
-[MIT licensed](LICENSE); this does not establish rights to the submodule.
+**TODO before submission:** verify event start and starter-material eligibility against the team
+registration; document which human reviewed and authored each submitted component; record the
+AIBot author's MIT license notice in that repository (the team confirmed submission permission and the license name); identify the exact
+AI-assisted files/assets and include any project-specific prompts required by the event rules.
+The public parent code is [MIT licensed](LICENSE); this does not establish rights to the submodule.
 
 Spec-driven materials: [spec](specs/001-private-dating/spec.md) ·
 [plan](specs/001-private-dating/plan.md) · [tasks](specs/001-private-dating/tasks.md) ·

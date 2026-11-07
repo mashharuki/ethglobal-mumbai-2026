@@ -59,6 +59,21 @@ test("should consume a SIWE challenge once under concurrent submissions", async 
       expiresAt: string;
     };
     assert.ok(new Date(challenge.expiresAt).getTime() > Date.now());
+    const malformedMessage = await fetch(`${origin}/v1/auth/sessions`, {
+      method: "POST",
+      headers: { Origin: origin, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        message: "not a SIWE message",
+        signature: "0x11",
+      }),
+    });
+    assert.equal(malformedMessage.status, 401);
+    const oversizedMessage = await fetch(`${origin}/v1/auth/sessions`, {
+      method: "POST",
+      headers: { Origin: origin, "Content-Type": "application/json" },
+      body: JSON.stringify({ message: "x".repeat(9000), signature: "0x11" }),
+    });
+    assert.equal(oversizedMessage.status, 422);
     const signature = await account.signMessage({ message: challenge.message });
     const outsider = privateKeyToAccount(generatePrivateKey());
     const invalidSignature = await outsider.signMessage({
@@ -93,6 +108,30 @@ test("should consume a SIWE challenge once under concurrent submissions", async 
       cookie ?? "",
       /^st_session=.*;.*HttpOnly;.*Secure;.*SameSite=Strict/i,
     );
+    const searchBody = JSON.stringify({
+      ephemeralPublicKey: "0x1234",
+      credentialGeneration: `0x${"22".repeat(32)}`,
+      credentialVersion: 1,
+      registrationVersion: 1,
+      ownerSignature: "0xabcd",
+    });
+    const searchHeaders = {
+      Origin: origin,
+      "Content-Type": "application/json",
+      "X-Operation-Id": crypto.randomUUID(),
+    };
+    const anonymousSearch = await fetch(`${origin}/v1/search-leases`, {
+      method: "POST",
+      headers: searchHeaders,
+      body: searchBody,
+    });
+    assert.equal(anonymousSearch.status, 401);
+    const gatedSearch = await fetch(`${origin}/v1/search-leases`, {
+      method: "POST",
+      headers: { ...searchHeaders, Cookie: cookie?.split(";")[0] ?? "" },
+      body: searchBody,
+    });
+    assert.equal(gatedSearch.status, 503);
     const operationId = crypto.randomUUID();
     const anonymous = await fetch(`${origin}/v1/operations/${operationId}`);
     assert.equal(anonymous.status, 401);

@@ -38,6 +38,14 @@ export type SimulationGate =
   | "consent-required"
   | "ready";
 
+const standaloneDemoUrl = "https://love-match-masala.vercel.app/";
+
+export function getStandaloneDemoHref(
+  hasSeparateAiConsent: boolean,
+): string | null {
+  return hasSeparateAiConsent ? standaloneDemoUrl : null;
+}
+
 export function getSimulationGate(
   entry: SimulationEntry,
   consent: SimulationConsent | null,

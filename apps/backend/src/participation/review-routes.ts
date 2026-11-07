@@ -6,6 +6,7 @@ import {
   reviewDecisionRequestSchema,
   reviewResponseRequestSchema,
 } from "shared";
+import { readBoundedJsonBody } from "../auth/request-body.ts";
 import { getAuthenticatedAddress, getAuthStore } from "../auth/session.ts";
 import {
   appealReview,
@@ -50,18 +51,6 @@ function isSameOrigin(c: ReviewContext): boolean {
     (url.protocol === "https:" || isLocal) &&
     c.req.header("Origin") === url.origin
   );
-}
-
-async function readReviewBody(c: ReviewContext): Promise<unknown> {
-  if (!c.req.header("Content-Type")?.startsWith("application/json"))
-    return null;
-  const text = await c.req.text();
-  if (text.length > 4096) return null;
-  try {
-    return JSON.parse(text) as unknown;
-  } catch {
-    return null;
-  }
 }
 
 function getReviewStore(env: CloudflareBindings) {
@@ -119,7 +108,9 @@ async function mutateReview(
   const operationId = operationIdSchema.safeParse(
     c.req.header("X-Operation-Id"),
   );
-  const body = reviewResponseRequestSchema.safeParse(await readReviewBody(c));
+  const body = reviewResponseRequestSchema.safeParse(
+    await readBoundedJsonBody(c.req.raw, 4096),
+  );
   if (!caseId.success || !operationId.success || !body.success)
     return reviewError(c, 422, "INVALID_INPUT");
   const store = getReviewStore(c.env);
@@ -255,7 +246,9 @@ reviewRoutes.post("/review-cases/:id/decisions", async (c) => {
   const operationId = operationIdSchema.safeParse(
     c.req.header("X-Operation-Id"),
   );
-  const body = reviewDecisionRequestSchema.safeParse(await readReviewBody(c));
+  const body = reviewDecisionRequestSchema.safeParse(
+    await readBoundedJsonBody(c.req.raw, 4096),
+  );
   if (!caseId.success || !operationId.success || !body.success)
     return reviewError(c, 422, "INVALID_INPUT");
   const store = getReviewStore(c.env);

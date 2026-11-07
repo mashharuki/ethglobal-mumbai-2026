@@ -1,5 +1,6 @@
 import { createPublicClient as createArkivClient } from "@arkiv-network/sdk";
 import { rabdi } from "@arkiv-network/sdk/chains";
+import { eq } from "@arkiv-network/sdk/query";
 import { bytes, defineSchema, str, u64 } from "@arkiv-network/sdk/schema";
 import {
   createPublicClient as createEthClient,
@@ -393,6 +394,135 @@ async function readPublication(reference: Reference, trust: Trust) {
   );
   if (!parsed.success) throw new InvalidCredential("INVALID_CREDENTIAL");
   return { credential: parsed.data, issuanceId: row.issuance_id.value };
+}
+
+async function queryHistoryRows(issuanceId: string, trust: Trust) {
+  return arkiv
+    .select({
+      $key: true,
+      $creator: true,
+      $owner: true,
+      $creationFlags: true,
+      issuance_id: true,
+      credential_version: true,
+      record_digest: true,
+      media_type: true,
+      content: true,
+    })
+    .from(publicationSchema, { onMismatch: "throw" })
+    .createdBy(trust.issuer)
+    .where(eq("issuance_id", issuanceId))
+    .withCount()
+    .limit(20)
+    .fetch();
+}
+
+type HistoryRow = Awaited<
+  ReturnType<typeof queryHistoryRows>
+>["entities"][number];
+
+async function checkHistoryRow(
+  row: HistoryRow,
+  context: Awaited<ReturnType<typeof readCurrentRecords>>,
+) {
+  const { trust, name, dnsName, issuanceId, reference } = context;
+  if (
+    !isAddressEqual(row.$creator, trust.issuer) ||
+    !isAddressEqual(row.$owner, trust.issuer) ||
+    !row.$creationFlags.readonly ||
+    row.$creationFlags.permissionlessExtension ||
+    row.issuance_id.value.toLowerCase() !== issuanceId.toLowerCase() ||
+    row.media_type.value !== "application/json"
+  ) {
+    throw new InvalidCredential("HISTORY_MISMATCH");
+  }
+  let content: string;
+  try {
+    content = hexToString(row.content.value);
+  } catch {
+    throw new InvalidCredential("HISTORY_MISMATCH");
+  }
+  const parsed = participationCredentialSchema.safeParse(
+    parseJson(content, "HISTORY_MISMATCH"),
+  );
+  const historicalReference = credentialReferenceSchema.safeParse({
+    schemaVersion: 1,
+    arkivEntityKey: row.$key,
+    digest: row.record_digest.value,
+    credentialVersion: Number(row.credential_version.value),
+  });
+  if (!parsed.success || !historicalReference.success) {
+    throw new InvalidCredential("HISTORY_MISMATCH");
+  }
+  await checkCredential(
+    parsed.data,
+    issuanceId,
+    historicalReference.data,
+    trust,
+    name.owner,
+    dnsName,
+  );
+  return {
+    version: parsed.data.credentialVersion,
+    status: parsed.data.status,
+    suspendedUntil: parsed.data.suspendedUntil,
+    isCurrent:
+      row.$key.toLowerCase() === reference.arkivEntityKey.toLowerCase(),
+  };
+}
+
+export type ParticipationHistoryResult =
+  | {
+      ok: true;
+      data: {
+        versions: Awaited<ReturnType<typeof checkHistoryRow>>[];
+        arkivBlockNumber: string;
+        isTruncated: boolean;
+      };
+    }
+  | { ok: false; error: "HISTORY_UNAVAILABLE" | "HISTORY_MISMATCH" };
+
+export async function readParticipationHistory(
+  label: "alice" | "bob",
+): Promise<ParticipationHistoryResult> {
+  try {
+    const context = await readCurrentRecords(label);
+    const { credential, issuanceId, reference, trust, name, dnsName, block } =
+      context;
+    await checkCredential(
+      credential,
+      issuanceId,
+      reference,
+      trust,
+      name.owner,
+      dnsName,
+    );
+    await checkIssuance(credential, label, trust, name.resource, block.number);
+    const page = await queryHistoryRows(issuanceId, trust);
+    const versions = await Promise.all(
+      page.entities.map((row) => checkHistoryRow(row, context)),
+    );
+    if (!versions.some((item) => item.isCurrent)) {
+      return { ok: false, error: "HISTORY_MISMATCH" };
+    }
+    versions.sort((a, b) => a.version - b.version);
+    return {
+      ok: true,
+      data: {
+        versions,
+        arkivBlockNumber: page.blockNumber.toString(),
+        isTruncated: page.count > BigInt(page.entities.length),
+      },
+    };
+  } catch (error) {
+    return {
+      ok: false,
+      error:
+        error instanceof InvalidCredential
+          ? "HISTORY_MISMATCH"
+          : "HISTORY_UNAVAILABLE",
+    };
+  }
 }
 
 export async function checkCredential(

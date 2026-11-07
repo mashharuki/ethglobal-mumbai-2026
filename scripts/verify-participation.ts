@@ -1,5 +1,3 @@
-import { readFile } from "node:fs/promises";
-
 import { createPublicClient as createArkivClient } from "@arkiv-network/sdk";
 import { rabdi } from "@arkiv-network/sdk/chains";
 import { bytes, defineSchema, str, u64 } from "@arkiv-network/sdk/schema";
@@ -26,11 +24,11 @@ import {
   participationTrustSchema,
   verifyParticipationSignature,
 } from "../packages/shared/src/index.ts";
+import trustRecord from "../specs/001-private-dating/evidence/ens-trust.json" with {
+  type: "json",
+};
 
-const trustPath = new URL(
-  "../specs/001-private-dating/evidence/ens-trust.json",
-  import.meta.url,
-);
+const runtimeEnv = typeof process === "undefined" ? undefined : process.env;
 const registryAbi = parseAbi([
   "function findTokenId(string label) view returns (uint256)",
   "function getOwner(uint256 anyId) view returns (address)",
@@ -65,14 +63,12 @@ const publicationSchema = defineSchema("secret_tinder_participation_v1", {
 const eth = createEthClient({
   chain: sepolia,
   transport: http(
-    // biome-ignore lint/suspicious/noUndeclaredEnvVars: Standalone CLI is not cached by Turbo.
-    process.env.SEPOLIA_RPC_URL ??
+    runtimeEnv?.SEPOLIA_RPC_URL ??
       "https://ethereum-sepolia-rpc.publicnode.com",
     { retryCount: 0, timeout: 10_000 },
   ),
 });
-// biome-ignore lint/suspicious/noUndeclaredEnvVars: Standalone CLI is not cached by Turbo.
-const arkivAccessKey = process.env.ARKIV_ACCESS_KEY ?? "";
+const arkivAccessKey = runtimeEnv?.ARKIV_ACCESS_KEY ?? "";
 const arkiv = createArkivClient({
   chain: rabdi({ accessKey: arkivAccessKey }),
   transport: http(undefined, { retryCount: 0, timeout: 10_000 }),
@@ -445,9 +441,7 @@ export async function readCurrentRecords(
   label: string,
   requestedBlock?: bigint,
 ) {
-  const trust = participationTrustSchema.parse(
-    JSON.parse(await readFile(trustPath, "utf8")),
-  );
+  const trust = participationTrustSchema.parse(trustRecord);
   const block = await fromNetwork(
     () =>
       eth.getBlock(
@@ -479,7 +473,7 @@ export async function readCurrentRecords(
   return { trust, block, dnsName, name, reference, credential, issuanceId };
 }
 
-async function verifyCurrent(label: string, requestedBlock?: bigint) {
+async function inspectCurrent(label: string, requestedBlock?: bigint) {
   const { trust, block, dnsName, name, reference, credential, issuanceId } =
     await readCurrentRecords(label, requestedBlock);
   await checkCredential(
@@ -502,7 +496,57 @@ async function verifyCurrent(label: string, requestedBlock?: bigint) {
     ensBlockNumber: block.number.toString(),
     credentialVersion: credential.credentialVersion,
     dnsName,
+    subject: name.owner,
+    credentialGeneration: credential.issuanceId,
+    expiresAtMs: credential.expiresAt * 1000,
+    maxPerRound: credential.accessTier === "new" ? 1 : 3,
   };
+}
+
+async function verifyCurrent(label: string, requestedBlock?: bigint) {
+  const {
+    subject,
+    credentialGeneration,
+    expiresAtMs,
+    maxPerRound,
+    ...publicResult
+  } = await inspectCurrent(label, requestedBlock);
+  return publicResult;
+}
+
+export async function verifyCurrentForAdmission(label: string): Promise<
+  | {
+      ok: true;
+      data: {
+        subject: `0x${string}`;
+        generation: `0x${string}`;
+        version: number;
+        status: "eligible" | "suspended";
+        expiresAtMs: number;
+        maxPerRound: 1 | 3;
+      };
+    }
+  | { ok: false; error: "ineligible" | "unavailable" }
+> {
+  try {
+    const current = await inspectCurrent(label);
+    return {
+      ok: true,
+      data: {
+        subject: current.subject,
+        generation: current.credentialGeneration as `0x${string}`,
+        version: current.credentialVersion,
+        status: current.verdict === "eligible" ? "eligible" : "suspended",
+        expiresAtMs: current.expiresAtMs,
+        maxPerRound: current.maxPerRound as 1 | 3,
+      },
+    };
+  } catch (error) {
+    return {
+      ok: false,
+      error: error instanceof InvalidCredential ? "ineligible" : "unavailable",
+    };
+  }
 }
 
 if (import.meta.main) {
