@@ -6,6 +6,7 @@ import {
 } from "../src/search/noir-match-engine.ts";
 
 const digestOnly = process.argv.includes("--digest-only");
+const resultOnly = process.argv.includes("--result-only");
 for (const [name, fixture] of [
   ["first", "matching"],
   ["second", "matching_b"],
@@ -28,6 +29,7 @@ for (const [name, fixture] of [
       }),
   );
   if (digestOnly && name !== "first") break;
+  if (resultOnly && name !== "result") continue;
   const proof = digestOnly
     ? undefined
     : await proveNoirMatchCircuit(name, inputs);
@@ -89,7 +91,12 @@ for (const [name, fixture] of [
   if (await verifyNoirMatchCircuit(name, tampered)) {
     throw new Error(`${name} tampered public input was accepted`);
   }
+  const falsifiedProof = new Uint8Array(proof.proof);
+  falsifiedProof[Math.floor(falsifiedProof.length / 2)] ^= 1;
+  if (await verifyNoirMatchCircuit(name, { ...proof, proof: falsifiedProof })) {
+    throw new Error(`${name} falsified proof bytes were accepted`);
+  }
   process.stdout.write(
-    `${name}: real proof accepted; tampered input rejected\n`,
+    `${name}: real proof accepted; tampered input and proof bytes rejected\n`,
   );
 }
