@@ -1,10 +1,11 @@
 # Secret Tinder
 
-> **Common ground before photos.**
+> **Common ground before photos. Your private life stays yours.**
 
-**Secret Tinder is a private-matching prototype where only the overall match result is revealed.**
-People choose preferences without publishing a detailed profile. ENSv2 and Arkiv make each
-person's participation credential publicly verifiable, without exposing what they are looking for.
+**Modern dating has two problems: people are judged by photos before anyone knows whether
+there is common ground — and to get matched, everyone hands one company their most private data.**
+Secret Tinder uses blockchain and cryptography to match people **without a central database of
+their intimate lives.**
 
 [![Concept replay: two private profiles exchange ciphertext through a relay; ENS gives pseudonyms and Arkiv holds public records. Two-party ZK and private settlement are unverified.](docs/assets/private-dating-overview.gif)](https://mashharuki.github.io/ethglobal-mumbai-2026/overview.html)
 
@@ -18,24 +19,47 @@ are a design concept with a fixed success path. Two-party ZK matching, deposits 
 **not yet verified**. What runs today is the public ENSv2 + Arkiv participation credential and its
 independent verifiers.</sub>
 
-## Executive summary
+## The problem
 
-**Dating apps ask you to publish yourself first.** Photos and detailed profiles are public before
-anyone knows whether there is common ground. Secret Tinder reverses the order: match first,
-reveal later — and let anyone check that the other person is a real participant.
+**1. Dating starts from the wrong end.** Apps ask you to publish photos and a detailed profile
+first. You are filtered by appearance and swiped on by strangers before anyone learns whether you
+share interests or want the same kind of relationship.
+
+**2. Matching platforms sit on an enormous pile of private data.** Sexual orientation, what you
+look for in a partner, location, messages, photos — to be matched, all of it goes into one
+company's database. That makes the platform a honeypot: one breach, insider or policy change can
+expose the most sensitive part of millions of lives. You cannot take it back, and you cannot
+check how it is used.
+
+**3. And you still cannot be sure the other person is real.** The same company that holds your
+data is also the only party that can vouch for who is a genuine participant.
+
+## Our answer: blockchain + cryptography
+
+| Problem | What Secret Tinder does | Built with |
+|---|---|---|
+| Judged by photos first | Match on shared interests and mutual preferences first; reveal only **whether** you match, not which conditions did | Two-party private matching (ZK) — **in development** |
+| A central honeypot of private data | Preferences and profile secrets **stay on your device**. The server relays only ciphertext; there is no profile database to leak | On-device encryption, encrypted relay — **in development** |
+| "Is this person real?" | A pseudonymous ENS name carries an **issuer-signed participation credential** that anyone can verify, without trusting our API or our database | **ENSv2 + Arkiv — working on testnet** |
+| Who controls what | The issuer can update only the credential reference; the participant controls their own limited keys. Enforced by contract roles, not by our server | **ENSv2 resolver roles — working on testnet** |
+| Money as commitment, not revenue | A match deposit is returned in full to each owner on mutual close or expiry; no penalty income for the operator | Ethereum Sepolia — **designed, not implemented** |
+
+## Executive summary
 
 | | In one sentence |
 |---|---|
-| **Customer** | People who want to meet someone without publishing their preferences, and client developers who want to verify participation without trusting our API. |
-| **Problem** | Today, proving "this person is a real participant" usually means trusting one company's database, and matching means handing that company everything. |
-| **Product** | Preferences stay on the device; only the overall match result is revealed; an AI Persona conversation is optional and needs separate consent. |
-| **Technical edge** | ENSv2 separates the issuer's control of the credential reference from the participant's limited profile keys. Arkiv holds the issuer-signed credential, readable without our backend. |
+| **Customer** | People who want to meet someone without surrendering their private life to a dating platform. |
+| **Problem** | Dating apps judge by photos first and accumulate huge amounts of intimate data in one place, while still asking you to trust them about who is real. |
+| **Product** | Private matching where secrets stay on the device and only the overall result is revealed, plus publicly verifiable, pseudonymous participation. An AI Persona conversation is optional and needs separate consent. |
+| **Technical edge** | ENSv2 separates the issuer's control of the credential reference from the participant's own keys. Arkiv holds the issuer-signed credential, readable by any client without our backend. |
 | **Working proof** | Alice and Bob have issuer-signed credentials on **Arkiv Rabdi**, referenced from **`alice.secrettinder.eth` / `bob.secrettinder.eth`** on Ethereum Sepolia. A browser verifier and an independent CLI both return `eligible` at the same block. |
 | **Not yet** | Private preference matching, deposits, suspension/recovery and the parent-app ↔ AIBot handoff are in development. |
 | **License** | Parent repository: [MIT](LICENSE). |
 
 ### What makes the combination valuable
 
+- **No honeypot by design.** The goal is a matching service that never holds the data a breach
+  would expose. What is public is only what must be verifiable: a pseudonym and a credential.
 - **A credential that survives our backend.** The browser verifier and the CLI read ENSv2 and
   Arkiv directly. Stop the Hono server and verification still works.
 - **The issuer and the participant hold different keys.** The issuer can update only the
@@ -49,13 +73,19 @@ reveal later — and let anyone check that the other person is a real participan
 
 <a id="日本語の概要"></a>
 
-**写真より先に、共通点から。**
+**写真より先に、共通点から。あなたの私生活は、あなたのもとに。**
 
-Secret Tinderは、詳しいプロフィールを公開せずに条件を選び、全体として合うかどうかだけを知る
-マッチングの試作です。参加資格はENSv2とArkivで公開検証でき、探している条件は公開しません。
+現代の恋愛には2つの課題があります。ひとつは、共通点を知る前に写真と見た目で判断されてしまうこと。
+もうひとつは、マッチングのために性的指向・相手への希望・位置情報・メッセージといった極めて
+プライベートなデータが、一つのプラットフォームに莫大に蓄積されていることです。漏えいや内部不正、
+方針変更が起きれば取り返しがつかず、利用者はその使われ方を確かめることもできません。
 
-- **顧客：** 条件を公開せずに出会いたい人と、発行者のAPIを信用せずに参加資格を確認したい別クライアントの開発者。
-- **強み：** ENSv2で発行者の資格参照と本人の限定キーの権限を分離。Arkivに発行者署名つきの公開資格を置き、バックエンドなしで読める。
+Secret Tinderは、この課題を**ブロックチェーンと暗号技術**で解決します。
+
+- **顧客：** プラットフォームに私生活を預けずに出会いたい人。
+- **解決策：** 条件や秘密は端末に残し、サーバーは暗号文を中継するだけ。二者照合で「合うかどうか」だけを当事者に示す（開発中）。
+- **本物の参加者か：** ENSv2の仮名に発行者署名つきの参加資格をArkivで結びつけ、誰でもAPIやDBを信用せずに検証できる（テストネットで動作）。
+- **権限の分離：** 発行者は資格参照だけ、本人は自分の限定キーだけを更新できる。サーバーではなくENSv2のロールで強制。
 - **実証：** Alice/BobのArkiv公開資格とSepoliaのENS参照を書き込み、ブラウザーと独立CLIが同じブロックで`eligible`を返すことを確認。
 - **未完了：** 秘密の条件照合、預託金、停止/回復、AIBotとの結合は開発中です。
 - **AI会話：** 承認済みPersonaとのAI会話は任意で、別の同意が必要です。
@@ -204,6 +234,7 @@ service-worker retirement in this branch is deployed and checked.
 | "The browser and CLI verify without our backend" | "There is no trusted party" — the issuer is one |
 | "ENSv2 roles separate what the issuer and the participant can change" | Anything about ENSv2 beyond that role boundary |
 | "Private matching is designed to reveal only the overall result" | "Private matching works" — it has not passed acceptance tests |
+| "The design keeps preferences on the device instead of a profile database" | "Nothing about you is ever public" — ENS names, wallet addresses and transaction times are linkable |
 | "An AI Persona conversation exists in the AIBot app" | "It is integrated with matching" — the handoff is pending |
 
 ## Structure and provenance
