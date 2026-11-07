@@ -1,5 +1,9 @@
 import assert from "node:assert/strict";
 import {
+  createRegistrationBackup,
+  restoreRegistrationBackup,
+} from "../src/profile/registration-backup.ts";
+import {
   createRegistrationProof,
   restoreRegistrationPrivateMaterial,
   verifyRegistrationProof,
@@ -32,6 +36,27 @@ const restored = await restoreRegistrationPrivateMaterial(
 assert.deepEqual(restored, registration.privateMaterial);
 assert.deepEqual(restored.profile, request.profile);
 assert.equal(restored.salts.length, 7);
+const backup = await createRegistrationBackup(
+  restored,
+  "synthetic registration backup passphrase",
+);
+assert.equal(backup.ok, true);
+if (!backup.ok) throw new Error("Registration backup failed");
+assert.equal(backup.data.includes("hobbies"), false);
+assert.equal(backup.data.includes(restored.salts[0]), false);
+const restoredBackup = await restoreRegistrationBackup(
+  backup.data,
+  "synthetic registration backup passphrase",
+);
+assert.equal(restoredBackup.ok, true);
+if (restoredBackup.ok) assert.deepEqual(restoredBackup.data, restored);
+assert.deepEqual(
+  await restoreRegistrationBackup(
+    backup.data,
+    "incorrect synthetic passphrase",
+  ),
+  { ok: false, error: "INVALID_BACKUP" },
+);
 await assert.rejects(
   restoreRegistrationPrivateMaterial({ ...restored, salts: ["0"] }),
 );
