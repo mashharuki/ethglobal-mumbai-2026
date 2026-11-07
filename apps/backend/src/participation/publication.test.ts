@@ -113,6 +113,12 @@ describe("Arkiv participation publication", () => {
     const row: ParticipationPublicationRow = {
       $key: entityKey,
       $owner: "0x4444444444444444444444444444444444444444",
+      $creator: participationTrustAnchor.issuer,
+      $creationFlags: {
+        readonly: true,
+        permissionlessExtension: false,
+        raw: 1,
+      },
       issuance_id: str(`0x${"e".repeat(64)}`),
       credential_version: u64(1n),
       record_digest: str(digest),

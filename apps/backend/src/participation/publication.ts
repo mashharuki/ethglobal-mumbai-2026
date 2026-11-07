@@ -150,6 +150,8 @@ export type ParticipationPublicationRow = Pick<
   FullRow<typeof ParticipationPublications>,
   | "$key"
   | "$owner"
+  | "$creator"
+  | "$creationFlags"
   | "issuance_id"
   | "credential_version"
   | "record_digest"
@@ -182,6 +184,9 @@ export async function verifyPublicationReadback(
   if (
     row.$key.toLowerCase() !== reference.arkivEntityKey.toLowerCase() ||
     !isAddressEqual(row.$owner, trust.issuer) ||
+    !isAddressEqual(row.$creator, trust.issuer) ||
+    !row.$creationFlags.readonly ||
+    row.$creationFlags.permissionlessExtension ||
     row.media_type.value !== "application/json" ||
     row.credential_version.value !== BigInt(reference.credentialVersion)
   ) {
