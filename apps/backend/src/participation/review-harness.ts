@@ -260,6 +260,13 @@ harness.get("/__effective-review", async (c) => {
   });
 });
 
+harness.get("/__review-events", async (c) => {
+  const caseId = reviewCaseIdSchema.safeParse(c.req.query("id"));
+  if (!caseId.success) return c.text("invalid", 422);
+  const store = c.env.AUTH_STORE.getByName("review-ledger");
+  return c.json({ events: await store.getReviewEvents(caseId.data) });
+});
+
 harness.route("/", app);
 
 export { AuthStore };
