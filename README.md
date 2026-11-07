@@ -133,24 +133,25 @@ the parent name and Registry is not a decentralized guarantee.
 
 ## Verify it yourself
 
-| Participant | ENS name | Arkiv entity key | ENS reference tx |
+| Participant | ENS name | Arkiv entity at latest verification | ENS reference tx |
 |---|---|---|---|
-| Alice | `alice.secrettinder.eth` | `0x628a86b2b8d2ee96d9b91b92a9013f10ce67421e4792bf7911c46234d92ab5d6` | [Sepolia](https://sepolia.etherscan.io/tx/0xf95064e137e787ef2e8f16ee9d7a0b582be4e6f31afae1504e0b26a422df9b5a) |
+| Alice | `alice.secrettinder.eth` | `0xe71e5fc6e6da0cfc338f8ca32a304947bcb98a7af0245a09638a101bcb4cbe0e` (version 3) | [Sepolia](https://sepolia.etherscan.io/tx/0x536871ba2a6f9bf6116b0ec4c80a6638765172c4ffdf2c03d9ef70b465817f34) |
 | Bob | `bob.secrettinder.eth` | `0x4e253c8b29d21b401d99a970bfe8624d0d27bd835e49962006e8c1440d39c151` | [Sepolia](https://sepolia.etherscan.io/tx/0xc798656879bcb49a22eacae9bd3beb46e28911bf9e8ec6ea9e1c333b8f4e16a5) |
 
-Arkiv write transactions: [Alice](https://explorer.rabdi.arkiv.network/tx/0x9f5788fd0e4c5dc326c838bf5d5dd19a80a21503c7f3e92bde1ea3578b206399) · [Bob](https://explorer.rabdi.arkiv.network/tx/0x331de4e344cd021bbdc3b6d6bae95a1ab6fc6b5c78afe0a67a95d4c0fb214cbd).
+Arkiv write transactions: [Alice version 1](https://explorer.rabdi.arkiv.network/tx/0x9f5788fd0e4c5dc326c838bf5d5dd19a80a21503c7f3e92bde1ea3578b206399) · [Alice version 2](https://explorer.rabdi.arkiv.network/tx/0xd0d7b896dfcda8cf1bf5e886136630278fa77513a58228a2abac0e2c2a702f3b) · [Alice version 3](https://explorer.rabdi.arkiv.network/tx/0x466822cef9d77438c5912d8cd7a5c4ef1eff69c63f0f8bfa126fe35f9cb00f77) · [Bob version 1](https://explorer.rabdi.arkiv.network/tx/0x331de4e344cd021bbdc3b6d6bae95a1ab6fc6b5c78afe0a67a95d4c0fb214cbd).
 
 ```sh
 git submodule update --init --recursive
 pnpm install --frozen-lockfile
 
 # Independent read-only verifier: ENSv2 + Arkiv only, no backend code
-pnpm exec node scripts/verify-participation.ts alice 12080090
-pnpm exec node scripts/verify-participation.ts bob 12080090
+pnpm exec node scripts/verify-participation.ts alice 12080771
+pnpm exec node scripts/verify-participation.ts bob 12080771
 ```
 
-**Both names returned `eligible` at Sepolia block `12080090` with credential version `1`** on
-7 November 2026. The CLI checks registry and resolver provenance, scoped permissions, the Arkiv
+**At Sepolia block `12080771`, Alice returned `eligible` with version `3`, and Bob returned
+`eligible` with version `1`** on 7 November 2026. The CLI checks registry and resolver provenance,
+scoped permissions, the Arkiv
 entity and issuer signature, registration events, current owner and expiry. `ineligible` and
 `unavailable` are reported separately. Arkiv reads use its current state, so a historical Sepolia
 block is not an atomic cross-chain snapshot.
