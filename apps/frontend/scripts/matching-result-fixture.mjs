@@ -19,10 +19,11 @@ const fieldBytes = (value) =>
 const fieldValue = (value) => BigInt(`0x${Buffer.from(value).toString("hex")}`);
 const encodeField = (value) => `"0x${BigInt(value).toString(16)}"`;
 const api = await Barretenberg.new({ skipSrsInit: true });
-const profileB =
-  process.env.MATCHING_SCENARIO === "no-shared-hobby"
-    ? { ...fixture.participants.B, hobbies: ["h3"] }
-    : fixture.participants.B;
+const scenarioId = process.env.MATCHING_SCENARIO ?? "all-conditions";
+const scenario = fixture.matchingCases.find(({ id }) => id === scenarioId);
+if (!scenario) throw new Error(`Unknown matching scenario: ${scenarioId}`);
+const profileA = { ...fixture.participants.A, ...scenario.overrides?.A };
+const profileB = { ...fixture.participants.B, ...scenario.overrides?.B };
 
 try {
   const first = {
@@ -36,11 +37,7 @@ try {
     fieldValue(shared.x) === BigInt(readValue("output_second_x")) &&
     fieldValue(shared.y) === BigInt(readValue("output_second_y"));
   const compatible = !isZero;
-  const oracle = checkCandidate(
-    fixture.participants.A,
-    profileB,
-    fixture.dictionary,
-  );
+  const oracle = checkCandidate(profileA, profileB, fixture.dictionary);
   if (!oracle.ok || oracle.data !== compatible)
     throw new Error("Encrypted result differs from oracle");
   const transcriptValues = [

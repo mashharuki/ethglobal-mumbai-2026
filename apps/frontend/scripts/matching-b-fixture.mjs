@@ -23,13 +23,23 @@ const pointAt = (xs, ys, index) => ({
   y: fieldBytes(ys[index]),
 });
 const api = await Barretenberg.new({ skipSrsInit: true });
-const hasNoSharedHobby = process.env.MATCHING_SCENARIO === "no-shared-hobby";
-const profileB = hasNoSharedHobby
-  ? { ...fixture.participants.B, hobbies: ["h3"] }
-  : fixture.participants.B;
-const hobbyBits = hasNoSharedHobby
-  ? [0, 0, 1, 0, 0, 0, 0, 0]
-  : [0, 1, 1, 0, 0, 0, 0, 0];
+const scenarioId = process.env.MATCHING_SCENARIO ?? "all-conditions";
+const scenario = fixture.matchingCases.find(({ id }) => id === scenarioId);
+if (!scenario) throw new Error(`Unknown matching scenario: ${scenarioId}`);
+const profileB = { ...fixture.participants.B, ...scenario.overrides?.B };
+const bits = (selected, values) =>
+  values.map((value) =>
+    Number(selected.includes("*") || selected.includes(value)),
+  );
+const itemValues = [
+  bits(profileB.hobbies, fixture.dictionary.hobbies),
+  bits([profileB.gender], fixture.dictionary.genders),
+  bits([profileB.intent], fixture.dictionary.intents),
+  bits(profileB.acceptsGenders, fixture.dictionary.genders),
+  bits(profileB.acceptsIntents, fixture.dictionary.intents),
+  [202],
+  [302],
+];
 
 try {
   const firstX = readValue("first_x");
@@ -95,15 +105,6 @@ try {
       ).hash,
     );
   const context = [1, 1, 42, 0, 52, 0, 1];
-  const itemValues = [
-    hobbyBits,
-    [0, 1, 0],
-    [0, 1],
-    [1, 0, 0],
-    [1, 0],
-    [202],
-    [302],
-  ];
   const commitments = [];
   for (let index = 0; index < 7; index += 1) {
     commitments.push(
@@ -119,11 +120,11 @@ try {
 
   const lines = [
     "# Synthetic fixture only. The scalars are public test data.",
-    `hobbies = ${JSON.stringify(hobbyBits)}`,
-    "gender = [0, 1, 0]",
-    "intent = [0, 1]",
-    "accepts_gender = [1, 0, 0]",
-    "accepts_intent = [1, 0]",
+    `hobbies = ${JSON.stringify(itemValues[0])}`,
+    `gender = ${JSON.stringify(itemValues[1])}`,
+    `intent = ${JSON.stringify(itemValues[2])}`,
+    `accepts_gender = ${JSON.stringify(itemValues[3])}`,
+    `accepts_intent = ${JSON.stringify(itemValues[4])}`,
     "job = 202",
     "age_band = 302",
     "salts = [21, 22, 23, 24, 25, 26, 27]",

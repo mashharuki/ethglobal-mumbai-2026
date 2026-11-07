@@ -14,13 +14,26 @@ const pointValue = (point) => ({
 });
 const encodeField = (value) => `"0x${value.toString(16)}"`;
 const api = await Barretenberg.new({ skipSrsInit: true });
+const scenarioId = process.env.MATCHING_SCENARIO ?? "all-conditions";
+const scenario = fixture.matchingCases.find(({ id }) => id === scenarioId);
+if (!scenario) throw new Error(`Unknown matching scenario: ${scenarioId}`);
+const profileA = { ...fixture.participants.A, ...scenario.overrides?.A };
+const bits = (selected, values) =>
+  values.map((value) =>
+    Number(selected.includes("*") || selected.includes(value)),
+  );
+const values = [
+  bits(profileA.hobbies, fixture.dictionary.hobbies),
+  bits([profileA.gender], fixture.dictionary.genders),
+  bits([profileA.intent], fixture.dictionary.intents),
+  bits(profileA.acceptsGenders, fixture.dictionary.genders),
+  bits(profileA.acceptsIntents, fixture.dictionary.intents),
+  [201],
+  [301],
+];
 
 try {
-  const vectorResult = deriveVector(
-    fixture.participants.A,
-    "A",
-    fixture.dictionary,
-  );
+  const vectorResult = deriveVector(profileA, "A", fixture.dictionary);
   if (!vectorResult.ok) throw new Error(vectorResult.error);
   const publicKey = (
     await api.grumpkinMul({
@@ -29,6 +42,28 @@ try {
     })
   ).point;
   const key = pointValue(publicKey);
+  const valueHash = async (items) =>
+    fieldValue(
+      (
+        await api.pedersenHash({
+          inputs: items.map(fieldBytes),
+          hashIndex: 0,
+        })
+      ).hash,
+    );
+  const context = [1, 1, 41, 0, 51, 0, 1];
+  const commitments = [];
+  for (let index = 0; index < values.length; index += 1) {
+    commitments.push(
+      await valueHash([
+        101 + index,
+        ...context,
+        11 + index,
+        await valueHash(values[index]),
+      ]),
+    );
+  }
+  const root = await valueHash([9001, ...commitments]);
   const firstX = [];
   const firstY = [];
   const secondX = [];
@@ -81,11 +116,11 @@ try {
 
   const lines = [
     "# Synthetic fixture only. All scalar values below are public test data.",
-    "hobbies = [1, 1, 0, 0, 0, 0, 0, 0]",
-    "gender = [1, 0, 0]",
-    "intent = [1, 0]",
-    "accepts_gender = [0, 1, 0]",
-    "accepts_intent = [0, 1]",
+    `hobbies = ${JSON.stringify(values[0])}`,
+    `gender = ${JSON.stringify(values[1])}`,
+    `intent = ${JSON.stringify(values[2])}`,
+    `accepts_gender = ${JSON.stringify(values[3])}`,
+    `accepts_intent = ${JSON.stringify(values[4])}`,
     "job = 201",
     "age_band = 301",
     "salts = [11, 12, 13, 14, 15, 16, 17]",
@@ -102,7 +137,7 @@ try {
     "issuance_lo = 51",
     "issuance_hi = 0",
     "profile_version = 1",
-    'root = "0x105c14d1f8f4dc5e31a9277a47489ed9dac4fc16515c6f3eefdf16ebd6f9cc2d"',
+    `root = ${encodeField(root)}`,
     "session_digest = 73",
     `public_key_x = ${encodeField(key.x)}`,
     `public_key_y = ${encodeField(key.y)}`,
