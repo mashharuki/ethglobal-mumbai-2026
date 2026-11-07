@@ -190,7 +190,7 @@ app.onError((_error, c) => {
   return sendError(c, 503, "UNAVAILABLE");
 });
 
-export { AuthStore };
 export { SearchCoordinator } from "./search/room.ts";
 export { SimulationDateRequestStore } from "./simulation/date-request-store.ts";
+export { AuthStore };
 export default app;

@@ -7,7 +7,10 @@
     "bindings": [
       { "name": "AUTH_STORE", "class_name": "AuthStore" },
       { "name": "SEARCH_COORDINATOR", "class_name": "SearchCoordinator" },
-      { "name": "SIMULATION_DATE_REQUESTS", "class_name": "SimulationDateRequestStore" }
+      {
+        "name": "SIMULATION_DATE_REQUESTS",
+        "class_name": "SimulationDateRequestStore"
+      }
     ]
   },
   "migrations": [

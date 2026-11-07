@@ -1,7 +1,11 @@
 // Local Wrangler entry point used only by review-api.test.ts; wrangler.jsonc still deploys src/index.ts.
 import { Hono } from "hono";
 import { authChallengeRequestSchema, reviewCaseIdSchema } from "shared";
-import app, { AuthStore } from "../index.ts";
+import app, {
+  AuthStore,
+  SearchCoordinator,
+  SimulationDateRequestStore,
+} from "../index.ts";
 import {
   appealReview,
   beginReview,
@@ -269,5 +273,5 @@ harness.get("/__review-events", async (c) => {
 
 harness.route("/", app);
 
-export { AuthStore };
+export { AuthStore, SearchCoordinator, SimulationDateRequestStore };
 export default harness;
