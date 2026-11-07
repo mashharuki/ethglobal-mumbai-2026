@@ -113,6 +113,7 @@ function matchesParticipant(
   participant: MatchContext["first"],
   context: MatchContext,
   digest: bigint,
+  expectedLength: 12 | 16,
 ): boolean {
   const [subjectLo, subjectHi] = splitId(participant.subjectId);
   const [issuanceLo, issuanceHi] = splitId(participant.issuanceId);
@@ -130,7 +131,8 @@ function matchesParticipant(
     BigInt(context.publicKeyY),
   ];
   return (
-    inputs.length === 12 && expected.every((value, i) => inputs[i] === value)
+    inputs.length === expectedLength &&
+    expected.every((value, i) => inputs[i] === value)
   );
 }
 
@@ -170,14 +172,17 @@ export function checkMatchProofContext(
   const digest = getMatchSessionDigest(context);
   const isBound =
     digest !== 0n &&
-    matchesParticipant(inputs.a, context.first, context, digest) &&
-    matchesParticipant(inputs.b, context.second, context, digest) &&
+    matchesParticipant(inputs.a, context.first, context, digest, 12) &&
+    matchesParticipant(inputs.b, context.second, context, digest, 16) &&
     inputs.result.length === 10 &&
     inputs.result[0] === digest &&
     inputs.a[11] === inputs.b[11] &&
     inputs.b[11] === inputs.result[1] &&
     inputs.result[2] === BigInt(context.publicKeyX) &&
-    inputs.result[3] === BigInt(context.publicKeyY);
+    inputs.result[3] === BigInt(context.publicKeyY) &&
+    [0, 1, 2, 3].every(
+      (index) => inputs.b[12 + index] === inputs.result[4 + index],
+    );
   return isBound
     ? { ok: true, data: { sessionDigest: digest } }
     : { ok: false, error: "PROOF_CONTEXT_MISMATCH" };

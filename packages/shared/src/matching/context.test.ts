@@ -60,16 +60,16 @@ function proofInputs(context: MatchContext): MatchProofInputs {
   ];
   return {
     a: participant(context.first),
-    b: participant(context.second),
+    b: [...participant(context.second), 101n, 102n, 103n, 104n],
     result: [
       digest,
       999n,
       BigInt(context.publicKeyX),
       BigInt(context.publicKeyY),
-      0n,
-      0n,
-      0n,
-      0n,
+      101n,
+      102n,
+      103n,
+      104n,
       0n,
       1n,
     ],
@@ -79,6 +79,8 @@ function proofInputs(context: MatchContext): MatchProofInputs {
 describe("matching proof context", () => {
   it("should accept the original ordered, unexpired proof claims", () => {
     const context = makeContext();
+    assert.equal(proofInputs(context).a.length, 12);
+    assert.equal(proofInputs(context).b.length, 16);
     const result = checkMatchProofContext(
       context,
       proofInputs(context),
@@ -137,6 +139,19 @@ describe("matching proof context", () => {
     const context = makeContext();
     const original = proofInputs(context);
     const mixed = { ...original, b: [...original.b.slice(0, 11), 998n] };
+    assert.deepEqual(checkMatchProofContext(context, mixed, 1_900_000_000), {
+      ok: false,
+      error: "PROOF_CONTEXT_MISMATCH",
+    });
+  });
+
+  it("should reject a B output mixed with another result proof", () => {
+    const context = makeContext();
+    const original = proofInputs(context);
+    const mixed = {
+      ...original,
+      b: [...original.b.slice(0, 12), 998n, ...original.b.slice(13)],
+    };
     assert.deepEqual(checkMatchProofContext(context, mixed, 1_900_000_000), {
       ok: false,
       error: "PROOF_CONTEXT_MISMATCH",
