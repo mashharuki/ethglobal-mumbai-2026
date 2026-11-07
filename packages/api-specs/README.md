@@ -24,11 +24,16 @@ pnpm exec biome ci .
 `JAVA_BIN` may be omitted when `java` on `PATH` is version 17 or newer.
 `OPENAPI_GENERATOR_JAR` may point to the same pinned JAR elsewhere. The script
 checks its SHA-256, generates into a temporary directory, and replaces only
-TypeScript files in `packages/shared/src/generated/`. It normalizes trailing
-whitespace so `git diff --check` passes. Its `client.ts` is a copy
+TypeScript files in `packages/shared/src/generated/`. A narrow postprocessor
+removes unused generator imports, expands runtime parameter properties for
+TypeScript 7 `erasableSyntaxOnly`, and normalizes trailing whitespace. Its
+`client.ts` is a copy
 of the generator's `index.ts`; all files in that directory are generated and
 must never be hand-edited. The generator emits API classes, models and a Fetch
 runtime. Biome excludes this generated directory; `check-types` still checks it.
+The generator's `withoutRuntimeChecks` mode keeps the client small and typed,
+but it does not validate untrusted response payloads at runtime. Callers must
+validate at their trust boundary before making authorization decisions.
 
 The generated runtime defaults to `/v1`. OpenAPI Generator 7.26.0 does not
 apply the operation-level AIBot server URL to `AIBotMetadataApi`, so a parent

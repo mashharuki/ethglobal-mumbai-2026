@@ -13,26 +13,11 @@
  */
 
 import * as runtime from '../runtime.js';
-import {
-    type ApiError,
-    ApiErrorFromJSON,
-    ApiErrorToJSON,
-} from '../models/ApiError.js';
-import {
-    type AuthChallenge,
-    AuthChallengeFromJSON,
-    AuthChallengeToJSON,
-} from '../models/AuthChallenge.js';
-import {
-    type AuthChallengeRequest,
-    AuthChallengeRequestFromJSON,
-    AuthChallengeRequestToJSON,
-} from '../models/AuthChallengeRequest.js';
-import {
-    type AuthSessionRequest,
-    AuthSessionRequestFromJSON,
-    AuthSessionRequestToJSON,
-} from '../models/AuthSessionRequest.js';
+import type {
+    AuthChallenge,
+    AuthChallengeRequest,
+    AuthSessionRequest,
+} from '../models/index.js';
 
 export interface CreateAuthChallengeRequest {
     /**
@@ -78,7 +63,7 @@ export class AuthenticationApi extends runtime.BaseAPI {
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-            body: AuthChallengeRequestToJSON(requestParameters['authChallengeRequest']),
+            body: requestParameters['authChallengeRequest'],
         };
     }
 
@@ -89,7 +74,7 @@ export class AuthenticationApi extends runtime.BaseAPI {
         const requestOptions = await this.createAuthChallengeRequestOpts(requestParameters);
         const response = await this.request(requestOptions, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => AuthChallengeFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response);
     }
 
     /**
@@ -125,7 +110,7 @@ export class AuthenticationApi extends runtime.BaseAPI {
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-            body: AuthSessionRequestToJSON(requestParameters['authSessionRequest']),
+            body: requestParameters['authSessionRequest'],
         };
     }
 

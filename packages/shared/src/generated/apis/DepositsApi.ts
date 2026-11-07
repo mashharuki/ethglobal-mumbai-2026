@@ -13,16 +13,9 @@
  */
 
 import * as runtime from '../runtime.js';
-import {
-    type ApiError,
-    ApiErrorFromJSON,
-    ApiErrorToJSON,
-} from '../models/ApiError.js';
-import {
-    type OwnerDeposit,
-    OwnerDepositFromJSON,
-    OwnerDepositToJSON,
-} from '../models/OwnerDeposit.js';
+import type {
+    OwnerDeposit,
+} from '../models/index.js';
 
 export interface GetDepositRequest {
     /**
@@ -70,7 +63,7 @@ export class DepositsApi extends runtime.BaseAPI {
         const requestOptions = await this.getDepositRequestOpts(requestParameters);
         const response = await this.request(requestOptions, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => OwnerDepositFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response);
     }
 
     /**

@@ -13,26 +13,11 @@
  */
 
 import * as runtime from '../runtime.js';
-import {
-    type ApiError,
-    ApiErrorFromJSON,
-    ApiErrorToJSON,
-} from '../models/ApiError.js';
-import {
-    type SearchLease,
-    SearchLeaseFromJSON,
-    SearchLeaseToJSON,
-} from '../models/SearchLease.js';
-import {
-    type SearchLeaseRenewal,
-    SearchLeaseRenewalFromJSON,
-    SearchLeaseRenewalToJSON,
-} from '../models/SearchLeaseRenewal.js';
-import {
-    type SearchLeaseRequest,
-    SearchLeaseRequestFromJSON,
-    SearchLeaseRequestToJSON,
-} from '../models/SearchLeaseRequest.js';
+import type {
+    SearchLease,
+    SearchLeaseRenewal,
+    SearchLeaseRequest,
+} from '../models/index.js';
 
 export interface CloseSearchLeaseRequest {
     /**
@@ -218,7 +203,7 @@ export class SearchApi extends runtime.BaseAPI {
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-            body: SearchLeaseRequestToJSON(requestParameters['searchLeaseRequest']),
+            body: requestParameters['searchLeaseRequest'],
         };
     }
 
@@ -229,7 +214,7 @@ export class SearchApi extends runtime.BaseAPI {
         const requestOptions = await this.createSearchLeaseRequestOpts(requestParameters);
         const response = await this.request(requestOptions, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => SearchLeaseFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response);
     }
 
     /**
@@ -284,7 +269,7 @@ export class SearchApi extends runtime.BaseAPI {
             method: 'PATCH',
             headers: headerParameters,
             query: queryParameters,
-            body: SearchLeaseRenewalToJSON(requestParameters['searchLeaseRenewal']),
+            body: requestParameters['searchLeaseRenewal'],
         };
     }
 
@@ -295,7 +280,7 @@ export class SearchApi extends runtime.BaseAPI {
         const requestOptions = await this.renewSearchLeaseRequestOpts(requestParameters);
         const response = await this.request(requestOptions, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => SearchLeaseFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response);
     }
 
     /**

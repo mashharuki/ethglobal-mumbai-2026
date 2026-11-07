@@ -13,31 +13,12 @@
  */
 
 import * as runtime from '../runtime.js';
-import {
-    type AcceptedOperation,
-    AcceptedOperationFromJSON,
-    AcceptedOperationToJSON,
-} from '../models/AcceptedOperation.js';
-import {
-    type ApiError,
-    ApiErrorFromJSON,
-    ApiErrorToJSON,
-} from '../models/ApiError.js';
-import {
-    type PrivateOperation,
-    PrivateOperationFromJSON,
-    PrivateOperationToJSON,
-} from '../models/PrivateOperation.js';
-import {
-    type PublicRegistration,
-    PublicRegistrationFromJSON,
-    PublicRegistrationToJSON,
-} from '../models/PublicRegistration.js';
-import {
-    type RegistrationRequest,
-    RegistrationRequestFromJSON,
-    RegistrationRequestToJSON,
-} from '../models/RegistrationRequest.js';
+import type {
+    AcceptedOperation,
+    PrivateOperation,
+    PublicRegistration,
+    RegistrationRequest,
+} from '../models/index.js';
 
 export interface CreateRegistrationRequest {
     /**
@@ -105,7 +86,7 @@ export class RegistrationsApi extends runtime.BaseAPI {
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-            body: RegistrationRequestToJSON(requestParameters['registrationRequest']),
+            body: requestParameters['registrationRequest'],
         };
     }
 
@@ -116,7 +97,7 @@ export class RegistrationsApi extends runtime.BaseAPI {
         const requestOptions = await this.createRegistrationRequestOpts(requestParameters);
         const response = await this.request(requestOptions, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => AcceptedOperationFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response);
     }
 
     /**
@@ -161,7 +142,7 @@ export class RegistrationsApi extends runtime.BaseAPI {
         const requestOptions = await this.getOperationRequestOpts(requestParameters);
         const response = await this.request(requestOptions, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => PrivateOperationFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response);
     }
 
     /**
@@ -206,7 +187,7 @@ export class RegistrationsApi extends runtime.BaseAPI {
         const requestOptions = await this.getPublicRegistrationRequestOpts(requestParameters);
         const response = await this.request(requestOptions, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => PublicRegistrationFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response);
     }
 
     /**
