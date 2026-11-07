@@ -66,7 +66,17 @@ Honoバックエンドを起動せず、Viteのローカル画面から`Particip
 
 `scripts/plan-participation-revision.ts`は`draft`→`publication`→`reference`の順に、外部書込なしで計画を生成する。入力JSONは`label`、`action: {"type":"suspend","until":<Unix秒>}`または`{"type":"restore"}`。`publication`には新版の`signedRevisionPath`、`reference`にはさらにArkiv書込後の`arkivEntityKey`を指定する。`draft`では現行ENS/Arkivを直接読み、現行参照の版・digest、所有者、登録receiptとresourceを照合してEIP-712署名用データを出す。`publication`はそのドラフトと新版署名を照合してArkivの読取専用entity作成値を出す。`reference`は指定entityをArkivから読み戻し、発行者・所有者・不変属性・版・digest・署名を確認した場合だけ、ENSの`app.credential`更新calldataを出す。各段階の出力には観測ENS blockと更新前参照を含める。取引送信や署名操作はしない。
 
-実Aliceの現行公開状態をblock`12080307`で読み、有限停止期限`1794503600`を指定した`draft`は資格版`2`、`status=suspended`、EIP-712 message digest `0x98a196785a10cf94e44d6fdd9a10e44d498e76f96fe5e558719809a2cd212d6f`を生成した。既存版`1`のAlice署名済み資格を`publication`入力として再利用した場合は`ineligible/REVISION_MISMATCH`で終了し、書込計画を出さなかった。Sepolia RPCを到達不能URLにした`draft`は`unavailable/ENS_UNAVAILABLE`で終了した。`apps/backend/src/participation/revision-flow.test.ts`の6件を含めBackendは27件合格。新版の実署名・Arkiv書込・ENS更新は行っていない。
+実Aliceの現行公開状態をblock`12080307`で読み、有限停止期限`1794503600`を指定した`draft`は資格版`2`、`status=suspended`、EIP-712 message digest `0x98a196785a10cf94e44d6fdd9a10e44d498e76f96fe5e558719809a2cd212d6f`を生成した。既存版`1`のAlice署名済み資格を`publication`入力として再利用した場合は`ineligible/REVISION_MISMATCH`で終了し、書込計画を出さなかった。Sepolia RPCを到達不能URLにした`draft`は`unavailable/ENS_UNAVAILABLE`で終了した。`apps/backend/src/participation/revision-flow.test.ts`の6件を含めBackendは27件合格。実チェーンの停止は下記で別途検証した。
+
+### Aliceの実チェーン版2停止（2026-11-07 02:36 UTC）
+
+[有限停止→回復の固定計画](ens-alice-suspension-recovery-plan.md)に基づき、発行者がMetaMask FlaskでAlice版`2`のEIP-712を署名した。署名は`verifyParticipationSignature`で固定発行者・発行ID・資格版・期限・message digest `0x98a196785a10cf94e44d6fdd9a10e44d498e76f96fe5e558719809a2cd212d6f`を再検証した。版`1`の署名を版`2`として流用する試行は`REVISION_MISMATCH`で拒否された。
+
+Arkiv Rabdiへの[版2書込](https://explorer.rabdi.arkiv.network/tx/0xd0d7b896dfcda8cf1bf5e886136630278fa77513a58228a2abac0e2c2a702f3b)はblock`316467`でreceipt `success`、gas使用量`204,980`、gas価格`2 gwei`だった。取引sender/宛先/nonce`3`/calldata/送金額`0`を固定計画と照合した。`EntityCreated`の発行者owner、read-only属性と新entity key`0xc7b963327b9a3d58587038e7323df2f9da97e83f4062896a4e5a2c9e53986375`を確認し、SDKのentity読戻しで資格本文・署名・版`2`・record digest`0x4f804ca73c9a00ed12108fc19890b373f4f3fe7d6b4d40bf2fd607b0617bd1c5`を照合した。発行IDでのArkiv索引検索にも版`1`と版`2`の両行が返った。
+
+その後にのみ、Alice専用Resolverの`app.credential`を[Sepolia取引](https://sepolia.etherscan.io/tx/0xa04578be2a72106eaa5dab3cc3af6eec7d5126ffe8609ea682861e835973610e)で版`2`entityへ更新した。block`12080730`でreceipt `success`、gas使用量`124,355`、gas価格`2 gwei`。送信者/Resolver宛先/nonce`30`/`setText` calldata/送金額`0`は計画と一致した。同じblockのENS読戻しでentity key・digest・資格版`2`が一致し、独立CLIの署名・所有者・発行イベント・権限・Arkiv行検証を通過して`status=suspended`、`suspendedUntil=1794503600`を返した。
+
+公開Vercelの「Verify Alice」をブラウザーで操作すると、`alice.secrettinder.eth : Ineligible Sepolia block 12080734 · Credential version 2 Reason: SUSPENDED`と表示された。同じSepolia block`12080734`を指定した独立CLI `node scripts/verify-participation.ts alice 12080734`は`{"verdict":"ineligible","reason":"SUSPENDED","ensBlockNumber":"12080734","credentialVersion":2}`、exit 0を返した。比較時にBFFは使用していない。Arkiv読取はその時点の現行entityを参照するため、SepoliaとArkivの原子的な同block snapshotではない。版`3`の回復はこの時点では未実施で、停止は合成参加者Aliceに対する手動実証であり審査決定に連動した停止ではない。
 
 ### 初回発行の計画ゲート（2026-11-07追加）
 
@@ -78,8 +88,8 @@ Aliceの既存公開資格では、従来の4引数`draft`がblock`12080394`で�
 
 ## 残る合格条件
 
-- T038: 有限停止/回復の発行者側オフライン計画、既存デプロイの読取専用権限試験、ローカルforkでの委任鍵失効を確認済み。新版の発行者署名・Arkiv書込・ENS参照更新、実チェーンでの委任鍵の発行/失効、本人ウォレットからの限定キー実更新は未実施。
-- T039: Web/CLIの正常系比較とBFF停止時のWeb動作は上記の通り実測済み。旧版・別発行者・Arkiv行ID不一致・障害分類、合成停止期限の判定は両実装の自動テストで確認済み。再発行後の実ENSイベント照合、Web画面での障害/停止表示、有限停止の両実装での実演は未完了。
+- T038: 版`2`有限停止の発行者署名→Arkiv書込→ENS参照更新と読戻し、既存デプロイの読取専用権限試験、ローカルforkでの委任鍵失効を確認済み。版`3`回復、実チェーンでの委任鍵の発行/失効、本人ウォレットからの限定キー実更新は未実施。
+- T039: Web/CLIの正常系比較、BFF停止時のWeb動作、実版`2`停止の同block比較は実測済み。旧版・別発行者・Arkiv行ID不一致・障害分類、合成停止期限の判定は両実装の自動テストで確認済み。再発行後の実ENSイベント照合、Web画面での障害表示、版`3`回復の両実装での実演は未完了。
 - T041/T042/T034: 審査停止・異議・回復、SC-005/007の総合判定と提出用証拠。
 
 発行者には親名と参加者Registryを管理する権限が残る。親やResolver実装の変更を検証者が追跡する必要がある。[ENSv2の権限モデル](https://docs.ens.domains/ensv2/enhanced-access-control/)に従い、名前のownerだけではroot権限や発行者署名を代替できない。現段階では段階Aの部分達成であり、SC-005合格やENS賞の応募条件達成とは判定しない。
