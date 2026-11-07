@@ -1,3 +1,4 @@
+import { execFileSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import {
   computeMatchCiphertextDigest,
@@ -5,10 +6,20 @@ import {
   verifyNoirMatchCircuit,
 } from "../src/search/noir-match-engine.ts";
 
-// Generate the ignored TOML fixtures from committed synthetic profiles.
-await import("./matching-a-fixture.mjs");
-await import("./matching-b-fixture.mjs");
-await import("./matching-result-fixture.mjs");
+// Generate ignored TOML fixtures in separate processes so the Noir and BB.js
+// module loaders used by the proof test start with a clean runtime.
+for (const name of ["matching-a", "matching-b", "matching-result"]) {
+  execFileSync(
+    process.execPath,
+    [
+      "--experimental-strip-types",
+      new URL(`./${name}-fixture.mjs`, import.meta.url).pathname,
+    ],
+    {
+      stdio: "inherit",
+    },
+  );
+}
 
 const digestOnly = process.argv.includes("--digest-only");
 const resultOnly = process.argv.includes("--result-only");
