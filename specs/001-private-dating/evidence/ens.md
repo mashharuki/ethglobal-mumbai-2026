@@ -56,15 +56,37 @@ Honoバックエンドを起動せず、Viteのローカル画面から`Particip
 
 `apps/backend/src/participation/revision.test.ts`は上記Aliceの実署名資格・現行ENS参照・信頼設定を入力とし、期限付き停止と復帰の署名前ドラフトが資格版`2`になることを確認した。旧版、再発行ID不一致、発行者改ざん、無効な停止期限、資格期限ちょうどを拒否する。`pnpm --filter backend test`は21件合格。ドラフトは署名・Arkiv公開・ENS参照更新を実行せず、実効停止を証明しない。
 
-`scripts/verify-participation.test.ts`はWebとCLIそれぞれの独立した資格照合処理へ同じ実署名fixtureを渡し、正常系と旧版、Arkiv行の発行ID不一致、発行者改ざんを検査した。ENS/Arkiv通信エラーがそれぞれ`ENS_UNAVAILABLE`/`ARKIV_UNAVAILABLE`になることも検査した。`node --test scripts/verify-participation.test.ts`は10件合格。これらは純粋な照合・エラー分類のテストであり、再発行後の実ENSイベント照合やブラウザー画面での停止表示の実演ではない。
+`scripts/verify-participation.test.ts`はWebとCLIそれぞれの独立した資格照合処理へ同じ実署名fixtureを渡し、正常系と旧版、Arkiv行の発行ID不一致、発行者改ざんを検査した。ENS/Arkiv通信エラーがそれぞれ`ENS_UNAVAILABLE`/`ARKIV_UNAVAILABLE`になることも検査した。停止期限の直前とちょうど、停止終了後の基礎資格期限切れも両実装で確認した。`node --test scripts/verify-participation.test.ts`は14件合格。停止の入力は合成fixtureであり、実署名された停止新版のネットワーク実演ではない。
 
-`apps/contract/test/ParticipationPermissions.ts`は固定block`12078653`の既存ENSv2デプロイに対し、**読取専用**の`eth_call`で権限と実行可否を検査する。`RUN_ENS_PERMISSION_TESTS=1 node --test apps/contract/test/ParticipationPermissions.ts`は4件合格した。Aliceの`app.endpoint`/`app.key`更新は成功し、本人・Bobの資格キー更新、BobによるAliceのendpoint更新、AliceのResolver差替え・safe transfer・権限再付与はrevertした。CI通常実行では外部RPCに依存しないよう、この実ネットワーク試験はskipする。委任鍵失効と実署名取引は未検査。
+`apps/contract/test/ParticipationPermissions.ts`は固定block`12078653`の既存ENSv2デプロイに対し、**読取専用**の`eth_call`で権限と実行可否を検査する。`RUN_ENS_PERMISSION_TESTS=1 node --test apps/contract/test/ParticipationPermissions.ts`は4件合格した。Aliceの`app.endpoint`/`app.key`更新は成功し、本人・Bobの資格キー更新、BobによるAliceのendpoint更新、AliceのResolver差替え・safe transfer・権限再付与はrevertした。CI通常実行では外部RPCに依存しないよう、この実ネットワーク試験はskipする。
+
+`apps/contract/test/ParticipationDelegationFork.ts`はSepoliaのblock`12080300`をローカルHardhatへforkし、発行者アカウントを**ローカルでのみ**模擬した。Alice Resolverの`app.endpoint` setterをテスト鍵へ付与すると、その鍵でAliceの同キー更新だけが通り、`app.credential`とBobの同キー更新はrevertした。ローカル`revokeRoles`後はAliceの同キーもrevertし、roleが0へ戻ることを確認した。`RUN_ENS_FORK_TESTS=1 pnpm --filter contract test`は6件合格。fork内の取引hashはSepoliaの実取引ではなく、本人鍵の所持証明や実チェーンでの委任/失効ではない。
 
 ### 発行者側の停止・回復計画
 
 `scripts/plan-participation-revision.ts`は`draft`→`publication`→`reference`の順に、外部書込なしで計画を生成する。入力JSONは`label`、`action: {"type":"suspend","until":<Unix秒>}`または`{"type":"restore"}`。`publication`には新版の`signedRevisionPath`、`reference`にはさらにArkiv書込後の`arkivEntityKey`を指定する。`draft`では現行ENS/Arkivを直接読み、現行参照の版・digest、所有者、登録receiptとresourceを照合してEIP-712署名用データを出す。`publication`はそのドラフトと新版署名を照合してArkivの読取専用entity作成値を出す。`reference`は指定entityをArkivから読み戻し、発行者・所有者・不変属性・版・digest・署名を確認した場合だけ、ENSの`app.credential`更新calldataを出す。各段階の出力には観測ENS blockと更新前参照を含める。取引送信や署名操作はしない。
 
-実Aliceの現行公開状態をblock`12080307`で読み、有限停止期限`1794503600`を指定した`draft`は資格版`2`、`status=suspended`、EIP-712 message digest `0x98a196785a10cf94e44d6fdd9a10e44d498e76f96fe5e558719809a2cd212d6f`を生成した。既存版`1`のAlice署名済み資格を`publication`入力として再利用した場合は`ineligible/REVISION_MISMATCH`で終了し、書込計画を出さなかった。Sepolia RPCを到達不能URLにした`draft`は`unavailable/ENS_UNAVAILABLE`で終了した。`apps/backend/src/participation/revision-flow.test.ts`の6件を含めBackendは27件合格。新版の実署名・Arkiv書込・ENS更新は行っていない。
+実Aliceの現行公開状態をblock`12080307`で読み、有限停止期限`1794503600`を指定した`draft`は資格版`2`、`status=suspended`、EIP-712 message digest `0x98a196785a10cf94e44d6fdd9a10e44d498e76f96fe5e558719809a2cd212d6f`を生成した。既存版`1`のAlice署名済み資格を`publication`入力として再利用した場合は`ineligible/REVISION_MISMATCH`で終了し、書込計画を出さなかった。Sepolia RPCを到達不能URLにした`draft`は`unavailable/ENS_UNAVAILABLE`で終了した。`apps/backend/src/participation/revision-flow.test.ts`の6件を含めBackendは27件合格。実チェーンの停止は下記で別途検証した。
+
+### Aliceの実チェーン版2停止（2026-11-07 02:36 UTC）
+
+[有限停止→回復の固定計画](ens-alice-suspension-recovery-plan.md)に基づき、発行者がMetaMask FlaskでAlice版`2`のEIP-712を署名した。署名は`verifyParticipationSignature`で固定発行者・発行ID・資格版・期限・message digest `0x98a196785a10cf94e44d6fdd9a10e44d498e76f96fe5e558719809a2cd212d6f`を再検証した。版`1`の署名を版`2`として流用する試行は`REVISION_MISMATCH`で拒否された。
+
+Arkiv Rabdiへの[版2書込](https://explorer.rabdi.arkiv.network/tx/0xd0d7b896dfcda8cf1bf5e886136630278fa77513a58228a2abac0e2c2a702f3b)はblock`316467`でreceipt `success`、gas使用量`204,980`、gas価格`2 gwei`だった。取引sender/宛先/nonce`3`/calldata/送金額`0`を固定計画と照合した。`EntityCreated`の発行者owner、read-only属性と新entity key`0xc7b963327b9a3d58587038e7323df2f9da97e83f4062896a4e5a2c9e53986375`を確認し、SDKのentity読戻しで資格本文・署名・版`2`・record digest`0x4f804ca73c9a00ed12108fc19890b373f4f3fe7d6b4d40bf2fd607b0617bd1c5`を照合した。発行IDでのArkiv索引検索にも版`1`と版`2`の両行が返った。
+
+その後にのみ、Alice専用Resolverの`app.credential`を[Sepolia取引](https://sepolia.etherscan.io/tx/0xa04578be2a72106eaa5dab3cc3af6eec7d5126ffe8609ea682861e835973610e)で版`2`entityへ更新した。block`12080730`でreceipt `success`、gas使用量`124,355`、gas価格`2 gwei`。送信者/Resolver宛先/nonce`30`/`setText` calldata/送金額`0`は計画と一致した。同じblockのENS読戻しでentity key・digest・資格版`2`が一致し、独立CLIの署名・所有者・発行イベント・権限・Arkiv行検証を通過して`status=suspended`、`suspendedUntil=1794503600`を返した。
+
+公開Vercelの「Verify Alice」をブラウザーで操作すると、`alice.secrettinder.eth : Ineligible Sepolia block 12080734 · Credential version 2 Reason: SUSPENDED`と表示された。同じSepolia block`12080734`を指定した独立CLI `node scripts/verify-participation.ts alice 12080734`は`{"verdict":"ineligible","reason":"SUSPENDED","ensBlockNumber":"12080734","credentialVersion":2}`、exit 0を返した。比較時にBFFは使用していない。Arkiv読取はその時点の現行entityを参照するため、SepoliaとArkivの原子的な同block snapshotではない。版`3`の回復はこの時点では未実施で、停止は合成参加者Aliceに対する手動実証であり審査決定に連動した停止ではない。
+
+### Aliceの実チェーン版3回復（2026-11-07 02:42 UTC）
+
+版`2`が現行ENS参照となりWeb/CLIで`SUSPENDED`を確認した後、同じ発行ID・主体・期限の版`3`ドラフトを再生成した。固定計画のmessage digest `0x078ea88bec2684ad0ad8a86cfc7dc7ae5a4d03b96eeee2d91182efe9d7fd0d09`と一致し、`eligible`、`suspendedUntil=null`となった。発行者がMetaMask FlaskでEIP-712へ署名し、保存した署名の復元発行者・本文全項目・資格版・期限・digestを独立検証した。版`3`のrecord digestは`0x5a4b12a165876147c050bdfe36968a233f16eb077fd8c7b60cfc75f23bce6f15`。
+
+Arkiv Rabdiの[版3書込](https://explorer.rabdi.arkiv.network/tx/0x466822cef9d77438c5912d8cd7a5c4ef1eff69c63f0f8bfa126fe35f9cb00f77)はblock`316696`でreceipt `success`、nonce`4`、gas使用量`204,692`、gas価格`2 gwei`。送信者/宛先/入力data/送金額`0`は固定した単回計画と一致し、`EntityCreated`のownerは発行者、read-only属性はtrueだった。新entity keyは`0xe71e5fc6e6da0cfc338f8ca32a304947bcb98a7af0245a09638a101bcb4cbe0e`。SDKのentity読戻しで版`3`本文・署名・digest・不変属性と、現行ENSがなお版`2`であることを確認した。Arkiv索引block`316711`では同一発行IDの版`1`・`2`・`3`の3行が返った。
+
+その後にAlice専用Resolverの`app.credential`を[Sepolia取引](https://sepolia.etherscan.io/tx/0x536871ba2a6f9bf6116b0ec4c80a6638765172c4ffdf2c03d9ef70b465817f34)で版`3`entityへ更新した。block`12080768`のreceiptは`success`、nonce`31`、gas使用量`124,355`、gas価格`2 gwei`。取引の発行者/Resolver宛先/`setText` calldata/送金額`0`は計画と一致した。同Sepolia blockのENS参照とその時点のArkiv資格の読戻し、所有者・権限・登録イベント・署名検証は合格し、独立CLIは`eligible`、資格版`3`、`suspendedUntil=null`を返した。
+
+公開Vercelで「Verify Alice」を実行すると`Eligible Sepolia block 12080771 · Credential version 3`と表示された。同blockを指定した独立CLI `node scripts/verify-participation.ts alice 12080771`も`{"verdict":"eligible","reason":null,"ensBlockNumber":"12080771","credentialVersion":3}`、exit 0だった。Bobの一回診断はCLIがblock`12080771`で`eligible`/版`1`、公開Webがblock`12080773`で`Eligible`/版`1`を返した。別ブラウザーで観測された一回の`ENS_UNAVAILABLE`はこの確認では再現せず、継続的なRPC安定性までは保証しない。停止と回復は手動の合成参加者実証であり、審査決定から自動で連動する仕組みは未実証。ArkivとSepoliaの原子的な同block snapshotも主張しない。
 
 ### 初回発行の計画ゲート（2026-11-07追加）
 
@@ -76,8 +98,8 @@ Aliceの既存公開資格では、従来の4引数`draft`がblock`12080394`で�
 
 ## 残る合格条件
 
-- T038: 有限停止/回復の発行者側オフライン計画と既存デプロイに対する権限の読取専用試験は追加済み。新版の発行者署名・Arkiv書込・ENS参照更新、委任鍵の発行/失効と失効後の拒否、本人ウォレットからの限定キー実更新は未実施。
-- T039: Web/CLIの正常系比較とBFF停止時のWeb動作は上記の通り実測済み。旧版・別発行者・Arkiv行ID不一致・障害分類は両実装の自動テストで確認済み。再発行後の実ENSイベント照合、Web画面での障害/停止表示、有限停止の両実装での実演は未完了。
+- T038: 版`2`停止→版`3`回復の発行者署名・Arkiv書込・ENS参照更新・読戻しを実チェーンで確認済み。既存デプロイの読取専用権限試験とローカルforkでの委任鍵失効も確認した。実チェーンでの委任鍵の発行/失効、本人ウォレットからの限定キー実更新は未実施。
+- T039: Web/CLIの正常系、実版`2`停止・版`3`回復の同block比較、BFF停止時のWeb動作を実測済み。旧版・別発行者・Arkiv行ID不一致・障害分類、合成停止期限の判定は両実装の自動テストで確認済み。再発行後の実ENSイベント照合とWeb画面での障害表示は未完了。
 - T041/T042/T034: 審査停止・異議・回復、SC-005/007の総合判定と提出用証拠。
 
 発行者には親名と参加者Registryを管理する権限が残る。親やResolver実装の変更を検証者が追跡する必要がある。[ENSv2の権限モデル](https://docs.ens.domains/ensv2/enhanced-access-control/)に従い、名前のownerだけではroot権限や発行者署名を代替できない。現段階では段階Aの部分達成であり、SC-005合格やENS賞の応募条件達成とは判定しない。

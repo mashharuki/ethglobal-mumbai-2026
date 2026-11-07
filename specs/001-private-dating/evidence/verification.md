@@ -1,6 +1,23 @@
 # 検証記録（2026-11-07 IST、T030進行中）
 
-対象は親リポジトリのmain `49cd9fa`から作った統合worktree `feat/001-spec-integration`。API・ENS・Webの担当worktreeのコミットをcherry-pickし、PR [#4](https://github.com/mashharuki/ethglobal-mumbai-2026/pull/4)を全CI成功後にmainへマージした。マージコミットは`8d1ceb7`。以下のローカル検査は同じ開発ホストで行い、第三者環境での再現ではないため、T030完了とは判定しない。
+最初の基準は親リポジトリのmain `49cd9fa`から作った統合worktree `feat/001-spec-integration`。API・ENS・Webの担当worktreeのコミットをcherry-pickし、PR [#4](https://github.com/mashharuki/ethglobal-mumbai-2026/pull/4)を全CI成功後にmainへマージした。マージコミットは`8d1ceb7`。以下のローカル検査は同じ開発ホストで行い、第三者環境での再現ではないため、T030完了とは判定しない。
+
+## 追加実装の統合追試（PR #7）
+
+2026-11-07 07:56 IST時点の統合ブランチ`codex/001-full-implementation`から[PR #7](https://github.com/mashharuki/ethglobal-mumbai-2026/pull/7)を作成した。下記は同じ開発ホストでの実測であり、GitHub CI結果や第三者環境の再現とは区別する。
+
+| 項目 | 実測 | 限界 |
+| --- | --- | --- |
+| 依存と静的検査 | `CI=true pnpm install --frozen-lockfile`成功、`CI=true pnpm exec biome ci .`で174ファイル・exit 0、frontend lint/build・backend型検査もexit 0 | 開発用Anon-RPC/Simulation画面は本番bundleに含めない。公開VercelはPRマージ前の旧版 |
+| Worker・共有型 | backend通常testは68件成功、Wrangler dry-runは3つのDO bindingを含むbundle生成・exit 0。shared testは15件成功 | Workerは外部デプロイしていない。dry-runはWranglerログへのsandbox `EPERM`を表示したがbundle生成自体は成功 |
+| Hardhat | Solidity format、単独build、testがexit 0。testは9件成功 | 2件のENS実ネットワークsuiteはsecretsなしでskip。並列build/testの初回試行はcompiler-list lock timeoutとなり、単独再実行で成功。入金・精算契約は未実装 |
+| ZK登録とバックアップ | NoirJS1.0/BB.js5.3のNode integrationで実証明を2回生成・検証し、公開proofから秘密を分離。AES-GCMバックアップの復元と誤パスフレーズ拒否を確認 | ブラウザー上の登録、公開登録API、2端末照合への結合は未実施 |
+| ZK照合 | Noir v1.0.0/BB CLI v6.0.0でSC-002の数学条件7例、Node/WASMでA/B/resultの3回路prove/verifyに成功。測定値とVKは[protocol](../../../circuits/protocol.md)に記録 | セッション・資格・登録・リースの実文脈、SC-002残り3例、独立2端末は未実施。CLIとBB.jsのVKは混用不可 |
+| Anon-RPC | 公式browser harnessのローカルChromeでSepolia block `12080644`を取得。失敗時fail-closedの9試験成功 | 公開資格画面は直接RPC。匿名性の外部観察と本番実演は未確認 |
+
+PR #7の作成はmainマージ・Vercel反映・提出を意味しない。AIBot gitlinkの新コミットは[上流PR #2](https://github.com/Jun0908/ethglobal-mumbai-2026-AIBot/pull/2)にあり、担当者のマージ・設定・公開を待つ。
+
+## PR #4時点の履歴
 
 | 項目 | 実行結果 | 限界・次の確認 |
 | --- | --- | --- |
@@ -23,4 +40,4 @@
 
 ルートBiomeは当初、ミラーされた`.agents/skills`と別リポジトリのAIBotを対象に含めて多数の既存エラーを報告した。`biome.json`で両ディレクトリを除外した後、親リポジトリの対象99ファイルが通過した。AIBotの独自検証は[作者側の検査記録](aibot-inspection.md)を参照。
 
-残るT030の完了条件は第三者環境でのquickstart再現、Noir回路の正負例と実証明、公開後の第三者端末での画面・資格検査。部分結果を全機能の合格と扱わない。
+残るT030の完了条件は第三者環境でのquickstart再現、Noir回路の残る版・主体・リース負例と2端末実証明、公開後の第三者端末での画面・資格検査。部分結果を全機能の合格と扱わない。

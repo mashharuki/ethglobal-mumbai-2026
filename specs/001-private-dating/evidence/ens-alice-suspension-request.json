@@ -1,0 +1,4 @@
+{
+  "label": "alice",
+  "action": { "type": "suspend", "until": 1794503600 }
+}

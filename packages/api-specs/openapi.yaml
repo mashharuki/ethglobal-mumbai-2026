@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: Secret Tinder API
   version: 0.1.0
-  description: Proposed parent API contract; an operation here does not imply a deployed handler.
+  description: Proposed parent API contract and outbound AIBot metadata contract; an operation here does not imply a deployed handler.
 servers:
   - url: /v1
 tags:
@@ -13,6 +13,7 @@ tags:
   - name: Deposits
   - name: Review
   - name: Simulation
+  - name: AIBot Metadata
 paths:
   /auth/challenges:
     post:
@@ -457,6 +458,36 @@ paths:
         "409": { $ref: "#/components/responses/Conflict" }
         "422": { $ref: "#/components/responses/InvalidInput" }
         "503": { $ref: "#/components/responses/Unavailable" }
+  /api/personas/{personaId}/metadata:
+    get:
+      tags: [AIBot Metadata]
+      operationId: getPersonaMetadata
+      summary: Read AIBot-held Persona ownership and approval metadata.
+      description: AIBot serves this private endpoint to the parent service, not to browsers. Unavailable metadata cannot authorize AI use.
+      servers:
+        - url: "{aibotOrigin}"
+          variables:
+            aibotOrigin:
+              default: https://aibot.example.invalid
+              description: Deployment-specific AIBot origin; replace before use.
+      security: [{ parentService: [] }]
+      parameters:
+        - name: personaId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        "200":
+          description: Current private metadata without Persona content.
+          headers:
+            Cache-Control:
+              schema: { type: string, const: no-store }
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PersonaMetadata" }
+        "401": { $ref: "#/components/responses/Unauthenticated" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "503": { $ref: "#/components/responses/Unavailable" }
   /date-requests:
     post:
       tags: [Simulation]
@@ -495,6 +526,11 @@ components:
       scheme: bearer
       bearerFormat: opaque
       description: Service-to-service token. Never expose it to a browser.
+    parentService:
+      type: http
+      scheme: bearer
+      bearerFormat: opaque
+      description: Parent-to-AIBot token for private Persona metadata; never expose it to a browser.
   parameters:
     Id:
       name: id
@@ -528,7 +564,7 @@ components:
       in: header
       required: true
       description: Subject authenticated by the AIBot service.
-      schema: { type: string, minLength: 1, maxLength: 128 }
+      schema: { type: string, minLength: 1, maxLength: 100 }
   responses:
     AcceptedOperation:
       description: Accepted asynchronous operation; poll /operations/{id}.
@@ -786,10 +822,11 @@ components:
     PrivateReviewCase:
       type: object
       additionalProperties: false
-      required: [caseId, policyVersion, state, revision, openedAt]
+      required: [caseId, policyVersion, prohibitedAct, state, revision, openedAt]
       properties:
         caseId: { type: string, minLength: 1, maxLength: 128 }
         policyVersion: { type: integer, minimum: 1 }
+        prohibitedAct: { type: string, minLength: 1 }
         state: { type: string, enum: [received, reviewing, decided, appealed, closed] }
         revision: { type: integer, minimum: 1 }
         openedAt: { type: string, format: date-time }
@@ -811,7 +848,7 @@ components:
       properties:
         expectedRevision: { type: integer, minimum: 1 }
         policyVersion: { type: integer, minimum: 1 }
-        decision: { type: string, enum: [dismiss, suspend, reverse] }
+        decision: { type: string, enum: [dismiss, suspend, uphold, reverse] }
         fixtureId: { type: string, minLength: 1, maxLength: 128 }
         suspendedUntil: { type: string, format: date-time }
     BlockRequest:
@@ -835,10 +872,23 @@ components:
       required: [matchId, agentPersonaId, playerSubject, simulationConsent, expiresAt]
       properties:
         matchId: { type: string, minLength: 1, maxLength: 128 }
-        agentPersonaId: { type: string, minLength: 1, maxLength: 128 }
+        agentPersonaId: { type: string, format: uuid }
         playerSubject: { type: string, minLength: 1, maxLength: 128 }
         simulationConsent: { type: boolean, const: true }
-        expiresAt: { type: string, format: date-time }
+        expiresAt:
+          type: integer
+          format: int64
+          minimum: 0
+          description: Unix timestamp in seconds, matching the AIBot Adapter.
+    PersonaMetadata:
+      type: object
+      additionalProperties: false
+      required: [personaId, ownerSubject, status, version]
+      properties:
+        personaId: { type: string, format: uuid }
+        ownerSubject: { type: string, minLength: 1, maxLength: 128 }
+        status: { type: string, enum: [approved, revoked] }
+        version: { type: integer, minimum: 1 }
     SimulationConsentRequest:
       type: object
       additionalProperties: false
@@ -869,4 +919,4 @@ components:
       required: [requestId, status]
       properties:
         requestId: { type: string, minLength: 1, maxLength: 128 }
-        status: { type: string, enum: [pending, accepted, rejected] }
+        status: { type: string, enum: [pending, accepted] }

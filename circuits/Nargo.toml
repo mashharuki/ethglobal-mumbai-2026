@@ -1,0 +1,2 @@
+[workspace]
+members = ["curve_probe", "matching", "matching_b", "matching_result", "profile", "register", "smoke"]

@@ -1,6 +1,15 @@
 import { Cluster, Columns, Lism, Stack, Wrapper } from "lism-css/react";
+import { lazy, Suspense, useSyncExternalStore } from "react";
 import Participation from "./pages/Participation.tsx";
+import { LiveParticipationReview } from "./pages/ParticipationReview.tsx";
 import "./App.css";
+
+const AnonRpcDiagnostics = import.meta.env.DEV
+  ? lazy(() => import("./pages/AnonRpcDiagnostics.tsx"))
+  : null;
+const Simulation = import.meta.env.DEV
+  ? lazy(() => import("./pages/Simulation.tsx"))
+  : null;
 
 const heroBackground =
   "radial-gradient(circle at 85% 20%, color-mix(in srgb, var(--brand) 18%, transparent), transparent 40%), radial-gradient(circle at 10% 85%, color-mix(in srgb, var(--accent) 12%, transparent), transparent 45%)";
@@ -258,7 +267,45 @@ function Proof() {
   );
 }
 
+function subscribeToPath(): () => void {
+  return () => {};
+}
+
+function getCurrentPath(): string {
+  return window.location.pathname;
+}
+
+function getServerPath(): string {
+  return "/";
+}
+
 export default function App() {
+  const currentPath = useSyncExternalStore(
+    subscribeToPath,
+    getCurrentPath,
+    getServerPath,
+  );
+  if (import.meta.env.DEV && currentPath === "/review") {
+    return <LiveParticipationReview />;
+  }
+  if (
+    import.meta.env.DEV &&
+    currentPath === "/anon-rpc" &&
+    AnonRpcDiagnostics
+  ) {
+    return (
+      <Suspense fallback={<p>Loading diagnostics...</p>}>
+        <AnonRpcDiagnostics />
+      </Suspense>
+    );
+  }
+  if (import.meta.env.DEV && currentPath === "/simulation" && Simulation) {
+    return (
+      <Suspense fallback={<p>Loading simulation preview...</p>}>
+        <Simulation />
+      </Suspense>
+    );
+  }
   return (
     <Lism isContainer className="c--landing" c="text" bgc="base">
       <SiteHeader />

@@ -7,11 +7,12 @@
   "types": "./src/index.ts",
   "exports": {
     ".": "./src/index.ts",
+    "./generated/client": "./src/generated/client.ts",
     "./participation": "./src/participation/schema.ts"
   },
   "scripts": {
     "check-types": "tsc --noEmit",
-    "test": "node --test src/participation/*.test.ts"
+    "test": "node --test src/participation/*.test.ts src/simulation/*.test.ts"
   },
   "keywords": [],
   "author": "",

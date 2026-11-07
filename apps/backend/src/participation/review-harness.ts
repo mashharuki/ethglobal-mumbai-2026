@@ -1,7 +1,11 @@
 // Local Wrangler entry point used only by review-api.test.ts; wrangler.jsonc still deploys src/index.ts.
 import { Hono } from "hono";
 import { authChallengeRequestSchema, reviewCaseIdSchema } from "shared";
-import app, { AuthStore } from "../index.ts";
+import app, {
+  AuthStore,
+  SearchCoordinator,
+  SimulationDateRequestStore,
+} from "../index.ts";
 import {
   appealReview,
   beginReview,
@@ -46,7 +50,7 @@ async function saveStep(
 async function advanceReview(
   store: DurableObjectStub<AuthStore>,
   received: ReviewCase,
-  state: "reviewing" | "decided",
+  state: "reviewing" | "reviewing-ready" | "decided",
   now: number,
 ): Promise<ReviewCase | null> {
   const started = await saveStep(
@@ -55,7 +59,7 @@ async function advanceReview(
     beginReview(received, first, mutation(received, "begin")),
   );
   if (!started) return null;
-  const deliveredAt = state === "decided" ? now - 7_200 : now;
+  const deliveredAt = state === "reviewing" ? now : now - 7_200;
   const reviewing = await saveStep(
     store,
     started,
@@ -65,7 +69,7 @@ async function advanceReview(
       mutation(started, "review-notice"),
     ),
   );
-  if (!reviewing || state === "reviewing") return reviewing;
+  if (!reviewing || state !== "decided") return reviewing;
   const choice = {
     outcome: "suspend" as const,
     fixtureId: "synthetic",
@@ -114,12 +118,32 @@ harness.post("/__seed-review", async (c) => {
   if (
     !target.success ||
     !caseId.success ||
-    !["reviewing", "decided"].includes(String(input.state))
+    !["reviewing", "reviewing-ready", "decided"].includes(String(input.state))
   ) {
     return c.text("invalid", 422);
   }
   const now = Math.floor(Date.now() / 1000);
-  const state = input.state === "decided" ? "decided" : "reviewing";
+  const state =
+    input.state === "decided"
+      ? "decided"
+      : input.state === "reviewing-ready"
+        ? "reviewing-ready"
+        : "reviewing";
+  const extraReviewers = Array.isArray(input.primaryReviewers)
+    ? input.primaryReviewers.map((value) =>
+        authChallengeRequestSchema.safeParse({ address: value }),
+      )
+    : [];
+  const extraAppealReviewers = Array.isArray(input.appealReviewers)
+    ? input.appealReviewers.map((value) =>
+        authChallengeRequestSchema.safeParse({ address: value }),
+      )
+    : [];
+  if (
+    extraReviewers.some((value) => !value.success) ||
+    extraAppealReviewers.some((value) => !value.success)
+  )
+    return c.text("invalid reviewers", 422);
   const received = receiveReviewCase({
     caseId: caseId.data,
     operationId: crypto.randomUUID(),
@@ -144,12 +168,24 @@ harness.post("/__seed-review", async (c) => {
       responseSeconds: 3_600,
       appealSeconds: 3_600,
       maxSuspensionSeconds: 86_400,
-      primaryReviewers: [first, second],
-      appealReviewers: [appealFirst, appealSecond],
+      primaryReviewers: [
+        first,
+        second,
+        ...extraReviewers.flatMap((value) =>
+          value.success ? [value.data.address] : [],
+        ),
+      ],
+      appealReviewers: [
+        appealFirst,
+        appealSecond,
+        ...extraAppealReviewers.flatMap((value) =>
+          value.success ? [value.data.address] : [],
+        ),
+      ],
       issuerOperators: ["0x8888888888888888888888888888888888888888"],
     },
     issuanceId: `0x${"a".repeat(64)}`,
-    now: state === "decided" ? now - 8_000 : now,
+    now: state === "reviewing" ? now : now - 8_000,
     existingCases: [],
   });
   if (!received.ok) return c.text("invalid fixture", 500);
@@ -228,7 +264,14 @@ harness.get("/__effective-review", async (c) => {
   });
 });
 
+harness.get("/__review-events", async (c) => {
+  const caseId = reviewCaseIdSchema.safeParse(c.req.query("id"));
+  if (!caseId.success) return c.text("invalid", 422);
+  const store = c.env.AUTH_STORE.getByName("review-ledger");
+  return c.json({ events: await store.getReviewEvents(caseId.data) });
+});
+
 harness.route("/", app);
 
-export { AuthStore };
+export { AuthStore, SearchCoordinator, SimulationDateRequestStore };
 export default harness;
