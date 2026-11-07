@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import { participationTrustAnchor } from "shared";
-import { decodeFunctionData, parseAbi } from "viem";
+import { decodeFunctionData, keccak256, parseAbi, stringToHex } from "viem";
 
 import {
   ensSepoliaDeployment,
@@ -9,6 +9,7 @@ import {
   participantRegistryRoles,
   planParentRegistry,
   planParticipant,
+  planTextRevocation,
 } from "./ens-plan.ts";
 
 const registryAbi = parseAbi([
@@ -17,6 +18,7 @@ const registryAbi = parseAbi([
 const resolverAbi = parseAbi([
   "function setText(bytes name, string key, string value)",
   "function grantSetterRoles(bytes setter, address account)",
+  "function revokeRoles(uint256 resource, uint256 roleBitmap, address account)",
 ]);
 const subject = "0x3333333333333333333333333333333333333333";
 
@@ -83,5 +85,18 @@ describe("ENS issuance call plans", () => {
   it("should use separate resolvers for different participant names", () => {
     assert.notEqual(makePlan("alice").resolver, makePlan("bob").resolver);
     assert.equal(makePlan("alice").resolver, makePlan("alice").resolver);
+  });
+
+  it("should revoke only the named text setter role", () => {
+    const resolver = makePlan("alice").resolver;
+    const call = planTextRevocation(resolver, "app.key", subject);
+    const decoded = decodeFunctionData({ abi: resolverAbi, data: call.data });
+    assert.equal(call.to, resolver);
+    assert.equal(decoded.functionName, "revokeRoles");
+    if (decoded.functionName !== "revokeRoles")
+      throw new Error("Wrong revoke call");
+    assert.equal(decoded.args[0], BigInt(keccak256(stringToHex("app.key"))));
+    assert.equal(decoded.args[1], 1n << 4n);
+    assert.equal(decoded.args[2], subject);
   });
 });

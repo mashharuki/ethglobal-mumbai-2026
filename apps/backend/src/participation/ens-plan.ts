@@ -42,6 +42,7 @@ const registryAbi = parseAbi([
 const resolverAbi = parseAbi([
   "function setText(bytes name, string key, string value)",
   "function grantSetterRoles(bytes setter, address account)",
+  "function revokeRoles(uint256 resource, uint256 roleBitmap, address account)",
 ]);
 
 const roleRegistrar = 1n << 0n;
@@ -227,6 +228,25 @@ export function planTextGrant(
       abi: resolverAbi,
       functionName: "grantSetterRoles",
       args: [setter, account],
+    }),
+  };
+}
+
+export function planTextRevocation(
+  resolver: Address,
+  key: "app.endpoint" | "app.key",
+  account: Address,
+): PlannedEnsCall {
+  return {
+    to: getAddress(resolver),
+    data: encodeFunctionData({
+      abi: resolverAbi,
+      functionName: "revokeRoles",
+      args: [
+        BigInt(keccak256(stringToHex(key))),
+        roleSetText,
+        getAddress(account),
+      ],
     }),
   };
 }
