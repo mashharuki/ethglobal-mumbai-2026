@@ -6,6 +6,7 @@ import { describe, it } from "node:test";
 import {
   createSimulationConsentApi,
   getSimulationGate,
+  getStandaloneDemoHref,
   type SimulationEntry,
 } from "./simulation-entry.ts";
 
@@ -25,6 +26,13 @@ const entry: SimulationEntry = {
 };
 
 describe("simulation entry gate", () => {
+  it("should expose the fictional external demo only after separate AI consent", () => {
+    assert.equal(getStandaloneDemoHref(false), null);
+    assert.equal(
+      getStandaloneDemoHref(true),
+      "https://love-match-masala.vercel.app/",
+    );
+  });
   it("should require both separate permissions before opening AIBot", () => {
     assert.equal(getSimulationGate(entry, consent, 1_799_999_999), "ready");
     assert.equal(

@@ -4,6 +4,7 @@ import { useState, useSyncExternalStore } from "react";
 import { simulationConsentSchema } from "../../../../packages/shared/src/simulation/contract.ts";
 import {
   getSimulationGate,
+  getStandaloneDemoHref,
   type SimulationActions,
   type SimulationConsent,
   type SimulationEntry,
@@ -56,13 +57,59 @@ function UnavailableSimulation() {
         Conversation is not connected yet
       </Lism>
       <Lism as="p">
-        This preview has no authorized match or AIBot handoff. The standalone
-        AIBot can demonstrate a fictional Persona, but this page cannot start a
-        real matched conversation.
+        This page has no authorized match or AIBot handoff. The standalone AIBot
+        can demonstrate a fictional Persona, but this page cannot start a real
+        matched conversation.
       </Lism>
       <Lism as="p" c="text-2" fz="s">
-        Match: not verified · AI mode: not configured · External handoff: off
+        Match: not verified · Secret Tinder AI mode: not connected
       </Lism>
+      <StandaloneDemo />
+    </Stack>
+  );
+}
+
+function StandaloneDemo() {
+  const [hasSeparateAiConsent, setHasSeparateAiConsent] = useState(false);
+  const demoHref = getStandaloneDemoHref(hasSeparateAiConsent);
+  return (
+    <Stack as="section" aria-label="Fictional AIBot demo" g="10">
+      <Lism as="h3" fz="l">
+        Try the separate fictional demo
+      </Lism>
+      <Lism as="p">
+        Asha and Mira are fictional adults in the teammate’s AIBot app. This
+        demo is not a Secret Tinder match or a date request to a real person.
+      </Lism>
+      <label>
+        <input
+          type="checkbox"
+          checked={hasSeparateAiConsent}
+          onChange={(event) =>
+            setHasSeparateAiConsent(event.currentTarget.checked)
+          }
+        />{" "}
+        I choose to open the separate AIBot demo. What I enter there may be
+        processed by AIBot and its AI provider; no matching secrets are sent
+        automatically from this page.
+      </label>
+      {demoHref ? (
+        <Lism
+          as="a"
+          href={demoHref}
+          target="_blank"
+          rel="noopener noreferrer"
+          referrerPolicy="no-referrer"
+          c="brand"
+          fw="bold"
+        >
+          Open fictional AIBot demo ↗
+        </Lism>
+      ) : (
+        <Lism as="p" c="text-2" fz="s">
+          Choose the option above to enable the external demo link.
+        </Lism>
+      )}
     </Stack>
   );
 }
