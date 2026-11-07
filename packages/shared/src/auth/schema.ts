@@ -2,7 +2,12 @@ import { isAddress, isHex } from "viem";
 import { z } from "zod";
 
 export const authChallengeRequestSchema = z.strictObject({
-  address: z.string().refine(isAddress, "Invalid EVM address"),
+  address: z
+    .string()
+    .refine(
+      (value) => isAddress(value, { strict: false }),
+      "Invalid EVM address",
+    ),
 });
 
 export const authSessionRequestSchema = z.strictObject({

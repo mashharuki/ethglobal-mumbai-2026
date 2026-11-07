@@ -109,6 +109,14 @@ test("should consume a SIWE challenge once under concurrent submissions", async 
       body: JSON.stringify({ address: account.address }),
     });
     assert.equal(wrongOrigin.status, 422);
+    const alternateCase = await fetch(`${origin}/v1/auth/challenges`, {
+      method: "POST",
+      headers: { Origin: origin, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        address: `0x${outsider.address.slice(2).toUpperCase()}`,
+      }),
+    });
+    assert.equal(alternateCase.status, 200);
     for (let index = 0; index < 5; index += 1) {
       const response = await fetch(`${origin}/v1/auth/challenges`, {
         method: "POST",
