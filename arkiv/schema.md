@@ -14,4 +14,6 @@
 
 Alice entity key: `0x628a86b2b8d2ee96d9b91b92a9013f10ce67421e4792bf7911c46234d92ab5d6`。Bob entity key: `0x4e253c8b29d21b401d99a970bfe8624d0d27bd835e49962006e8c1440d39c151`。書込receipt・読戻し・digestは[証拠](../specs/001-private-dating/evidence/arkiv.md)を参照。
 
+実際のArkiv entity expirationはAliceがblock `1600794`、Bobが`1600888`で、書込receiptから読戻した値。30日指定の仕組みは実装・書込済みだが、自然期限切れや新版への切替が起きた場面はまだ観測していない。索引検索は[再現スクリプト](../apps/backend/scripts/query-publications.ts)の`createdBy(issuer)`と`where(eq("issuance_id", ...))`を組み合わせる。ライブ画面は検索結果を固定表示せず、ENSの現行参照が指すentity keyを直接読む。
+
 趣味、希望条件、ペア、照合結果、審査根拠、AI会話はArkivへ保存しない。公開資格にはウォレット、ENS名、発行者、状態と期限が含まれ、相互に関連付けられる。この公開範囲はUIで説明する。
