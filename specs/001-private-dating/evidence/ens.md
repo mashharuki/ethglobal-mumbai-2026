@@ -96,10 +96,16 @@ Arkiv Rabdiの[版3書込](https://explorer.rabdi.arkiv.network/tx/0x466822cef9d
 
 Aliceの既存公開資格では、従来の4引数`draft`がblock`12080394`で元のmessage digest `0x7376e32934e9585ba99760ddeec83ff74e3ca3469f60ebbf521289ff85a833c7`を返し、`publication`は`ALREADY_ISSUED`、既存Arkiv entityを指定した`reference`はblock`12080393`で`alreadyCurrent: true`を返した。これは既存Alice/Bob資格への書込ではない。`apps/backend/src/participation/publication-gate.test.ts`は実Alice署名fixtureで正常なArkiv計画、改ざん署名/本文拒否、読戻し後のENS calldataと可変entity拒否を5件検証した。未発行の新規参加者に対する実送信は未実施。
 
+### Webでの版履歴と障害表示（2026-11-07追加）
+
+[PR #8](https://github.com/mashharuki/ethglobal-mumbai-2026/pull/8)のローカルWeb（`127.0.0.1:5177`、公開本番への反映前）で、Arkivの発行ID索引をブラウザーから直接検索した。Aliceはindex block`317246`で署名済み版`1` eligible、版`2` suspended（期限`1794503600`）、版`3` eligibleの3行が出て、現行ENS参照は版`3`に一致した。Bobはindex block`317255`で版`1`の1行が現行参照に一致した。各行のcreator/owner/read-only属性、発行ID、digest、資格署名、現在のENS ownerとの対応をWebで検査する。古い版の状態は「発行時の申告状態」として表示し、現行の有効性判定とは分ける。Arkiv索引は現在見える行であり、期限切れentityまで含む完全な永久履歴とは主張しない。
+
+同じ隔離ブラウザータブで`window.fetch`を一時的に上書きし、Arkiv Rabdi RPCへのリクエストだけを`TypeError`で拒否した。Bobを既に`Eligible`/版`1`と確認した後の履歴再読取は「Public version history is temporarily unavailable」と表示し、前回の資格判定を上書きしなかった。続いて現行資格を再検証すると「Unable to verify right now」「Reason: ARKIV_UNAVAILABLE」と表示され、以前の成功表示は残らなかった。これはブラウザー内の合成障害試験であり、Arkiv実ネットワークの障害観測ではない。
+
 ## 残る合格条件
 
 - T038: 版`2`停止→版`3`回復の発行者署名・Arkiv書込・ENS参照更新・読戻しを実チェーンで確認済み。既存デプロイの読取専用権限試験とローカルforkでの委任鍵失効も確認した。実チェーンでの委任鍵の発行/失効、本人ウォレットからの限定キー実更新は未実施。
-- T039: Web/CLIの正常系、実版`2`停止・版`3`回復の同block比較、BFF停止時のWeb動作を実測済み。旧版・別発行者・Arkiv行ID不一致・障害分類、合成停止期限の判定は両実装の自動テストで確認済み。再発行後の実ENSイベント照合とWeb画面での障害表示は未完了。
+- T039: Web/CLIの正常系、実版`2`停止・版`3`回復の同block比較、BFF停止時のWeb動作を実測済み。旧版・別発行者・Arkiv行ID不一致・障害分類、合成停止期限の判定は両実装の自動テストで確認済み。Web画面のArkiv読取障害表示も合成遮断で確認した。再発行後の実ENSイベント照合は未完了。
 - T041/T042/T034: 審査停止・異議・回復、SC-005/007の総合判定と提出用証拠。
 
 発行者には親名と参加者Registryを管理する権限が残る。親やResolver実装の変更を検証者が追跡する必要がある。[ENSv2の権限モデル](https://docs.ens.domains/ensv2/enhanced-access-control/)に従い、名前のownerだけではroot権限や発行者署名を代替できない。現段階では段階Aの部分達成であり、SC-005合格やENS賞の応募条件達成とは判定しない。
