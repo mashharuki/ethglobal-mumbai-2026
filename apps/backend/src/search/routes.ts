@@ -8,7 +8,8 @@ import {
 import { getAddress } from "viem";
 import { readBoundedJsonBody } from "../auth/request-body.ts";
 import { getAuthenticatedAddress } from "../auth/session.ts";
-import type { SearchAdmission } from "./admission.ts";
+import { isCredentialCurrent, type SearchAdmission } from "./admission.ts";
+import { readDemoParticipationCredential } from "./participation-reader.ts";
 
 type SearchContext = Context<{ Bindings: CloudflareBindings }>;
 export type SearchAdmissionGate = (
@@ -16,6 +17,20 @@ export type SearchAdmissionGate = (
   request: SearchLeaseRequest,
   nowMs: number,
 ) => Promise<SearchAdmission>;
+
+async function publicParticipationGate(
+  subject: `0x${string}`,
+  request: SearchLeaseRequest,
+  nowMs: number,
+): Promise<SearchAdmission> {
+  const credential = await readDemoParticipationCredential(subject);
+  if (!credential.ok) return credential;
+  if (!isCredentialCurrent(credential.data, subject, request, nowMs)) {
+    return { ok: false, error: "ineligible" };
+  }
+  // Registration proof, owner signature and confirmed deposit readers are pending.
+  return { ok: false, error: "unavailable" };
+}
 
 function searchError(
   c: SearchContext,
@@ -92,7 +107,7 @@ async function createLease(
 }
 
 export function createSearchRoutes(
-  gate: SearchAdmissionGate = async () => ({ ok: false, error: "unavailable" }),
+  gate: SearchAdmissionGate = publicParticipationGate,
 ): Hono<{ Bindings: CloudflareBindings }> {
   const routes = new Hono<{ Bindings: CloudflareBindings }>();
   routes.post("/search-leases", (c) => createLease(c, gate));

@@ -45,7 +45,7 @@ export type SearchAdmission = Evidence<{
   maxExpiresAt: number;
 }>;
 
-function isCredentialCurrent(
+export function isCredentialCurrent(
   credential: VerifiedCredential,
   subject: `0x${string}`,
   request: SearchLeaseRequest,
