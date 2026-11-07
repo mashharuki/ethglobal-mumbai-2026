@@ -16,7 +16,7 @@ pnpm --filter backend exec node scripts/query-publications.ts 0x7bfef7a2d485ad0f
 
 検索結果のdigestはAlice`0x5eef3a22c4bfc28571afc6839201338b553c6e0105ce09bec9f70504b8f2dded`、Bob`0x492c0346ed438fd8cb9d71321a88e6e2ed8c11aa08493924974790b740fac75f`で、[ENS参照の読戻し](ens.md)と一致した。検索結果だけで資格を有効とは判定しない。署名、現在のENS参照、名前の登録世代、期限と権限を[独立CLI](../../../scripts/verify-participation.ts)で別途照合する。
 
-利用者が見る[公開資格検証画面](../../../apps/frontend/src/pages/Participation.tsx)もArkivの現行entityをブラウザーから直接取得し、ENS参照と署名を検証する。[本番URL](https://ethglobal-mumbai-2026.vercel.app/)は未認証の新規アクセスでHTTP 200を返し、クリーンなブラウザーでAlice/Bobとも`資格あり`・credential版`1`・Sepolia block`12080239`を表示した。画面はentity keyによる現行読取であり、索引による発見は上記CLIの別経路。両経路の対象entity keyとdigestは一致する。Hono backendを止めても[Webと独立CLIの同一ブロック比較](ens.md#ブラウザーとcliの比較)は可能だった。
+利用者が見る[公開資格検証画面](../../../apps/frontend/src/pages/Participation.tsx)もArkivの現行entityをブラウザーから直接取得し、ENS参照と署名を検証する。PR [#4](https://github.com/mashharuki/ethglobal-mumbai-2026/pull/4)をmainへマージした後、[本番URL](https://ethglobal-mumbai-2026.vercel.app/)は未認証でHTTP 200を返し、新規ブラウザーのAlice/Bob検証はともに`資格あり`・credential版`1`・Sepolia block`12080373`だった。同じ開発者の端末での再実測であり第三者確認ではない。画面はentity keyによる現行読取であり、索引による発見は上記CLIの別経路。両経路の対象entity keyとdigestは一致する。Hono backendを止めても[Webと独立CLIの同一ブロック比較](ens.md#ブラウザーとcliの比較)は可能だった。
 
 指定の[5つのArkiv資料](../../../arkiv/schema.md)は作成した。実測値に基づく範囲と未計測事項をそれぞれ明記している。2026-11-07の[提出範囲決定](../prize-targets.md)では、この公開資格をARKIV-APPの主実演にする。公開プロフィール登録、資格新版の実書込、期限切れ/失効は未実装・未検証であり、本番の照合フローと呼ばない。
 

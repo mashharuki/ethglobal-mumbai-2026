@@ -1,12 +1,12 @@
 # 検証記録（2026-11-07 IST、T030進行中）
 
-対象は親リポジトリのmain `49cd9fa`から作った統合worktree `feat/001-spec-integration`。API・ENS・Webの担当worktreeのコミットをcherry-pickし、同じ開発ホストで検査した。第三者環境での再現ではないため、T030完了とは判定しない。以下の本番観察はmain `49cd9fa`であり、統合ブランチの公開動作ではない。
+対象は親リポジトリのmain `49cd9fa`から作った統合worktree `feat/001-spec-integration`。API・ENS・Webの担当worktreeのコミットをcherry-pickし、PR [#4](https://github.com/mashharuki/ethglobal-mumbai-2026/pull/4)を全CI成功後にmainへマージした。マージコミットは`8d1ceb7`。以下のローカル検査は同じ開発ホストで行い、第三者環境での再現ではないため、T030完了とは判定しない。
 
 | 項目 | 実行結果 | 限界・次の確認 |
 | --- | --- | --- |
 | `pnpm exec biome ci .` | 統合後124ファイル検査、exit 0 | `.agents`とAIBotサブモジュール、Wrangler生成型は親のBiome対象から除外。別repoの品質を親のCIで保証しない |
-| `pnpm --filter frontend lint` / `build` | 統合後ともにexit 0。Void準備、Worker/client bundleを確認。`VERCEL_STATIC_BUILD=1`でもbuildし、Vercel設定どおり退役用`sw.js`を出力 | 対面開示/審査UIは独立プレビューで公開Appには未接続。照合/登録UIの合格ではなく、旧Service Workerの本番移行も未検証 |
-| Vercel本番 | main `49cd9fa`のマージ後、未認証HTTPで`200`と現行Secret Tinder HTMLを確認。新規ブラウザーからAlice/Bobを直接検証し、両方`資格あり`・Sepolia block `12080239`・資格版`1` | 既存Chromeでは旧Vite starterが再読込後も残った。旧Service Worker/キャッシュの可能性があり、原因と移行策は別途検証する |
+| `pnpm --filter frontend lint` / `build` | 統合後ともにexit 0。Void準備、Worker/client bundleを確認。`VERCEL_STATIC_BUILD=1`でもbuildし、Vercel設定どおり退役用`sw.js`を出力 | 対面開示/審査UIは独立プレビューで公開Appには未接続。照合/登録UIの合格ではない |
+| Vercel本番 | PR #4マージ後、公開URLのHTMLは新しい`index-CxflyAhj.js`を参照し、Vercelがマージコミットのデプロイ成功を報告。bundleに「公開資格の実演を見る」等の新文言を確認。`/sw.js`はHTTP 200・`Cache-Control: no-store`で退役コードを配信。新規ブラウザーからAlice/Bobをそれぞれ直接検証し、両方`資格あり`・Sepolia block `12080373`・資格版`1`を表示。旧Vite starterが残っていた既存Chromeタブも再読込後に新画面へ移った | 同じ開発者の端末での観察。第三者ブラウザーや別端末での再現ではない。旧Service Workerが各利用者端末で必ず自動退役することまでは確認していない |
 | `pnpm --filter backend check-types` / `test` | 統合後に型検査成功。参加資格34件とSIWE認証1件を通常のbackend testで実行し35件成功。2つのローカルWrangler試験が同時起動して一度失敗したため`--test-concurrency=1`で順次実行 | 外部への審査APIデプロイ、通報の接触資格検証、審査員認可、署名資格への反映は未実装・未検証 |
 | 本人向け審査API | ローカルWranglerで停止中の本人が通知GET・反証POST・異議POSTを利用でき、別人には404。操作IDの本人照会と`Cache-Control: no-store`も確認 | 合成ケースの試験用ハーネスでseed。公開の通報作成と審査員決定は本番の信頼設定がないため公開しない |
 | `pnpm --filter shared check-types` / `test` | 型検査成功、署名/schemaの12試験すべて成功 | 審査・照合・資金の受入試験ではない |
@@ -22,4 +22,4 @@
 
 ルートBiomeは当初、ミラーされた`.agents/skills`と別リポジトリのAIBotを対象に含めて多数の既存エラーを報告した。`biome.json`で両ディレクトリを除外した後、親リポジトリの対象99ファイルが通過した。AIBotの独自検証は[作者側の検査記録](aibot-inspection.md)を参照。
 
-残るT030の完了条件は第三者環境でのquickstart再現、Noir回路の正負例と実証明、既存Chromeの旧表示の解消、公開後の統合ブランチ検査。部分結果を全機能の合格と扱わない。
+残るT030の完了条件は第三者環境でのquickstart再現、Noir回路の正負例と実証明、公開後の第三者端末での画面・資格検査。部分結果を全機能の合格と扱わない。
