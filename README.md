@@ -125,7 +125,7 @@ the parent name and Registry is not a decentralized guarantee.
 | **Issuer-signed public credentials** | ✅ written and read back on Arkiv Rabdi | [Alice](specs/001-private-dating/evidence/arkiv-alice-publication.json) · [Bob](specs/001-private-dating/evidence/arkiv-bob-publication.json) |
 | **ENS `app.credential` → Arkiv entity** | ✅ written and read back on Sepolia | [Alice](specs/001-private-dating/evidence/ens-alice-reference.json) · [Bob](specs/001-private-dating/evidence/ens-bob-reference.json) |
 | **Independent participation verification** | ✅ browser and CLI, without the Hono backend | [browser](apps/frontend/src/pages/Participation.tsx) · [CLI](scripts/verify-participation.ts) |
-| **SIWE session and private-operation read API** | ⚠️ implemented and tested locally; not deployed or connected to the live frontend | [source](apps/backend/src/auth/session.ts) · [API contract](packages/api-specs/openapi.yaml) · [record](specs/001-private-dating/evidence/verification.md) |
+| **SIWE session and private-operation read API** | ⚠️ implemented and tested locally, with a development-only review view; not deployed on the live frontend | [source](apps/backend/src/auth/session.ts) · [API contract](packages/api-specs/openapi.yaml) · [record](specs/001-private-dating/evidence/participation-review.md) |
 | **In-person selective-disclosure preview** | ⚠️ synthetic local fixture only | [UI](apps/frontend/src/pages/InPerson.tsx) · [record](specs/001-private-dating/evidence/verification.md) |
 | **Private preference matching** | 🚧 design and implementation in progress | [plan](specs/001-private-dating/plan.md) |
 | **Optional AI Persona conversation** | 🚧 built in the submodule; parent integration pending | [inspection](specs/001-private-dating/evidence/aibot-inspection.md) |
@@ -193,14 +193,14 @@ RPC access keys or private profile data in the repository.
 
 ## CROPS
 
-These boundaries describe the deployed participation verifier and the proposed matching flow. End-to-end private matching is **not yet verified**.
+These boundaries describe the deployed participation verifier and the proposed matching flow. End-to-end private matching is **not yet verified**. The [EF-CROPS conditions](https://ethglobal.com/events/mumbai/prizes/ethereum-foundation) also require a video of the lead property working end to end in at most three minutes; that video has not been recorded.
 
-| Property | Current behavior and limit |
+| Letter | Current behavior and limit |
 | --- | --- |
-| Censorship resistance | Anyone can read the public ENS and Arkiv records without our Hono backend. The live page still depends on Vercel; reads depend on Sepolia/Arkiv RPC availability and the issuer-controlled parent name. RPC outages make the live check unavailable. |
-| Open source | This repository has an existing [MIT license file](LICENSE) and local build instructions above. The team must confirm rights for every submitted component. The teammate-owned AIBot has separate authorship and unconfirmed license; the landing page builds without its runtime. |
-| Privacy | The live verifier sends the selected **public** ENS name to RPC providers; they can observe requests and network metadata. Public ENS/Arkiv records, addresses and transaction timing are linkable and indexable. Proposed matching inputs remain on devices only in the design; no deployed private-match flow proves that yet. The optional AIBot sends separately consented Persona/conversation data to its AI provider. |
-| Security | Issuer EIP-712 signatures and ENS permissions protect the public credential path, subject to the issuer and parent-name controller remaining trusted. Private matching proofs, deposits and review recovery have not passed end-to-end acceptance tests. No real match or financial safety claim follows from `eligible`. |
+| **C — Censorship resistant** | Public ENS/Arkiv verification works without our Hono backend. The Vercel page, Sepolia/Arkiv RPCs and issuer-controlled parent name remain dependencies; RPC failure is shown as unavailable. |
+| **O — Open source** | This parent repository is [MIT licensed](LICENSE) and can be built with the commands above. The separately authored AIBot's license and submission rights are unconfirmed, so the complete proposed product cannot yet be reproduced from this repository alone. |
+| **P — Private** | RPC providers see the selected public ENS name and network metadata; public names, addresses and transaction timing remain linkable. Private-match inputs staying on devices is still a design goal; the standalone AIBot sends separately consented Persona/conversation data to its AI provider. |
+| **S — Secure** | Issuer EIP-712 signatures and scoped ENSv2 permissions protect the current public credential path. The issuer, parent-name controller, wallet keys and RPCs remain trust assumptions; private matching, deposits and review recovery lack end-to-end proof. |
 
 **No trackers in the frontend source.** On 7 November 2026 the frontend source, HTML, Vite config
 and public assets were searched for Google Analytics, Tag Manager, Segment, Mixpanel, PostHog,
@@ -211,9 +211,9 @@ static source check, not a network audit of the deployment or the AIBot.
 
 | Target | State |
 |---|---|
-| **ENS — Best Use of ENSv2** | Alice/Bob credentials and role separation demonstrated on Sepolia. Suspension/recovery unfinished. |
-| **Arkiv — Build on Arkiv** | Alice/Bob credentials written on Rabdi; the live browser reads the current entities. Credential update/expiry demo unfinished. Notes: [schema](arkiv/schema.md) · [friction](arkiv/friction.md) · [reach](arkiv/reach.md) · [why Arkiv](arkiv/why-arkiv.md) · [how we use Arkiv](arkiv/how-you-use-arkiv.md) |
-| **Ethereum Foundation — Best CROPS App** | Design boundaries documented; the private-matching flow and its video are **not done**. |
+| **ENS — Best Use of ENSv2** | Alice/Bob credentials and role separation demonstrated on Sepolia. The live demo is the public qualification verifier; real suspension/recovery remains unfinished. [Official conditions](https://ethglobal.com/events/mumbai/prizes/ens) · [evidence](specs/001-private-dating/evidence/ens.md) |
+| **Arkiv — Build on Arkiv (from scratch)** | Alice/Bob credentials written on Rabdi; the live browser reads the current entities. From Scratch eligibility and third-party reproduction still need confirmation. [Official conditions](https://ethglobal.com/events/mumbai/prizes/arkiv) · [schema](arkiv/schema.md) · [friction](arkiv/friction.md) · [reach](arkiv/reach.md) · [why Arkiv](arkiv/why-arkiv.md) · [how we use Arkiv](arkiv/how-you-use-arkiv.md) |
+| **Ethereum Foundation — Best CROPS App** | The [CROPS boundaries](#crops) are documented; end-to-end private matching and the required video are **not done**. [Official conditions](https://ethglobal.com/events/mumbai/prizes/ethereum-foundation) |
 | Arkiv + Swarm bonus | Conditional; not demonstrated. |
 
 The [official-condition mapping](specs/001-private-dating/prize-targets.md) lists each acceptance
@@ -244,22 +244,48 @@ need a recorded human rehearsal.
 | Path | What it is |
 |---|---|
 | `apps/frontend` | React/Vite/Void landing page and the read-only participation verifier |
-| `apps/backend` | Hono/Workers starter, SIWE session, participation issuance and evidence scripts |
-| `packages/shared` | Credential schemas and EIP-712 signing format |
-| `packages/api-specs` | OpenAPI HTTP contract; generated client pending |
+| `apps/backend` | Hono/Workers API with local SIWE, private review and participation issuance code; product matching and funding are not live |
+| `packages/shared` | Credential, review and simulation schemas, generated API client, EIP-712 signing format |
+| `packages/api-specs` | OpenAPI HTTP contract used to generate the shared client |
 | `apps/contract` | Hardhat starter; deposit contracts planned |
 | `ethglobal-mumbai-2026-AIBot` | Teammate-owned, separately implemented AI Persona app |
 | `specs/001-private-dating` | Specification, plan, tasks, fixtures and evidence |
 
-This project builds on public starter templates and a teammate-owned AIBot submodule; the Git
-history separates new hackathon work from the starter. The team must confirm the event's submission
-track and rights for all components; the AIBot submodule has separate authorship and an unconfirmed
-license. This parent repository has an existing [MIT license file](LICENSE). AI tools, including Codex and Claude Code,
-assisted with specification writing, integration planning, evidence scripts and the landing page.
-Team members supplied the concept, sponsor feedback, wallet signatures and the AIBot
-implementation. Scope and prompts for further work: [spec](specs/001-private-dating/spec.md) ·
+### Classic / From Scratch provenance
+
+The [Mumbai rules](https://ethglobal.com/events/mumbai/info/details) require Classic work to start
+after the event officially begins, and the Arkiv target is specifically **from scratch**. This
+repository's first commit, `14128aa` (5 November 2026, 21:08 IST), contained only a two-line
+README; later setup commits added the Vite/Void frontend, Hono backend, Hardhat Counter sample,
+pnpm/Turbo configuration and Spec Kit tooling. The event start time, chosen submission track and
+whether each setup item qualifies as permitted starter material have **not been confirmed** against
+the team's registration. We do not claim From Scratch eligibility from the commit dates alone.
+
+| Scope | Provenance and current status |
+|---|---|
+| New project-specific work shown in this repository | Secret Tinder concept/specification, ENSv2 Alice/Bob subnames and scoped resolvers, issuer-signed Arkiv credentials, indexed Arkiv query, independent browser/CLI verification, and the animated explanation. Local SIWE/review/simulation work is separate from the public verifier. Use `git log --reverse --format='%h %aI %s'` to inspect the sequence. |
+| Reused material | The frontend/backend/contract starter scaffolding, open-source package dependencies, Spec Kit tooling and the separately authored [AIBot git submodule](ethglobal-mumbai-2026-AIBot/) are not presented as newly built matching or settlement features. The submodule has its own history, setup and author. |
+| Still proposed | Private preference matching, deposits/refunds, public profile registration, real credential suspension/recovery and the authenticated parent-to-AIBot handoff have no end-to-end live demonstration. |
+
+### AI assistance and team contribution
+
+Codex and Claude Code assisted with [specification and plan files](specs/001-private-dating/),
+integration planning, [evidence scripts](scripts/) and the [landing page](apps/frontend/src/App.tsx)
+and [public verifier](apps/frontend/src/pages/Participation.tsx). This describes assistance, not
+exclusive authorship of every line. The project concept and sponsor feedback came from team members;
+the issuer's live wallet signatures were explicitly approved and signed by a human. A teammate built
+the standalone AIBot, which is a separate repository and is not evidence of parent integration.
+
+**TODO before submission:** verify the Classic/From Scratch track and event start against the team
+registration; document which human reviewed and authored each submitted component; confirm the
+AIBot author's license and permission to submit it; identify the exact AI-assisted files/assets and
+include any project-specific prompts required by the event rules. The public parent code is
+[MIT licensed](LICENSE); this does not establish rights to the submodule.
+
+Spec-driven materials: [spec](specs/001-private-dating/spec.md) ·
 [plan](specs/001-private-dating/plan.md) · [tasks](specs/001-private-dating/tasks.md) ·
-[acceptance guide](specs/001-private-dating/quickstart.md).
+[acceptance guide](specs/001-private-dating/quickstart.md) ·
+[Spec Kit setup](.specify/).
 
 </details>
 
