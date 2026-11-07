@@ -19,6 +19,17 @@ function randomId(): string {
   return id;
 }
 
+function downloadBackup(backup: string): void {
+  const url = URL.createObjectURL(
+    new Blob([backup], { type: "application/json" }),
+  );
+  const anchor = document.createElement("a");
+  anchor.href = url;
+  anchor.download = "secret-tinder-private-backup.json";
+  anchor.click();
+  window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
 function Choice({
   label,
   value,
@@ -48,9 +59,12 @@ export default function Registration() {
   const [profile, setProfile] = useState<SyntheticProfile>(defaultProfile);
   const [isBusy, setIsBusy] = useState(false);
   const [result, setResult] = useState("");
+  const [passphrase, setPassphrase] = useState("");
+  const [backup, setBackup] = useState<string | null>(null);
 
   async function generateProof(): Promise<void> {
     setIsBusy(true);
+    setBackup(null);
     setResult(
       "Generating a real Noir proof on this device. This may take a minute...",
     );
@@ -70,6 +84,16 @@ export default function Registration() {
         registration.publicProof,
         claim,
       );
+      if (isVerified && passphrase.length >= 16) {
+        const { createRegistrationBackup } = await import(
+          "../profile/registration-backup.ts"
+        );
+        const encrypted = await createRegistrationBackup(
+          registration.privateMaterial,
+          passphrase,
+        );
+        if (encrypted.ok) setBackup(encrypted.data);
+      }
       setResult(
         isVerified
           ? `Proof verified locally. Public commitment: ${claim.root}`
@@ -80,6 +104,7 @@ export default function Registration() {
         `Proof generation failed: ${error instanceof Error ? error.message : "unknown error"}`,
       );
     } finally {
+      setPassphrase("");
       setIsBusy(false);
     }
   }
@@ -134,6 +159,21 @@ export default function Registration() {
               }
             />
           </Cluster>
+          <label>
+            Optional backup passphrase (16 characters or more){" "}
+            <input
+              type="password"
+              autoComplete="new-password"
+              value={passphrase}
+              maxLength={1024}
+              onChange={(event) => setPassphrase(event.target.value)}
+            />
+          </label>
+          <Lism as="p" c="text-2" fz="s">
+            With a passphrase, an encrypted private backup is prepared locally
+            after verification. Without it, the private witness is discarded. A
+            lost passphrase cannot be recovered.
+          </Lism>
           <button
             type="button"
             disabled={isBusy}
@@ -150,6 +190,11 @@ export default function Registration() {
             >
               {result}
             </Lism>
+          )}
+          {backup && (
+            <button type="button" onClick={() => downloadBackup(backup)}>
+              Download encrypted private backup
+            </button>
           )}
         </Stack>
       </Wrapper>
