@@ -424,6 +424,23 @@ export async function checkCredential(
   }
 }
 
+export function checkCredentialStatus(
+  credential: Credential,
+  timestamp: bigint,
+): { verdict: "eligible" | "ineligible"; reason: string | null } {
+  if (BigInt(credential.expiresAt) <= timestamp) {
+    return { verdict: "ineligible", reason: "CREDENTIAL_EXPIRED" };
+  }
+  if (
+    credential.status === "suspended" &&
+    credential.suspendedUntil !== null &&
+    BigInt(credential.suspendedUntil) > timestamp
+  ) {
+    return { verdict: "ineligible", reason: "SUSPENDED" };
+  }
+  return { verdict: "eligible", reason: null };
+}
+
 export async function readCurrentRecords(
   label: string,
   requestedBlock?: bigint,
@@ -479,13 +496,9 @@ async function verifyCurrent(label: string, requestedBlock?: bigint) {
   );
   if (BigInt(credential.expiresAt) <= block.timestamp)
     throw new InvalidCredential("CREDENTIAL_EXPIRED");
-  const isSuspended =
-    credential.status === "suspended" &&
-    credential.suspendedUntil !== null &&
-    BigInt(credential.suspendedUntil) > block.timestamp;
+  const status = checkCredentialStatus(credential, block.timestamp);
   return {
-    verdict: isSuspended ? "ineligible" : "eligible",
-    reason: isSuspended ? "SUSPENDED" : null,
+    ...status,
     ensBlockNumber: block.number.toString(),
     credentialVersion: credential.credentialVersion,
     dnsName,
