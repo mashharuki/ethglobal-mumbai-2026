@@ -59,6 +59,21 @@ test("should consume a SIWE challenge once under concurrent submissions", async 
       expiresAt: string;
     };
     assert.ok(new Date(challenge.expiresAt).getTime() > Date.now());
+    const malformedMessage = await fetch(`${origin}/v1/auth/sessions`, {
+      method: "POST",
+      headers: { Origin: origin, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        message: "not a SIWE message",
+        signature: "0x11",
+      }),
+    });
+    assert.equal(malformedMessage.status, 401);
+    const oversizedMessage = await fetch(`${origin}/v1/auth/sessions`, {
+      method: "POST",
+      headers: { Origin: origin, "Content-Type": "application/json" },
+      body: JSON.stringify({ message: "x".repeat(9000), signature: "0x11" }),
+    });
+    assert.equal(oversizedMessage.status, 422);
     const signature = await account.signMessage({ message: challenge.message });
     const outsider = privateKeyToAccount(generatePrivateKey());
     const invalidSignature = await outsider.signMessage({

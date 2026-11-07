@@ -7,6 +7,7 @@ import {
 } from "shared";
 import { getAddress, isAddress } from "viem";
 import { parseSiweMessage } from "viem/siwe";
+import { readBoundedJsonBody } from "./auth/request-body.ts";
 import {
   AuthStore,
   getAuthenticatedAddress,
@@ -49,18 +50,6 @@ function getRequestOrigin(c: AppContext): string | null {
   return c.req.header("Origin") === url.origin ? url.origin : null;
 }
 
-async function readJsonBody(c: AppContext): Promise<unknown> {
-  if (!c.req.header("Content-Type")?.startsWith("application/json"))
-    return null;
-  const body = await c.req.text();
-  if (body.length > 8192) return null;
-  try {
-    return JSON.parse(body) as unknown;
-  } catch {
-    return null;
-  }
-}
-
 app.use("*", async (c, next) => {
   await next();
   c.header("Cache-Control", "no-store");
@@ -78,7 +67,9 @@ app.use("*", async (c, next) => {
 app.post("/v1/auth/challenges", async (c) => {
   const origin = getRequestOrigin(c);
   if (!origin) return sendError(c, 422, "INVALID_INPUT");
-  const parsed = authChallengeRequestSchema.safeParse(await readJsonBody(c));
+  const parsed = authChallengeRequestSchema.safeParse(
+    await readBoundedJsonBody(c.req.raw, 8192),
+  );
   if (!parsed.success) return sendError(c, 422, "INVALID_INPUT");
   const store = getAuthStore(c.env, getAddress(parsed.data.address));
   const result = await store.issueChallenge(parsed.data.address, origin);
@@ -95,9 +86,16 @@ app.post("/v1/auth/challenges", async (c) => {
 app.post("/v1/auth/sessions", async (c) => {
   const origin = getRequestOrigin(c);
   if (!origin) return sendError(c, 422, "INVALID_INPUT");
-  const parsed = authSessionRequestSchema.safeParse(await readJsonBody(c));
+  const parsed = authSessionRequestSchema.safeParse(
+    await readBoundedJsonBody(c.req.raw, 8192),
+  );
   if (!parsed.success) return sendError(c, 422, "INVALID_INPUT");
-  const siwe = parseSiweMessage(parsed.data.message);
+  let siwe: ReturnType<typeof parseSiweMessage>;
+  try {
+    siwe = parseSiweMessage(parsed.data.message);
+  } catch {
+    return sendError(c, 401, "UNAUTHENTICATED");
+  }
   if (!siwe.address || !isAddress(siwe.address, { strict: false })) {
     return sendError(c, 401, "UNAUTHENTICATED");
   }
