@@ -4,9 +4,9 @@ import { useRef, useState } from "react";
 import type { VerificationResult } from "./participation-verifier.ts";
 
 const verdictText = {
-  eligible: "資格あり",
-  ineligible: "資格なし",
-  unavailable: "現在確認できません",
+  eligible: "Eligible",
+  ineligible: "Ineligible",
+  unavailable: "Unable to verify right now",
 } as const;
 
 function VerificationOutput({ result }: { result: VerificationResult | null }) {
@@ -14,16 +14,16 @@ function VerificationOutput({ result }: { result: VerificationResult | null }) {
   return (
     <Stack as="output" p="20" g="10" bgc="base" bdrs="10">
       <Lism as="strong" fz="l">
-        {result.dnsName}：{verdictText[result.verdict]}
+        {result.dnsName}: {verdictText[result.verdict]}
       </Lism>
       <Lism as="span" c="text-2" fz="s">
         {result.ensBlockNumber
-          ? `Sepolia block ${result.ensBlockNumber} · 資格版 ${result.credentialVersion}`
-          : `理由: ${result.reason ?? "不明"}`}
+          ? `Sepolia block ${result.ensBlockNumber} · Credential version ${result.credentialVersion}`
+          : `Reason: ${result.reason ?? "Unknown"}`}
       </Lism>
       {result.ensBlockNumber && result.reason ? (
         <Lism as="span" c="text-2" fz="s">
-          理由: {result.reason}
+          Reason: {result.reason}
         </Lism>
       ) : null}
     </Stack>
@@ -53,7 +53,7 @@ function VerificationButtons({
           bdrs="99"
           fw="bold"
         >
-          {label === "alice" ? "Alice" : "Bob"}を検証
+          Verify {label === "alice" ? "Alice" : "Bob"}
         </Lism>
       ))}
     </Cluster>
@@ -69,7 +69,7 @@ function VerificationStatus({
 }) {
   return (
     <Stack role="status" aria-live="polite" aria-atomic="true">
-      {isChecking ? <Lism as="p">公開ネットワークを確認中…</Lism> : null}
+      {isChecking ? <Lism as="p">Checking public networks…</Lism> : null}
       <VerificationOutput result={result} />
     </Stack>
   );
@@ -107,10 +107,11 @@ export default function Participation() {
     <Stack as="section" p="30" g="20" bgc="base-2" bdrs="20">
       <Stack g="10">
         <Lism as="h3" fz="xl">
-          公開資格を自分で確認
+          Check the credentials yourself
         </Lism>
         <Lism as="p" c="text-2" fz="s">
-          ENSとArkivの現行データをブラウザーから直接読みます。ウォレット接続や署名は不要です。
+          Your browser reads the current ENS and Arkiv records directly. No
+          wallet connection or signature is needed.
         </Lism>
       </Stack>
       <VerificationButtons
@@ -119,7 +120,9 @@ export default function Participation() {
       />
       <VerificationStatus isChecking={isChecking} result={result} />
       <Lism as="p" c="text-2" fz="s">
-        読取先のRPCにはENS名と問い合わせ時刻が見えます。趣味や希望条件は送信しません。通信障害は資格なしと区別して表示します。
+        RPC providers can see the ENS name you check and the time of your
+        request. We do not send hobbies or preferences. Network errors are shown
+        separately from an ineligible credential.
       </Lism>
     </Stack>
   );
