@@ -70,6 +70,8 @@ Honoバックエンドを起動せず、Viteのローカル画面から`Particip
 
 `scripts/issue-participation.ts`は従来の4引数`draft`を維持し、`publication`と`reference`の段階を追加した。登録receipt・現行owner/resource・親接続・Factory出自を確認して得た初回資格ドラフトと、後から渡す発行者署名済み資格のEIP-712 message hashを比較する。署名と期限が正しい場合だけArkivの読取専用entity書込値を生成する。`reference`は指定したArkiv entityを読み戻し、発行者・所有者・不変属性・版・digest・署名を照合してからENSの`app.credential`更新calldataを生成する。既存参照と異なる更新は`REFERENCE_CONFLICT`、同じ参照は`alreadyCurrent`となる。初回`publication`は参照が既に存在すると`ALREADY_ISSUED`となり、重複公開計画を出さない。外部署名・書込は行わない。
 
+初回資格の期限は登録ブロック時刻から7日とENS名の期限の早い方に固定する。後から`publication`を実行しても、確認ブロックの時刻だけで署名本文が変わらない。期限切れ・未来の登録ブロックは拒否する。Aliceの既存署名のmessage digestがこの変更後も変わらないことを読取で確認した。
+
 Aliceの既存公開資格では、従来の4引数`draft`がblock`12080394`で元のmessage digest `0x7376e32934e9585ba99760ddeec83ff74e3ca3469f60ebbf521289ff85a833c7`を返し、`publication`は`ALREADY_ISSUED`、既存Arkiv entityを指定した`reference`はblock`12080393`で`alreadyCurrent: true`を返した。これは既存Alice/Bob資格への書込ではない。`apps/backend/src/participation/publication-gate.test.ts`は実Alice署名fixtureで正常なArkiv計画、改ざん署名/本文拒否、読戻し後のENS calldataと可変entity拒否を5件検証した。未発行の新規参加者に対する実送信は未実施。
 
 ## 残る合格条件

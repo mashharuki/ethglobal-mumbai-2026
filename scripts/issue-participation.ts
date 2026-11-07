@@ -23,6 +23,7 @@ import { packetToBytes } from "viem/ens";
 
 import { ensSepoliaDeployment } from "../apps/backend/src/participation/ens-plan.ts";
 import {
+  chooseInitialCredentialExpiry,
   type RegistrationEvidenceResult,
   verifyRegistrationEvidence,
 } from "../apps/backend/src/participation/issuer.ts";
@@ -222,7 +223,7 @@ function makeCredential(
   trust: ParticipationTrust,
   subject: Address,
   registration: Extract<RegistrationEvidenceResult, { ok: true }>["data"],
-  expiry: bigint,
+  expiry: number,
 ): UnsignedParticipationCredential {
   return {
     schemaVersion: 1,
@@ -235,7 +236,7 @@ function makeCredential(
     issuanceEvent: registration.issuanceEvent,
     credentialVersion: 1,
     status: "eligible",
-    expiresAt: Number(expiry),
+    expiresAt: expiry,
     policyVersion: 1,
     accessTier: "new",
     suspendedUntil: null,
@@ -354,11 +355,17 @@ async function readIssuanceContext(args: Arguments) {
   });
   if (!evidence.ok)
     throw new Error(`Registration evidence failed: ${evidence.error}`);
-  const expiry =
-    participant.expiry < block.timestamp + 7n * 86_400n
-      ? participant.expiry
-      : block.timestamp + 7n * 86_400n;
-  const credential = makeCredential(trust, subject, evidence.data, expiry);
+  const registrationBlock = await client.getBlock({
+    blockNumber: receipt.blockNumber,
+  });
+  const expiry = chooseInitialCredentialExpiry(
+    participant.expiry,
+    registrationBlock.timestamp,
+    block.timestamp,
+  );
+  if (!expiry.ok)
+    throw new Error(`Registration evidence failed: ${expiry.error}`);
+  const credential = makeCredential(trust, subject, evidence.data, expiry.data);
   return { trust, block, participant, credential };
 }
 
