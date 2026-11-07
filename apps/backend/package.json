@@ -8,7 +8,7 @@
     "deploy": "wrangler deploy --minify",
     "cf-typegen": "wrangler types --env-interface CloudflareBindings",
     "check-types": "tsc --noEmit",
-    "test": "node --test src/participation/*.test.ts"
+    "test": "node --test src/participation/*.test.ts src/auth/*.test.ts"
   },
   "dependencies": {
     "@arkiv-network/sdk": "1.0.1",
