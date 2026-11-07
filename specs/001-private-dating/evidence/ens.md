@@ -66,6 +66,12 @@ Honoバックエンドを起動せず、Viteのローカル画面から`Particip
 
 実Aliceの現行公開状態をblock`12080307`で読み、有限停止期限`1794503600`を指定した`draft`は資格版`2`、`status=suspended`、EIP-712 message digest `0x98a196785a10cf94e44d6fdd9a10e44d498e76f96fe5e558719809a2cd212d6f`を生成した。既存版`1`のAlice署名済み資格を`publication`入力として再利用した場合は`ineligible/REVISION_MISMATCH`で終了し、書込計画を出さなかった。Sepolia RPCを到達不能URLにした`draft`は`unavailable/ENS_UNAVAILABLE`で終了した。`apps/backend/src/participation/revision-flow.test.ts`の6件を含めBackendは27件合格。新版の実署名・Arkiv書込・ENS更新は行っていない。
 
+### 初回発行の計画ゲート（2026-11-07追加）
+
+`scripts/issue-participation.ts`は従来の4引数`draft`を維持し、`publication`と`reference`の段階を追加した。登録receipt・現行owner/resource・親接続・Factory出自を確認して得た初回資格ドラフトと、後から渡す発行者署名済み資格のEIP-712 message hashを比較する。署名と期限が正しい場合だけArkivの読取専用entity書込値を生成する。`reference`は指定したArkiv entityを読み戻し、発行者・所有者・不変属性・版・digest・署名を照合してからENSの`app.credential`更新calldataを生成する。既存参照と異なる更新は`REFERENCE_CONFLICT`、同じ参照は`alreadyCurrent`となる。初回`publication`は参照が既に存在すると`ALREADY_ISSUED`となり、重複公開計画を出さない。外部署名・書込は行わない。
+
+Aliceの既存公開資格では、従来の4引数`draft`がblock`12080394`で元のmessage digest `0x7376e32934e9585ba99760ddeec83ff74e3ca3469f60ebbf521289ff85a833c7`を返し、`publication`は`ALREADY_ISSUED`、既存Arkiv entityを指定した`reference`はblock`12080393`で`alreadyCurrent: true`を返した。これは既存Alice/Bob資格への書込ではない。`apps/backend/src/participation/publication-gate.test.ts`は実Alice署名fixtureで正常なArkiv計画、改ざん署名/本文拒否、読戻し後のENS calldataと可変entity拒否を5件検証した。未発行の新規参加者に対する実送信は未実施。
+
 ## 残る合格条件
 
 - T038: 有限停止/回復の発行者側オフライン計画と既存デプロイに対する権限の読取専用試験は追加済み。新版の発行者署名・Arkiv書込・ENS参照更新、委任鍵の発行/失効と失効後の拒否、本人ウォレットからの限定キー実更新は未実施。
