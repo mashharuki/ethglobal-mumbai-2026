@@ -1,0 +1,20 @@
+{
+  "status": "verified",
+  "participant": "bob",
+  "chainId": 7794095,
+  "issuer": "0xcA341CE4902756bF9e96e145014DD0aB36A0Fe8E",
+  "txHash": "0x331de4e344cd021bbdc3b6d6bae95a1ab6fc6b5c78afe0a67a95d4c0fb214cbd",
+  "blockNumber": "304888",
+  "blockHash": "0x61f030fabdab66bb8e0706bc6220272c0a22470c8cce35b954f9c994401f9c24",
+  "gasUsed": "204650",
+  "effectiveGasPrice": "1000000000",
+  "entityKey": "0x4e253c8b29d21b401d99a970bfe8624d0d27bd835e49962006e8c1440d39c151",
+  "entityExpiresAtBlock": "1600888",
+  "recordDigest": "0x492c0346ed438fd8cb9d71321a88e6e2ed8c11aa08493924974790b740fac75f",
+  "reference": {
+    "schemaVersion": 1,
+    "arkivEntityKey": "0x4e253c8b29d21b401d99a970bfe8624d0d27bd835e49962006e8c1440d39c151",
+    "digest": "0x492c0346ed438fd8cb9d71321a88e6e2ed8c11aa08493924974790b740fac75f",
+    "credentialVersion": 1
+  }
+}

@@ -36,14 +36,26 @@ block `12078385`のSepolia ETH残高は発行者が`137.058953682100413728`、Al
 
 `planParentRegistry`は発行者のroot権限を登録・登録解除・更新・Resolver差替えに限定し、参加者の登録時ロールをゼロとする。`planParticipant`は参加者ごとに別Resolverを予測し、本人に`app.endpoint`と`app.key`のsetterだけを計画する。Factoryのデプロイと親への接続のcalldataはスクリプトの出力に含まれる。実行前に現行ブロックでowner・権限・コード・予測アドレスの状態を再確認する。
 
-登録receiptから署名対象を生成する読取専用CLIも用意したが、参加者用Registryが未接続のため成功経路は未実行。Arkivへの書込、資格署名、本人キー委任、独立クライアント検証は行っていない。したがってT038・T039・T034は未完了。外部書込はリポジトリの承認境界に従って実行する。
+登録receiptから署名対象を生成する読取専用CLIも用意したが、参加者の登録receiptがないため成功経路は未実行。Arkivへの書込、資格署名、本人キー委任、独立クライアント検証は行っていない。したがってT038・T039・T034は未完了。外部書込はリポジトリの承認境界に従って実行する。
 
 ユーザーは2026-11-07（IST）に親Registryの2取引を発行者ウォレットで進めることを承認した。BraveのSepolia Etherscan Factory `deployProxy`フォームに、保存計画から復号したimplementation・salt・初期化dataを入力した。ウォレットは未接続で、送信・署名は行っていない。block `12078432`でも予測Registryのコードはなく、親のsubregistryはゼロアドレスだった。フォームの入力状態はブラウザーに依存するため、送信前には保存JSONと再照合する。
 
-その後、MetaMask Flaskを接続し、発行者`0xcA34…Fe8E`からFactory `deployProxy`を送信した。[tx `0xe2db…b1ec`](https://sepolia.etherscan.io/tx/0xe2db27c89fc275006f33b14bacc28867af18ded2db3664306bb3b547afd9b1ec)はblock `12078491`で成功。Etherscanの`ProxyDeployed`イベントに記録されたproxy・implementation・saltは保存計画と一致した。Etherscanの親ETHRegistry `getSubregistry("secrettinder")`の読取結果はゼロアドレスであり、親への接続は未送信。別途、公開RPCの再読取CLIは`HttpRequestError`、`ResourceNotFoundRpcError`、代替RPCの`ContractFunctionExecutionError`で失敗したため、デプロイ済みコード・Factory `verifyContract`・現行ブロックのowner/権限の再照合は未完了。第2取引の送信前に確認する。
+その後、MetaMask Flaskを接続し、発行者`0xcA34…Fe8E`からFactory `deployProxy`を送信した。[tx `0xe2db…b1ec`](https://sepolia.etherscan.io/tx/0xe2db27c89fc275006f33b14bacc28867af18ded2db3664306bb3b547afd9b1ec)はblock `12078491`で成功。Etherscanの`ProxyDeployed`イベントに記録されたproxy・implementation・saltは保存計画と一致した。[予測Registryのコード](https://sepolia.etherscan.io/address/0x8A189F48764C466972c0244C5671B4461C958E8C#code)が存在し、Factory `verifyContract(proxy)`は予定のUserRegistry実装を返した。Etherscanで親ETHRegistryの`getSubregistry("secrettinder")`はゼロアドレス、`getOwner(parentTokenId)`は発行者、`getExpiry(parentTokenId)`は`1825526676`、`hasRoles(parentTokenId, 1048576, issuer)`は`true`と再読取した。親への接続は未送信。公開RPCの再読取CLIは`HttpRequestError`、`ResourceNotFoundRpcError`、代替RPCの`ContractFunctionExecutionError`で失敗したため、これらの照合はEtherscan UIによる読取結果を記録した。
+
+発行者が親ETHRegistryの`setSubregistry`を署名・送信した。[tx `0x0afe…4bcf`](https://sepolia.etherscan.io/tx/0x0afe81bdc06d3b8c1cbd5b1d29fa4b368b1e442f21367b45e3a41d4725fd4bcf)はblock `12078582`で成功。Etherscanの`SubregistryUpdated`イベントは保存計画のparent tokenId、参加者用Registry `0x8A189F48764C466972c0244C5671B4461C958E8C`、発行者アドレスと一致した。親ETHRegistryの`getSubregistry("secrettinder")`も同じRegistryを返した。
+
+block `12078589`の`node scripts/plan-participation.ts parent`で接続を再確認した。parent ownerは発行者、期限は`1825526676`、Registryコードhashは`0xa13bfb0e089b8cd24e4f2e00257b59b266c712a81da27ebf19680c204796c297`。Factory `verifyContract`は予定のUserRegistry実装を返し、`isFactoryVerified`と`isParentConnected`はともに`true`。このブロックで信頼設定を生成できた。これは時点付きの読取結果であり、参加者の登録や資格の発行は示さない。
+
+## 接続後のAlice/Bob発行計画
+
+[Aliceの接続後計画](ens-alice-connected-plan.json)はblock `12078590`、[Bobの接続後計画](ens-bob-connected-plan.json)はblock `12078593`で生成した。両方とも親への接続とRegistryコードを同じブロックで確認し、Registryコードhashは上記と一致。Aliceの専用Resolver予測値は`0x28a0549e48190d69Ae8Bf6046713F766B20A5598`、Bobは`0xf40e2D397cDb891b57eA47CAeBEC26D080778a50`。
+
+各calldataを復号し、Factoryに指定するPermissionedResolver実装、`register`のlabel・owner・専用Resolver・`roleBitmap=0`、および`grantSetterRoles`の受領者が[参加者fixture](../fixtures/ens-demo-participants.json)と一致することを確認した。登録期限はAliceが`1794597600`、Bobが`1794597636`（Unix秒）。この時点では未送信で、後続の送信・検証は[ENS実ネットワーク証拠](ens.md)に記録した。
+
+block `12078602`で両Resolver予測アドレスにコードがないことを確認した。同じブロックの`eth_call`では各Factory `deployProxy`が計画したアドレスを返し、ガス見積りは各`816973`。発行者の残高は`136.055711256565214056 ETH`だった。これは送信前のシミュレーションであり、実際のgas価格・receipt・将来の残高を保証しない。
 
 ## ローカル検証
 
 - `pnpm --filter shared check-types`、`pnpm --filter backend check-types`、共有12件/バックエンド13件のテスト、対象ファイルのBiome検査、フロントエンドlint/build、`pnpm install --offline --frozen-lockfile`、`git diff --check`は通過した。
 - Workers dry-runは終了コード0でbundleを生成したが、sandbox外のWranglerログ保存先への`EPERM`を表示した。
-- ルートの`pnpm exec biome ci .`は、取り込み済み`.agents/skills`等の86エラーで失敗した。今回変更した`apps/backend`、`packages/shared`、`scripts`、`specs/001-private-dating/fixtures`の限定検査は通過した。
+- 2026-11-07のルート`pnpm exec biome ci .`は293エラーで失敗した。今回追加したAlice/Bob計画JSONの限定Biome検査と`git diff --check`は通過した。以前のコード変更時には`apps/backend`、`packages/shared`、`scripts`、`specs/001-private-dating/fixtures`の限定検査が通過した。

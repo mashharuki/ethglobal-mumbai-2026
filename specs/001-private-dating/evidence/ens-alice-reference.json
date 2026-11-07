@@ -1,0 +1,15 @@
+{
+  "status": "verified",
+  "participant": "alice",
+  "txHash": "0xf95064e137e787ef2e8f16ee9d7a0b582be4e6f31afae1504e0b26a422df9b5a",
+  "blockNumber": "12078888",
+  "blockHash": "0x9f9fbc0f1a73cfafc3d5979fe520d287bf93c5be0e7072cb9ee119db11c5a406",
+  "gasUsed": "1148397",
+  "effectiveGasPrice": "1000000000",
+  "reference": {
+    "schemaVersion": 1,
+    "arkivEntityKey": "0x628a86b2b8d2ee96d9b91b92a9013f10ce67421e4792bf7911c46234d92ab5d6",
+    "digest": "0x5eef3a22c4bfc28571afc6839201338b553c6e0105ce09bec9f70504b8f2dded",
+    "credentialVersion": 1
+  }
+}

@@ -6,7 +6,7 @@
 
 MVPはチームが管理する発行者が、架空の参加者へ資格を発行する。[資格審査契約](participation-review.md)に従い、合成の根拠に基づく停止・本人通知・異議・回復を実装する。現実の不正検出、人気スコア、普遍的な一人一資格、自動没収を実証したとは扱わない。
 
-Sepoliaの信頼する名前空間・Registry・発行者鍵・deployment版を検証者の設定に固定する。親名`secrettinder.eth`、親のETHRegistry、発行者公開アドレスは[実測fixture](../fixtures/participation.json)に記録し、共有schemaの`participationTrustAnchor`にも固定した。block 12076657では親名のownerと指定発行者が一致し、block 12076672ではそのアドレスに親のsubregistry設定権限があった。一方、参加者用Registryは未接続であり、fixtureを完全な参加者資格の信頼設定として受け入れない。T038で参加者用RegistryとResolverを作成したら、現行ブロックで親の接続、コード、権限、発行世代を再確認して設定を完成させる。任意のENS名を同じ発行者の資格として受け入れない。参加者ごとにResolver proxyのコードはsaltを含んで異なるため、共通信頼設定ではResolver実装のコードhashを固定し、各proxyは公式Factoryの`verifyContract`で出自と現行実装を確認する。
+Sepoliaの信頼する名前空間・Registry・発行者鍵・deployment版を検証者の設定に固定する。親名`secrettinder.eth`、親のETHRegistry、発行者公開アドレスは[実測fixture](../fixtures/participation.json)に記録し、共有schemaの`participationTrustAnchor`にも固定した。block 12076657では親名のownerと指定発行者が一致し、block 12076672ではそのアドレスに親のsubregistry設定権限があった。このfixtureは過去ブロックのスナップショットで、その時点では参加者用Registryは未接続だった。参加者用Registryと専用Resolverの現在の接続と実コードhashは[公開の信頼設定](../evidence/ens-trust.json)・[実ネットワーク証拠](../evidence/ens.md)を参照する。検証時にも現行ブロックで親の接続、コード、権限、発行世代を読み直す。任意のENS名を同じ発行者の資格として受け入れない。参加者ごとにResolver proxyのコードはsaltを含んで異なるため、共通信頼設定ではResolver実装のコードhashを固定し、各proxyは公式Factoryの`verifyContract`で出自と現行実装を確認する。
 
 | 対象 | 更新者 | 検証者の扱い |
 | --- | --- | --- |
