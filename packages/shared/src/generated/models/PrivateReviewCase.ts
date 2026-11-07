@@ -30,6 +30,10 @@ export interface PrivateReviewCase {
     /**
      *
      */
+    prohibitedAct: string;
+    /**
+     *
+     */
     state: PrivateReviewCaseStateEnum;
     /**
      *
@@ -77,6 +81,7 @@ export type PrivateReviewCaseStateEnum = typeof PrivateReviewCaseStateEnum[keyof
 export function instanceOfPrivateReviewCase(value: object): value is PrivateReviewCase {
     if (!('caseId' in value) || value['caseId'] === undefined) return false;
     if (!('policyVersion' in value) || value['policyVersion'] === undefined) return false;
+    if (!('prohibitedAct' in value) || value['prohibitedAct'] === undefined) return false;
     if (!('state' in value) || value['state'] === undefined) return false;
     if (!('revision' in value) || value['revision'] === undefined) return false;
     if (!('openedAt' in value) || value['openedAt'] === undefined) return false;
@@ -95,6 +100,7 @@ export function PrivateReviewCaseFromJSONTyped(json: any, ignoreDiscriminator: b
 
         'caseId': json['caseId'],
         'policyVersion': json['policyVersion'],
+        'prohibitedAct': json['prohibitedAct'],
         'state': json['state'],
         'revision': json['revision'],
         'openedAt': (json['openedAt'] == null ? json['openedAt'] : parseDateTime(json['openedAt'])),
@@ -118,6 +124,7 @@ export function PrivateReviewCaseToJSONTyped(value?: PrivateReviewCase | null, i
 
         'caseId': value['caseId'],
         'policyVersion': value['policyVersion'],
+        'prohibitedAct': value['prohibitedAct'],
         'state': value['state'],
         'revision': value['revision'],
         'openedAt': value['openedAt'] == null ? value['openedAt'] : serializeDateTime(value['openedAt']),
