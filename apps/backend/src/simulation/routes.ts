@@ -32,10 +32,12 @@ export type PendingDateRequest = {
 
 export type SimulationRoutesDependencies = {
   loadMatchEvidence: (
+    env: CloudflareBindings,
     matchId: string,
   ) => Promise<SimulationMatchEvidence | null>;
   // Implementations must atomically persist by gameSessionId across Worker restarts.
   createPendingDateRequest: (
+    env: CloudflareBindings,
     input: PendingDateRequest,
   ) => Promise<DateRequestWrite>;
   fetchPersonaMetadata?: (
@@ -139,7 +141,7 @@ async function authorizeRequest(
 > {
   let evidence: SimulationMatchEvidence | null;
   try {
-    evidence = await deps.loadMatchEvidence(matchId);
+    evidence = await deps.loadMatchEvidence(c.env, matchId);
   } catch {
     return { ok: false, status: 503 };
   }
@@ -213,7 +215,7 @@ export function createSimulationRoutes(
       );
     let stored: DateRequestWrite;
     try {
-      stored = await deps.createPendingDateRequest({
+      stored = await deps.createPendingDateRequest(c.env, {
         playerSubject: subject,
         matchId: parsed.data.matchId,
         gameSessionId: parsed.data.gameSessionId,

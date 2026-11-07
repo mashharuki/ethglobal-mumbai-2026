@@ -72,8 +72,8 @@ function createFixture(): Fixture {
   let metadataCalls = 0;
   let isMetadataDown = false;
   const deps: SimulationRoutesDependencies = {
-    loadMatchEvidence: async (id) => evidence.get(id) ?? null,
-    createPendingDateRequest: async (input) => {
+    loadMatchEvidence: async (_env, id) => evidence.get(id) ?? null,
+    createPendingDateRequest: async (_env, input) => {
       const stored = requests.get(input.gameSessionId);
       if (stored) {
         if (
