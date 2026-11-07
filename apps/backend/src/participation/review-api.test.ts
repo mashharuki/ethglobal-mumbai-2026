@@ -111,8 +111,10 @@ describe("private review API", () => {
         state: string;
         revision: number;
         suspendedUntil: string;
+        prohibitedAct: string;
       };
       assert.equal(notice.state, "decided");
+      assert.equal(notice.prohibitedAct, "synthetic-solicitation");
       assert.ok(new Date(notice.suspendedUntil).getTime() > Date.now());
       assert.equal(ownerNotice.headers.get("Cache-Control"), "no-store");
       const outsiderNotice = await fetch(

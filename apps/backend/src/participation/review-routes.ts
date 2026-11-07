@@ -88,6 +88,7 @@ reviewRoutes.get("/review-cases/:id", async (c) => {
   return c.json({
     caseId: detail.caseId,
     policyVersion: detail.policyVersion,
+    prohibitedAct: detail.prohibitedAct,
     state: detail.state,
     revision: detail.revision,
     openedAt: toIso(detail.openedAt),
