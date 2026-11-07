@@ -3,6 +3,7 @@ import { readFileSync } from "node:fs";
 import { describe, it } from "node:test";
 import {
   checkCredential as checkWebCredential,
+  checkCredentialStatus as checkWebCredentialStatus,
   fromNetwork as fromWebNetwork,
 } from "../apps/frontend/src/pages/participation-verifier.ts";
 import {
@@ -12,6 +13,7 @@ import {
 } from "../packages/shared/src/index.ts";
 import {
   checkCredential as checkCliCredential,
+  checkCredentialStatus as checkCliCredentialStatus,
   fromNetwork as fromCliNetwork,
 } from "./verify-participation.ts";
 
@@ -41,8 +43,18 @@ const reference = credentialReferenceSchema.parse(
 );
 const trust = participationTrustSchema.parse(loadEvidence("ens-trust.json"));
 const clients = [
-  { name: "Web", check: checkWebCredential, fromNetwork: fromWebNetwork },
-  { name: "CLI", check: checkCliCredential, fromNetwork: fromCliNetwork },
+  {
+    name: "Web",
+    check: checkWebCredential,
+    status: checkWebCredentialStatus,
+    fromNetwork: fromWebNetwork,
+  },
+  {
+    name: "CLI",
+    check: checkCliCredential,
+    status: checkCliCredentialStatus,
+    fromNetwork: fromCliNetwork,
+  },
 ] as const;
 
 function hasCode(expected: string): (error: unknown) => boolean {
@@ -116,6 +128,35 @@ for (const client of clients) {
           hasCode(code),
         );
       }
+    });
+
+    it("should reject a suspended credential until its finite deadline", () => {
+      const suspendedUntil = credential.expiresAt - 60;
+      const suspended = {
+        ...credential,
+        status: "suspended" as const,
+        suspendedUntil,
+      };
+      assert.deepEqual(client.status(suspended, BigInt(suspendedUntil - 1)), {
+        verdict: "ineligible",
+        reason: "SUSPENDED",
+      });
+      assert.deepEqual(client.status(suspended, BigInt(suspendedUntil)), {
+        verdict: "eligible",
+        reason: null,
+      });
+    });
+
+    it("should reject an expired credential even after suspension ends", () => {
+      const suspended = {
+        ...credential,
+        status: "suspended" as const,
+        suspendedUntil: credential.expiresAt - 60,
+      };
+      assert.deepEqual(client.status(suspended, BigInt(credential.expiresAt)), {
+        verdict: "ineligible",
+        reason: "CREDENTIAL_EXPIRED",
+      });
     });
   });
 }
