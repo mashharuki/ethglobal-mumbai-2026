@@ -51,7 +51,7 @@ BN254 Fr/Grumpkinと128-bit非零スカラーを採用した。BB.js v5.3.0に�
 
 合成fixtureはBB.jsの実Grumpkin演算と独立の平文oracleから生成した。Noir v1.0.0でwitness生成、BB CLI v6.0.0でUltraHonk prove/verify成功、暗号文の最初のx座標を1変更したwitnessは失敗し、公開digestを1 bit変更したverifyも失敗した。A側VKファイルSHA-256は`629107f9a38859e0460efe80439e93a979f1e1dd105ba0f584c3557775ddecf1`。公開入力12個、証明14,656 byte、暗号文の生座標だけで36,864 byte。ACIRは15,688 opcodes。初回proveコマンドは27.5秒、再実行は5.6秒、BBのメモリ表示は最大約1.67 GiBだった。計測機はmacOS arm64で、ブラウザーの処理時間・メモリとは異なる。`matching`が登録ルート式を複製しているため、登録回路との合成root一致試験を維持する。
 
-同じA側合成入力をNode 24のNoirJS v1.0.0 + BB.js v5.3.0でも`apps/frontend/scripts/matching-bbjs-smoke.mjs matching`でprove/verifyした。実測約59秒、証明14,656 byte、公開入力12個、VK SHA-256は`12ea1b68e06613acdcb46abb3d3a6a8caf99f8ea25e44c86629cc32d3a57ea2f`で、CLI v6の鍵と異なる。公開CRSのローカルキャッシュは8 MiBの圧縮G1を要した。この試験はNode/WASMであり、実ブラウザー内のメモリ、読み込み時間、2端末通信を示さない。
+同じA側合成入力をNode 24のNoirJS v1.0.0 + BB.js v5.3.0でも`apps/frontend/scripts/matching-bbjs-smoke.mjs matching`でprove/verifyした。実測約59秒、証明14,656 byte、公開入力12個、VK SHA-256は`12ea1b68e06613acdcb46abb3d3a6a8caf99f8ea25e44c86629cc32d3a57ea2f`で、CLI v6の鍵と異なる。B側も同じNode/WASMで約36秒、16公開入力、VK SHA-256は`4e61e813dc5777c41e087d4ac78eda234caaf68e2f624eee2d5c9277b055cd40`、結果側は約3秒、10公開入力、VK SHA-256は`6690b2bc2472a4856e47b0a9325b93d8af587550a964527ce7b83408470d9fde`だった。B側は公開CRSのローカルキャッシュに1,048,576点、圧縮G1 32 MiBを要した。この試験はNode/WASMであり、実ブラウザー内のメモリ、読み込み時間、2端末通信を示さない。
 
 ## B側と結果の回路（合成fixture）
 
