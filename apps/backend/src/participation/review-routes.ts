@@ -23,6 +23,11 @@ type ReviewErrorCode =
 
 export const reviewRoutes = new Hono<{ Bindings: CloudflareBindings }>();
 
+reviewRoutes.use("*", async (c, next) => {
+  await next();
+  c.header("Cache-Control", "no-store");
+});
+
 function reviewError(
   c: ReviewContext,
   status: 401 | 404 | 409 | 422 | 503,
@@ -76,7 +81,6 @@ reviewRoutes.get("/review-cases/:id", async (c) => {
   const visible = getPrivateReviewCase(review, actor);
   if (!visible.ok) return reviewError(c, 404, "NOT_FOUND");
   const detail = visible.data;
-  c.header("Cache-Control", "no-store");
   return c.json({
     caseId: detail.caseId,
     policyVersion: detail.policyVersion,
@@ -146,11 +150,14 @@ async function mutateReview(
       result.error === "INVALID_INPUT" ? "INVALID_INPUT" : "CONFLICT",
     );
   }
-  if (
-    result.data.revision !== review.revision &&
-    !(await store.putReviewCase(result.data, review.revision))
-  )
-    return reviewError(c, 409, "CONFLICT");
+  if (result.data.revision !== review.revision) {
+    const isSaved = await store.putReviewCase(result.data, review.revision);
+    if (!isSaved) {
+      const latest = await store.getReviewCase(caseId.data);
+      if (latest?.operationFingerprints[operationId.data] !== input.fingerprint)
+        return reviewError(c, 409, "CONFLICT");
+    }
+  }
   await getAuthStore(c.env, actor).putPrivateOperation({
     operationId: operationId.data,
     kind: "review",
@@ -158,7 +165,6 @@ async function mutateReview(
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   });
-  c.header("Cache-Control", "no-store");
   return c.json(
     { operationId: operationId.data, status: "pending" as const },
     202,

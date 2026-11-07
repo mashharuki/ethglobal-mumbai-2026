@@ -6,7 +6,7 @@ Always reply to the user in **Japanese**.
 ## Project status
 
 - Hackathon project for **ETHGlobal Mumbai 2026**.
-- An existing **private dating / matching proposal** lives in `specs/001-private-dating/`. The live frontend has an overview and read-only ENSv2/Arkiv participation verifier. This branch adds local SIWE/Hono auth and an isolated in-person disclosure preview; they are not deployed or joined to matching. Counter is still the only sample contract. Issuer and independent verification scripts live outside the app routes. The AIBot submodule has a standalone Persona conversation implementation; parent matching integration is unverified. A written requirement is not implemented behavior.
+- An existing **private dating / matching proposal** lives in `specs/001-private-dating/`. The live frontend has an overview and read-only ENSv2/Arkiv participation verifier. Local SIWE/Hono auth, synthetic owner-only review routes and isolated in-person/review previews are in the repository; they are not deployed or joined to matching. Counter is still the only sample contract. Issuer and independent verification scripts live outside the app routes. The AIBot submodule has a standalone Persona conversation implementation; parent matching integration is unverified. A written requirement is not implemented behavior.
 - The specification remains **Draft** and `.specify/memory/constitution.md` is an unratified template. Ethereum Foundation, ENS and Arkiv are confirmed prize targets; this does not imply that the whole specification is approved or the prize requirements are met.
 - **Do not generate or modify Spec Kit artifacts** (`speckit-*`, `.specify/`, `specs/`) unless the user asks for specification work. A status review may read them without starting a workflow.
 
@@ -23,7 +23,7 @@ Always reply to the user in **Japanese**.
 | Path | What it is | Stack |
 |---|---|---|
 | `apps/frontend` | Overview UI and read-only ENSv2/Arkiv verifier, with Void + PWA | React 19, Vite 8, TypeScript 7, lism-css, oxlint |
-| `apps/backend` | Local SIWE/Hono routes plus participation issuance/evidence code | Hono 4 on Cloudflare Workers (wrangler) |
+| `apps/backend` | Local SIWE/Hono and synthetic owner-only review routes plus participation issuance/evidence code | Hono 4 on Cloudflare Workers (wrangler) |
 | `apps/contract` | Counter sample, Solidity + TS tests, Ignition | Hardhat 3, viem, Solidity 0.8.37, TypeScript 6 |
 | `packages/api-specs` | Proposed HTTP API contract (`openapi.yaml`) | OpenAPI 3.1 |
 | `packages/shared` | Participation schema, trust anchor and signature format | TypeScript, Zod, viem |

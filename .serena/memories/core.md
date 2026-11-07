@@ -1,6 +1,6 @@
 # Core
 
-ETHGlobal Mumbai 2026 hackathon monorepo. Existing private-dating proposal and Spec Kit plans live in `specs/001-private-dating/`; do not confuse planned features with implemented behavior. The frontend now contains an overview and a read-only ENSv2/Arkiv participation verifier; Hono API routes and the Counter contract remain starters. Status reviews may read specs; generation/modification requires an explicit specification-work request.
+ETHGlobal Mumbai 2026 hackathon monorepo. Existing private-dating proposal and Spec Kit plans live in `specs/001-private-dating/`; do not confuse planned features with implemented behavior. PR #4 merged into main: the public frontend contains an overview and a read-only ENSv2/Arkiv participation verifier. Hono has local SIWE session and synthetic owner-only review routes, but those are not deployed or connected to the public frontend. The contract package still has only the starter Counter and read-only ENS permission tests; no deposit or matching contract. Status reviews may read specs; generation/modification requires an explicit specification-work request.
 
 ## Navigation
 - Animated mentor overview: `docs/overview.html` (offline, English/Japanese, 32 seconds). `docs/overview/` holds shared SVG story/player/build sources; README GIFs and posters live in `docs/assets/private-dating-overview*`. This illustrates a proposed flow, never evidence of real proof execution or transactions.
@@ -17,4 +17,4 @@ ETHGlobal Mumbai 2026 hackathon monorepo. Existing private-dating proposal and S
 - CI and completion checks: `mem:task_completion`.
 - Memory structure/update policy: `mem:memory_maintenance`.
 
-`packages/api-specs/openapi.yaml` is still empty. `packages/shared/src/participation/` now contains qualification schemas and signature logic; see `mem:participation/core`. Package scripts and current source override older template notes. Installed skills are support code, not application implementation.
+`packages/api-specs/openapi.yaml` now defines the planned HTTP contract, but generated client and many routes are absent. `packages/shared/src/participation/` contains qualification schemas and signature logic; see `mem:participation/core`. `circuits/oracle.ts` is a plaintext synthetic oracle, not a Noir proof. Package scripts and current source override older template notes. Installed skills are support code, not application implementation.

@@ -1,28 +1,43 @@
 import { readFile } from "node:fs/promises";
 
+import { createPublicClient as createArkivClient } from "@arkiv-network/sdk";
+import { rabdi } from "@arkiv-network/sdk/chains";
 import {
   type Address,
+  bytesToHex,
   createPublicClient,
+  decodeFunctionResult,
+  encodeFunctionData,
   getAddress,
   http,
   isAddressEqual,
   isHex,
   keccak256,
+  namehash,
   parseAbi,
+  toHex,
   zeroAddress,
 } from "viem";
 import { sepolia } from "viem/chains";
+import { packetToBytes } from "viem/ens";
 
 import { ensSepoliaDeployment } from "../apps/backend/src/participation/ens-plan.ts";
 import {
+  chooseInitialCredentialExpiry,
   type RegistrationEvidenceResult,
   verifyRegistrationEvidence,
 } from "../apps/backend/src/participation/issuer.ts";
+import { ParticipationPublications } from "../apps/backend/src/participation/publication.ts";
+import {
+  prepareCredentialReferenceAfterReadback,
+  prepareSignedCredentialPublication,
+} from "../apps/backend/src/participation/publication-gate.ts";
 import {
   getParticipationTypedData,
   hashParticipationMessage,
 } from "../packages/shared/src/participation/credential.ts";
 import {
+  credentialReferenceSchema,
   type ParticipationTrust,
   participationTrustAnchor,
   participationTrustSchema,
@@ -39,6 +54,12 @@ const registryAbi = parseAbi([
 ]);
 const factoryAbi = parseAbi([
   "function verifyContract(address proxy) view returns (address implementation)",
+]);
+const resolverAbi = parseAbi([
+  "function resolve(bytes name, bytes data) view returns (bytes)",
+]);
+const textAbi = parseAbi([
+  "function text(bytes32 node, string key) view returns (string)",
 ]);
 const client = createPublicClient({
   chain: sepolia,
@@ -202,7 +223,7 @@ function makeCredential(
   trust: ParticipationTrust,
   subject: Address,
   registration: Extract<RegistrationEvidenceResult, { ok: true }>["data"],
-  expiry: bigint,
+  expiry: number,
 ): UnsignedParticipationCredential {
   return {
     schemaVersion: 1,
@@ -215,35 +236,109 @@ function makeCredential(
     issuanceEvent: registration.issuanceEvent,
     credentialVersion: 1,
     status: "eligible",
-    expiresAt: Number(expiry),
+    expiresAt: expiry,
     policyVersion: 1,
     accessTier: "new",
     suspendedUntil: null,
   } satisfies UnsignedParticipationCredential;
 }
 
-async function main(): Promise<void> {
-  const [txHashValue, label, subjectValue, trustPath] = process.argv.slice(2);
+type Stage = "draft" | "publication" | "reference";
+
+function readArguments() {
+  const args = process.argv.slice(2);
+  const first = args[0];
+  const stage: Stage =
+    first === "draft" || first === "publication" || first === "reference"
+      ? first
+      : "draft";
+  const values = stage === first ? args.slice(1) : args;
+  const [txHash, label, subject, trustPath, signedPath, entityKey] = values;
   if (
-    !txHashValue ||
-    !isHex(txHashValue, { strict: true }) ||
-    txHashValue.length !== 66 ||
+    !txHash ||
+    !isHex(txHash, { strict: true }) ||
+    txHash.length !== 66 ||
     !label ||
-    !subjectValue ||
-    !trustPath
+    !subject ||
+    !trustPath ||
+    (stage !== "draft" && !signedPath) ||
+    (stage === "reference" &&
+      (!entityKey || !isHex(entityKey) || entityKey.length !== 66))
   ) {
     throw new Error(
-      "Usage: node scripts/issue-participation.ts <registrationTxHash> <label> <subjectAddress> <trust.json>",
+      "Usage: node scripts/issue-participation.ts [draft|publication|reference] <registrationTxHash> <label> <subjectAddress> <trust.json> [signed.json] [arkivEntityKey]",
     );
   }
-  const trust = await readTrust(trustPath);
-  const subject = getAddress(subjectValue);
+  return { stage, txHash, label, subject, trustPath, signedPath, entityKey };
+}
+
+async function readSignedCredential(path: string): Promise<unknown> {
+  const value: unknown = JSON.parse(await readFile(path, "utf8"));
+  if (typeof value === "object" && value !== null && "credential" in value) {
+    return value.credential;
+  }
+  return value;
+}
+
+function printJson(value: unknown): void {
+  process.stdout.write(
+    `${JSON.stringify(value, (_, item) => (typeof item === "bigint" ? item.toString() : item), 2)}\n`,
+  );
+}
+
+async function readOptionalReference(
+  dnsName: string,
+  resolver: Address,
+  blockNumber: bigint,
+) {
+  const profile = encodeFunctionData({
+    abi: textAbi,
+    functionName: "text",
+    args: [namehash(dnsName), "app.credential"],
+  });
+  const answer = await client.readContract({
+    address: resolver,
+    abi: resolverAbi,
+    functionName: "resolve",
+    args: [toHex(packetToBytes(dnsName)), profile],
+    blockNumber,
+  });
+  const value = decodeFunctionResult({
+    abi: textAbi,
+    functionName: "text",
+    data: answer,
+  });
+  if (!value) return null;
+  const parsed = credentialReferenceSchema.safeParse(JSON.parse(value));
+  if (!parsed.success) throw new Error("REFERENCE_MISMATCH");
+  return parsed.data;
+}
+
+async function readArkivRow(entityKey: `0x${string}`) {
+  // biome-ignore lint/suspicious/noUndeclaredEnvVars: This standalone CLI is not cached by Turbo.
+  const accessKey = process.env.ARKIV_ACCESS_KEY ?? "";
+  const arkiv = createArkivClient({
+    chain: rabdi({ accessKey }),
+    transport: http(undefined, { retryCount: 0, timeout: 10_000 }),
+  });
+  try {
+    return await arkiv.getEntity(entityKey, ParticipationPublications);
+  } catch {
+    throw new Error("ARKIV_UNAVAILABLE");
+  }
+}
+
+type Arguments = ReturnType<typeof readArguments>;
+
+async function readIssuanceContext(args: Arguments) {
+  const trust = await readTrust(args.trustPath);
+  const subject = getAddress(args.subject);
   if ((await client.getChainId()) !== trust.chainId)
     throw new Error("Wrong chain");
   const block = await client.getBlock({ blockTag: "latest" });
   const [receipt, participant] = await Promise.all([
-    client.getTransactionReceipt({ hash: txHashValue }),
-    readParticipant(trust, label, block.number),
+    client.getTransactionReceipt({ hash: args.txHash }),
+    readParticipant(trust, args.label, block.number),
   ]);
   await verifyParent(trust, block.number, block.timestamp);
   await verifyDeployment(trust, participant.resolver, block.number);
@@ -252,7 +347,7 @@ async function main(): Promise<void> {
     receipt,
     observedBlockNumber: block.number,
     observedBlockTimestamp: block.timestamp,
-    label,
+    label: args.label,
     subject,
     currentOwner: participant.owner,
     currentExpiry: participant.expiry,
@@ -260,26 +355,132 @@ async function main(): Promise<void> {
   });
   if (!evidence.ok)
     throw new Error(`Registration evidence failed: ${evidence.error}`);
-  const expiry =
-    participant.expiry < block.timestamp + 7n * 86_400n
-      ? participant.expiry
-      : block.timestamp + 7n * 86_400n;
-  const credential = makeCredential(trust, subject, evidence.data, expiry);
-  const output = {
-    blockNumber: block.number,
-    credential,
-    messageDigest: hashParticipationMessage(credential),
-    typedData: getParticipationTypedData(credential),
-  };
-  process.stdout.write(
-    `${JSON.stringify(output, (_, value) => (typeof value === "bigint" ? value.toString() : value), 2)}\n`,
+  const registrationBlock = await client.getBlock({
+    blockNumber: receipt.blockNumber,
+  });
+  const expiry = chooseInitialCredentialExpiry(
+    participant.expiry,
+    registrationBlock.timestamp,
+    block.timestamp,
   );
+  if (!expiry.ok)
+    throw new Error(`Registration evidence failed: ${expiry.error}`);
+  const credential = makeCredential(trust, subject, evidence.data, expiry.data);
+  return { trust, block, participant, credential };
+}
+
+type IssuanceContext = Awaited<ReturnType<typeof readIssuanceContext>>;
+
+async function printPublicationStage(
+  context: IssuanceContext,
+  signed: unknown,
+): Promise<void> {
+  const { trust, block, credential } = context;
+  const prepared = await prepareSignedCredentialPublication({
+    expected: credential,
+    signed,
+    trust,
+    observedAt: block.timestamp,
+  });
+  if (!prepared.ok) throw new Error(prepared.error);
+  const current = await readOptionalReference(
+    credential.dnsName,
+    context.participant.resolver,
+    block.number,
+  );
+  if (current) throw new Error("ALREADY_ISSUED");
+  const { publication } = prepared.data;
+  if (!(publication.values.content instanceof Uint8Array))
+    throw new Error("INVALID_PUBLICATION");
+  printJson({
+    blockNumber: block.number,
+    arkivWritePlan: {
+      schema: "secret_tinder_participation_v1",
+      issuanceId: prepared.data.credential.issuanceId,
+      credentialVersion: publication.credentialVersion,
+      recordDigest: publication.recordDigest,
+      contentHex: bytesToHex(publication.values.content),
+      expirationDays: 30,
+      flags: { readonly: true, permissionlessExtension: false },
+    },
+  });
+}
+
+function isSameReference(
+  current: ReturnType<typeof credentialReferenceSchema.parse>,
+  proposed: ReturnType<typeof credentialReferenceSchema.parse>,
+): boolean {
+  return (
+    current.schemaVersion === proposed.schemaVersion &&
+    current.credentialVersion === proposed.credentialVersion &&
+    current.arkivEntityKey.toLowerCase() ===
+      proposed.arkivEntityKey.toLowerCase() &&
+    current.digest.toLowerCase() === proposed.digest.toLowerCase()
+  );
+}
+
+async function printReferenceStage(
+  args: Arguments,
+  context: IssuanceContext,
+  signed: unknown,
+): Promise<void> {
+  const { trust, block, participant, credential } = context;
+  const row = await readArkivRow(args.entityKey as `0x${string}`);
+  const result = await prepareCredentialReferenceAfterReadback({
+    expected: credential,
+    signed,
+    trust,
+    observedAt: block.timestamp,
+    row,
+    resolver: participant.resolver,
+  });
+  if (!result.ok) throw new Error(result.error);
+  const current = await readOptionalReference(
+    credential.dnsName,
+    participant.resolver,
+    block.number,
+  );
+  if (current) {
+    if (!isSameReference(current, result.data.reference))
+      throw new Error("REFERENCE_CONFLICT");
+    printJson({
+      blockNumber: block.number,
+      reference: current,
+      alreadyCurrent: true,
+    });
+    return;
+  }
+  printJson({
+    blockNumber: block.number,
+    readbackEntityKey: row.$key,
+    ...result.data,
+  });
+}
+
+async function main(): Promise<void> {
+  const args = readArguments();
+  const context = await readIssuanceContext(args);
+  if (args.stage === "draft") {
+    printJson({
+      blockNumber: context.block.number,
+      credential: context.credential,
+      messageDigest: hashParticipationMessage(context.credential),
+      typedData: getParticipationTypedData(context.credential),
+    });
+    return;
+  }
+  const signed = await readSignedCredential(args.signedPath ?? "");
+  if (args.stage === "publication") {
+    await printPublicationStage(context, signed);
+    return;
+  }
+  await printReferenceStage(args, context, signed);
 }
 
 main().catch((error: unknown) => {
   const message =
     error instanceof Error &&
-    /^(Usage:|Wrong chain|Untrusted parent|ENS deployment|ENS Factory|Participant Resolver|Registration evidence)/.test(
+    /^(Usage:|Wrong chain|Untrusted parent|ENS deployment|ENS Factory|Participant Resolver|Registration evidence|[A-Z_]+$)/.test(
       error.message,
     )
       ? error.message

@@ -52,6 +52,24 @@ export type RegistrationEvidenceResult =
       error: "REGISTRY_MISMATCH" | "ISSUANCE_MISMATCH" | "NAME_EXPIRED";
     };
 
+export function chooseInitialCredentialExpiry(
+  nameExpiry: bigint,
+  registrationTimestamp: bigint,
+  observedTimestamp: bigint,
+):
+  | { ok: true; data: number }
+  | { ok: false; error: "ISSUANCE_MISMATCH" | "CREDENTIAL_EXPIRED" } {
+  if (registrationTimestamp > observedTimestamp || registrationTimestamp < 0n) {
+    return { ok: false, error: "ISSUANCE_MISMATCH" };
+  }
+  const sevenDays = registrationTimestamp + 7n * 86_400n;
+  const expiry = nameExpiry < sevenDays ? nameExpiry : sevenDays;
+  if (expiry <= observedTimestamp || expiry > BigInt(Number.MAX_SAFE_INTEGER)) {
+    return { ok: false, error: "CREDENTIAL_EXPIRED" };
+  }
+  return { ok: true, data: Number(expiry) };
+}
+
 function findRegistration(
   input: RegistrationEvidence,
   registry: Address,

@@ -39,6 +39,7 @@ type ChallengeRow = {
 type SessionRow = { token_hash: string; expires_at: number };
 type OperationRow = { body: string };
 type ReviewRow = { body: string };
+class ReviewWriteConflict extends Error {}
 type RetainedRow = {
   stable_subject_id: string;
   policy_version: number;
@@ -143,6 +144,9 @@ export class AuthStore extends DurableObject<CloudflareBindings> {
     );
     this.ctx.storage.sql.exec(
       "CREATE INDEX IF NOT EXISTS review_cases_subject ON review_cases (stable_subject_id)",
+    );
+    this.ctx.storage.sql.exec(
+      "CREATE TABLE IF NOT EXISTS review_operations (operation_id TEXT PRIMARY KEY, case_id TEXT NOT NULL, fingerprint TEXT NOT NULL)",
     );
     this.ctx.storage.sql.exec(
       "CREATE TABLE IF NOT EXISTS retained_measures (case_id TEXT PRIMARY KEY, stable_subject_id TEXT NOT NULL, policy_version INTEGER NOT NULL, suspended_until INTEGER NOT NULL)",
@@ -295,29 +299,59 @@ export class AuthStore extends DurableObject<CloudflareBindings> {
     expectedRevision: number,
   ): Promise<boolean> {
     if (review.revision !== expectedRevision + 1) return false;
+    const previous =
+      expectedRevision === 0 ? null : this.getReviewCase(review.caseId);
+    if (
+      expectedRevision > 0 &&
+      (!previous || previous.revision !== expectedRevision)
+    )
+      return false;
+    const previousIds = previous?.operationFingerprints ?? {};
+    const newOperations = Object.entries(review.operationFingerprints).filter(
+      ([id]) => !Object.hasOwn(previousIds, id),
+    );
+    if (newOperations.length !== 1) return false;
+    const [operationId, fingerprint] = newOperations[0];
     const body = JSON.stringify(review);
-    let isStored = false;
-    if (expectedRevision === 0) {
-      const inserted = this.ctx.storage.sql.exec(
-        "INSERT OR IGNORE INTO review_cases (case_id, stable_subject_id, revision, body) VALUES (?, ?, ?, ?) RETURNING case_id",
-        review.caseId,
-        review.stableSubjectId,
-        review.revision,
-        body,
-      );
-      isStored = inserted.toArray().length === 1;
-    } else {
-      const updated = this.ctx.storage.sql.exec(
-        "UPDATE review_cases SET revision = ?, body = ? WHERE case_id = ? AND revision = ? AND stable_subject_id = ? RETURNING case_id",
-        review.revision,
-        body,
-        review.caseId,
-        expectedRevision,
-        review.stableSubjectId,
-      );
-      isStored = updated.toArray().length === 1;
+    try {
+      this.ctx.storage.transactionSync(() => {
+        const indexed = this.ctx.storage.sql
+          .exec(
+            "INSERT OR IGNORE INTO review_operations (operation_id, case_id, fingerprint) VALUES (?, ?, ?) RETURNING operation_id",
+            operationId,
+            review.caseId,
+            fingerprint,
+          )
+          .toArray();
+        if (indexed.length !== 1) throw new ReviewWriteConflict();
+        const updated =
+          expectedRevision === 0
+            ? this.ctx.storage.sql
+                .exec(
+                  "INSERT OR IGNORE INTO review_cases (case_id, stable_subject_id, revision, body) VALUES (?, ?, ?, ?) RETURNING case_id",
+                  review.caseId,
+                  review.stableSubjectId,
+                  review.revision,
+                  body,
+                )
+                .toArray()
+            : this.ctx.storage.sql
+                .exec(
+                  "UPDATE review_cases SET revision = ?, body = ? WHERE case_id = ? AND revision = ? AND stable_subject_id = ? RETURNING case_id",
+                  review.revision,
+                  body,
+                  review.caseId,
+                  expectedRevision,
+                  review.stableSubjectId,
+                )
+                .toArray();
+        if (updated.length !== 1) throw new ReviewWriteConflict();
+      });
+    } catch (error) {
+      if (error instanceof ReviewWriteConflict) return false;
+      throw error;
     }
-    if (!isStored || review.closedAt === null) return isStored;
+    if (review.closedAt === null) return true;
     const cleanupAt = Math.max(
       Date.now() + 1_000,
       (review.closedAt + REVIEW_RETENTION_SECONDS) * 1_000,
@@ -384,6 +418,10 @@ export class AuthStore extends DurableObject<CloudflareBindings> {
         }
         this.ctx.storage.sql.exec(
           "DELETE FROM review_cases WHERE case_id = ?",
+          review.caseId,
+        );
+        this.ctx.storage.sql.exec(
+          "DELETE FROM review_operations WHERE case_id = ?",
           review.caseId,
         );
       }

@@ -193,15 +193,14 @@ RPC access keys or private profile data in the repository.
 
 ## CROPS
 
-The intended private matching system has these design boundaries. Its end-to-end implementation
-is **not yet verified**.
+These boundaries describe the deployed participation verifier and the proposed matching flow. End-to-end private matching is **not yet verified**.
 
-| Property | Intended behavior and current limit |
-|---|---|
-| **Censorship resistance** | ENS and Arkiv records can be read independently, but the issuer, backend coordination and RPC availability remain dependencies. |
-| **Open source** | Parent specification and code under [MIT](LICENSE). The teammate-owned AIBot submodule has separate authorship; its license has not been confirmed. |
-| **Privacy** | Matching attributes and preferences are intended to stay on devices. Public credentials, wallet addresses, transaction times and an optional AI Persona are linkable or disclosed to their services. |
-| **Security** | Issuer signatures bind the public credential and ENS key permissions separate roles. Private matching proofs, deposit safety and review recovery have not passed acceptance tests. |
+| Property | Current behavior and limit |
+| --- | --- |
+| Censorship resistance | Anyone can read the public ENS and Arkiv records without our Hono backend. The live page still depends on Vercel; reads depend on Sepolia/Arkiv RPC availability and the issuer-controlled parent name. RPC outages make the live check unavailable. |
+| Open source | This repository has an existing [MIT license file](LICENSE) and local build instructions above. The team must confirm rights for every submitted component. The teammate-owned AIBot has separate authorship and unconfirmed license; the landing page builds without its runtime. |
+| Privacy | The live verifier sends the selected **public** ENS name to RPC providers; they can observe requests and network metadata. Public ENS/Arkiv records, addresses and transaction timing are linkable and indexable. Proposed matching inputs remain on devices only in the design; no deployed private-match flow proves that yet. The optional AIBot sends separately consented Persona/conversation data to its AI provider. |
+| Security | Issuer EIP-712 signatures and ENS permissions protect the public credential path, subject to the issuer and parent-name controller remaining trusted. Private matching proofs, deposits and review recovery have not passed end-to-end acceptance tests. No real match or financial safety claim follows from `eligible`. |
 
 **No trackers in the frontend source.** On 7 November 2026 the frontend source, HTML, Vite config
 and public assets were searched for Google Analytics, Tag Manager, Segment, Mixpanel, PostHog,
@@ -220,11 +219,14 @@ static source check, not a network audit of the deployment or the AIBot.
 The [official-condition mapping](specs/001-private-dating/prize-targets.md) lists each acceptance
 gate. Third-party reproduction and the final submission decision remain open.
 
-On 7 November 2026 the [production URL](https://ethglobal-mumbai-2026.vercel.app/) returned the
-Secret Tinder page, and in a clean browser the Alice and Bob buttons returned `資格あり` (eligible),
-credential version 1 at Sepolia block `12080239`. An older Chrome profile still showed the Vite
-starter from a cached PWA service worker; **use a clean browser profile for the demo** until the
-service-worker retirement in this branch is deployed and checked.
+After PR #5 merged on 7 November 2026, the [production URL](https://ethglobal-mumbai-2026.vercel.app/)
+served the English Secret Tinder page. In a clean browser, Alice and Bob both returned `Eligible`,
+credential version 1 at Sepolia block `12080445`. The deployed `/sw.js` serves the retirement
+worker. An older Chrome tab that had shown the Vite starter changed to Secret Tinder after reload;
+use a fresh browser tab for a predictable live demo. The [public GitHub repository](https://github.com/mashharuki/ethglobal-mumbai-2026)
+is accessible anonymously, but an independent third party has not repeated the verifier or Arkiv
+query. The [120-second pitch](docs/demo-script.md) and separate 2–3 minute submission video still
+need a recorded human rehearsal.
 
 ## What we will not claim
 
@@ -250,7 +252,9 @@ service-worker retirement in this branch is deployed and checked.
 | `specs/001-private-dating` | Specification, plan, tasks, fixtures and evidence |
 
 This project builds on public starter templates and a teammate-owned AIBot submodule; the Git
-history separates new hackathon work from the starter. AI tools, including Codex and Claude Code,
+history separates new hackathon work from the starter. The team must confirm the event's submission
+track and rights for all components; the AIBot submodule has separate authorship and an unconfirmed
+license. This parent repository has an existing [MIT license file](LICENSE). AI tools, including Codex and Claude Code,
 assisted with specification writing, integration planning, evidence scripts and the landing page.
 Team members supplied the concept, sponsor feedback, wallet signatures and the AIBot
 implementation. Scope and prompts for further work: [spec](specs/001-private-dating/spec.md) ·

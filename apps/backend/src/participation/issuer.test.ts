@@ -13,7 +13,10 @@ import {
   zeroHash,
 } from "viem";
 
-import { verifyRegistrationEvidence } from "./issuer.ts";
+import {
+  chooseInitialCredentialExpiry,
+  verifyRegistrationEvidence,
+} from "./issuer.ts";
 
 const registry: Address = "0x1111111111111111111111111111111111111111";
 const subject: Address = "0x3333333333333333333333333333333333333333";
@@ -109,6 +112,28 @@ function makeEvidence(sender?: Address) {
 }
 
 describe("ENS issuance receipt", () => {
+  it("should keep the initial credential expiry stable across later planning blocks", () => {
+    const first = chooseInitialCredentialExpiry(2_000_000n, 1_000n, 2_000n);
+    const later = chooseInitialCredentialExpiry(2_000_000n, 1_000n, 3_000n);
+    assert.deepEqual(first, { ok: true, data: 605_800 });
+    assert.deepEqual(later, first);
+  });
+
+  it("should use an earlier name expiry and reject a stale or future registration", () => {
+    assert.deepEqual(chooseInitialCredentialExpiry(10_000n, 1_000n, 2_000n), {
+      ok: true,
+      data: 10_000,
+    });
+    assert.deepEqual(chooseInitialCredentialExpiry(10_000n, 1_000n, 10_000n), {
+      ok: false,
+      error: "CREDENTIAL_EXPIRED",
+    });
+    assert.deepEqual(chooseInitialCredentialExpiry(10_000n, 3_000n, 2_000n), {
+      ok: false,
+      error: "ISSUANCE_MISMATCH",
+    });
+  });
+
   it("should accept a current registration with a stable resource", () => {
     const result = verifyRegistrationEvidence(makeEvidence());
     assert.equal(result.ok, true);
