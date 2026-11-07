@@ -5,6 +5,11 @@ import {
   verifyNoirMatchCircuit,
 } from "../src/search/noir-match-engine.ts";
 
+// Generate the ignored TOML fixtures from committed synthetic profiles.
+await import("./matching-a-fixture.mjs");
+await import("./matching-b-fixture.mjs");
+await import("./matching-result-fixture.mjs");
+
 const digestOnly = process.argv.includes("--digest-only");
 const resultOnly = process.argv.includes("--result-only");
 for (const [name, fixture] of [
