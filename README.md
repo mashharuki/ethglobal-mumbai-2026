@@ -2,6 +2,8 @@
 
 **Common ground before photos.** A hackathon prototype exploring private matching, verifiable participation, and an optional AI Persona conversation.
 
+**[Live demo](https://ethglobal-mumbai-2026.vercel.app/)** · [120-second pitch and recording plan](docs/demo-script.md)
+
 > Current state (7 November 2026): Alice and Bob have issuer-signed participation credentials on Arkiv Rabdi, referenced by separate ENSv2 names on Ethereum Sepolia. A browser verifier and independent CLI read those public records. Private matching, deposits, and the parent-app/AIBot handoff remain in development. The [landing page](apps/frontend/src/App.tsx) explains the journey; it is not a completed matching flow.
 
 ## The idea in 30 seconds
@@ -90,9 +92,9 @@ The current frontend source, HTML, Vite configuration, and public assets were se
 
 ## Prize targets and submission state
 
-We are preparing for **Ethereum Foundation (Best CROPS App)**, **ENS (Best Use of ENSv2)**, and **Arkiv (Build on Arkiv)**. The Arkiv + Swarm bonus remains conditional and is not demonstrated. The [official-condition mapping](specs/001-private-dating/prize-targets.md) lists each acceptance gate. The browser and CLI public reads support a partial ENS/Arkiv demonstration; they do not establish submission readiness for any prize. Suspension and recovery, Arkiv update/expiry, the CROPS end-to-end demo, final video, and live deployment still require verification.
+We are preparing for **Ethereum Foundation (Best CROPS App)**, **ENS (Best Use of ENSv2)**, and **Arkiv (Build on Arkiv)**. The Arkiv + Swarm bonus remains conditional and is not demonstrated. The [official-condition mapping](specs/001-private-dating/prize-targets.md) lists each acceptance gate. The browser and CLI public reads support a partial ENS/Arkiv demonstration; they do not establish submission readiness for any prize. Suspension and recovery, Arkiv update/expiry, the CROPS end-to-end demo, and final video still require verification.
 
-The [Vercel project](https://ethglobal-mumbai-2026.vercel.app/) exists, but a fresh request to its production URL returned `404 NOT_FOUND` on 7 November 2026. Vercel marks its current production deployment Ready at main commit `0545316`; the frontend changes in this branch are not deployed to production. `apps/frontend/vercel.json` prepares the static client output for the next deployment, which still needs a live check before it can serve as submission evidence. The [two-minute in-person script](docs/demo-script.md) is a draft; the submission video is a separate 2–4 minute artifact.
+On 7 November 2026, a fresh request to the [production URL](https://ethglobal-mumbai-2026.vercel.app/) returned HTTP 200 with the Secret Tinder page. In a clean browser, the live Alice and Bob buttons independently returned `資格あり` (eligible), credential version 1 at Sepolia block `12080239`. An existing Chrome profile still showed the earlier Vite starter, consistent with its old PWA service worker caching the page. The Vercel-only worker retirement in this branch is prepared for a later deployment and has **not** been verified live. Until then, use a clean browser profile for the demo. The [two-minute in-person script](docs/demo-script.md) is separate from the required 2–3 minute submission video; neither has a recorded human rehearsal yet.
 
 ## Structure and provenance
 
