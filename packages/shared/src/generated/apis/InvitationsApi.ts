@@ -13,31 +13,12 @@
  */
 
 import * as runtime from '../runtime.js';
-import {
-    type ApiError,
-    ApiErrorFromJSON,
-    ApiErrorToJSON,
-} from '../models/ApiError.js';
-import {
-    type InviteDecision,
-    InviteDecisionFromJSON,
-    InviteDecisionToJSON,
-} from '../models/InviteDecision.js';
-import {
-    type InviteDecisionResult,
-    InviteDecisionResultFromJSON,
-    InviteDecisionResultToJSON,
-} from '../models/InviteDecisionResult.js';
-import {
-    type InviteDelivery,
-    InviteDeliveryFromJSON,
-    InviteDeliveryToJSON,
-} from '../models/InviteDelivery.js';
-import {
-    type InviteRequest,
-    InviteRequestFromJSON,
-    InviteRequestToJSON,
-} from '../models/InviteRequest.js';
+import type {
+    InviteDecision,
+    InviteDecisionResult,
+    InviteDelivery,
+    InviteRequest,
+} from '../models/index.js';
 
 export interface CreateInviteRequest {
     /**
@@ -106,7 +87,7 @@ export class InvitationsApi extends runtime.BaseAPI {
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-            body: InviteRequestToJSON(requestParameters['inviteRequest']),
+            body: requestParameters['inviteRequest'],
         };
     }
 
@@ -117,7 +98,7 @@ export class InvitationsApi extends runtime.BaseAPI {
         const requestOptions = await this.createInviteRequestOpts(requestParameters);
         const response = await this.request(requestOptions, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => InviteDeliveryFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response);
     }
 
     /**
@@ -172,7 +153,7 @@ export class InvitationsApi extends runtime.BaseAPI {
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-            body: InviteDecisionToJSON(requestParameters['inviteDecision']),
+            body: requestParameters['inviteDecision'],
         };
     }
 
@@ -183,7 +164,7 @@ export class InvitationsApi extends runtime.BaseAPI {
         const requestOptions = await this.decideInviteRequestOpts(requestParameters);
         const response = await this.request(requestOptions, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => InviteDecisionResultFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response);
     }
 
     /**

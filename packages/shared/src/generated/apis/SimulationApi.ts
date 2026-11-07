@@ -13,41 +13,14 @@
  */
 
 import * as runtime from '../runtime.js';
-import {
-    type ApiError,
-    ApiErrorFromJSON,
-    ApiErrorToJSON,
-} from '../models/ApiError.js';
-import {
-    type AuthorizedMatch,
-    AuthorizedMatchFromJSON,
-    AuthorizedMatchToJSON,
-} from '../models/AuthorizedMatch.js';
-import {
-    type DateRequest,
-    DateRequestFromJSON,
-    DateRequestToJSON,
-} from '../models/DateRequest.js';
-import {
-    type DateRequestInput,
-    DateRequestInputFromJSON,
-    DateRequestInputToJSON,
-} from '../models/DateRequestInput.js';
-import {
-    type SimulationConsent,
-    SimulationConsentFromJSON,
-    SimulationConsentToJSON,
-} from '../models/SimulationConsent.js';
-import {
-    type SimulationConsentRequest,
-    SimulationConsentRequestFromJSON,
-    SimulationConsentRequestToJSON,
-} from '../models/SimulationConsentRequest.js';
-import {
-    type SimulationIdentity,
-    SimulationIdentityFromJSON,
-    SimulationIdentityToJSON,
-} from '../models/SimulationIdentity.js';
+import type {
+    AuthorizedMatch,
+    DateRequest,
+    DateRequestInput,
+    SimulationConsent,
+    SimulationConsentRequest,
+    SimulationIdentity,
+} from '../models/index.js';
 
 export interface CreateDateRequestRequest {
     /**
@@ -157,7 +130,7 @@ export class SimulationApi extends runtime.BaseAPI {
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-            body: DateRequestInputToJSON(requestParameters['dateRequestInput']),
+            body: requestParameters['dateRequestInput'],
         };
     }
 
@@ -168,7 +141,7 @@ export class SimulationApi extends runtime.BaseAPI {
         const requestOptions = await this.createDateRequestRequestOpts(requestParameters);
         const response = await this.request(requestOptions, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => DateRequestFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response);
     }
 
     /**
@@ -216,7 +189,7 @@ export class SimulationApi extends runtime.BaseAPI {
         const requestOptions = await this.createSimulationIdentityRequestOpts(requestParameters);
         const response = await this.request(requestOptions, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => SimulationIdentityFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response);
     }
 
     /**
@@ -280,7 +253,7 @@ export class SimulationApi extends runtime.BaseAPI {
         const requestOptions = await this.getAuthorizedMatchRequestOpts(requestParameters);
         const response = await this.request(requestOptions, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => AuthorizedMatchFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response);
     }
 
     /**
@@ -335,7 +308,7 @@ export class SimulationApi extends runtime.BaseAPI {
             method: 'PUT',
             headers: headerParameters,
             query: queryParameters,
-            body: SimulationConsentRequestToJSON(requestParameters['simulationConsentRequest']),
+            body: requestParameters['simulationConsentRequest'],
         };
     }
 
@@ -346,7 +319,7 @@ export class SimulationApi extends runtime.BaseAPI {
         const requestOptions = await this.updateSimulationConsentRequestOpts(requestParameters);
         const response = await this.request(requestOptions, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => SimulationConsentFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response);
     }
 
     /**

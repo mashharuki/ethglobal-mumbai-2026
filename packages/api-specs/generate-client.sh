@@ -21,7 +21,7 @@ fi
   -i "$repo_root/packages/api-specs/openapi.yaml" \
   -g typescript-fetch \
   -o "$generated_dir" \
-  --additional-properties=importFileExtension=.js \
+  --additional-properties=importFileExtension=.js,withoutRuntimeChecks=true \
   --global-property=apiDocs=false,modelDocs=false,apiTests=false,modelTests=false
 
 test -f "$generated_dir/index.ts"
@@ -35,10 +35,4 @@ find "$target_dir" -type f -name '*.ts' -delete
 cp -R "$generated_dir/apis" "$generated_dir/models" "$target_dir/"
 cp "$generated_dir/runtime.ts" "$target_dir/runtime.ts"
 cp "$generated_dir/index.ts" "$target_dir/client.ts"
-find "$target_dir" -type f -name '*.ts' -print0 | xargs -0 node -e '
-  const fs = require("node:fs");
-  for (const file of process.argv.slice(1)) {
-    const source = fs.readFileSync(file, "utf8");
-    fs.writeFileSync(file, source.replace(/[ \t]+$/gm, "").replace(/\n+$/, "\n"));
-  }
-'
+node "$repo_root/packages/api-specs/postprocess-client.mjs" "$target_dir"

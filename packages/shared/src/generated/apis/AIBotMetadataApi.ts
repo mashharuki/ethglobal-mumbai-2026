@@ -13,16 +13,9 @@
  */
 
 import * as runtime from '../runtime.js';
-import {
-    type ApiError,
-    ApiErrorFromJSON,
-    ApiErrorToJSON,
-} from '../models/ApiError.js';
-import {
-    type PersonaMetadata,
-    PersonaMetadataFromJSON,
-    PersonaMetadataToJSON,
-} from '../models/PersonaMetadata.js';
+import type {
+    PersonaMetadata,
+} from '../models/index.js';
 
 export interface GetPersonaMetadataRequest {
     /**
@@ -79,7 +72,7 @@ export class AIBotMetadataApi extends runtime.BaseAPI {
         const requestOptions = await this.getPersonaMetadataRequestOpts(requestParameters);
         const response = await this.request(requestOptions, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => PersonaMetadataFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response);
     }
 
     /**

@@ -28,7 +28,8 @@ export interface ConfigurationParameters {
 }
 
 export class Configuration {
-    constructor(private configuration: ConfigurationParameters = {}) {}
+    private configuration: ConfigurationParameters;
+    constructor(configuration: ConfigurationParameters = {}) { this.configuration = configuration; }
 
     set config(configuration: Configuration) {
         this.configuration = configuration;
@@ -92,8 +93,10 @@ export class BaseAPI {
 
     private static readonly jsonRegex = /^(:?application\/json|[^;/ \t]+\/[^;/ \t]+[+]json)[ \t]*(:?;.*)?$/i;
     private middleware: Middleware[];
+    protected configuration: Configuration;
 
-    constructor(protected configuration = DefaultConfig) {
+    constructor(configuration = DefaultConfig) {
+        this.configuration = configuration;
         this.middleware = configuration.middleware;
     }
 
@@ -258,8 +261,10 @@ function isFormData(value: any): value is FormData {
 
 export class ResponseError extends Error {
     override name: "ResponseError" = "ResponseError";
-    constructor(public response: Response, msg?: string) {
+    public response: Response;
+    constructor(response: Response, msg?: string) {
         super(msg);
+        this.response = response;
 
         // restore prototype chain
         const actualProto = new.target.prototype;
@@ -271,8 +276,10 @@ export class ResponseError extends Error {
 
 export class FetchError extends Error {
     override name: "FetchError" = "FetchError";
-    constructor(public cause: Error, msg?: string) {
+    public cause: Error;
+    constructor(cause: Error, msg?: string) {
         super(msg);
+        this.cause = cause;
 
         // restore prototype chain
         const actualProto = new.target.prototype;
@@ -284,8 +291,10 @@ export class FetchError extends Error {
 
 export class RequiredError extends Error {
     override name: "RequiredError" = "RequiredError";
-    constructor(public field: string, msg?: string) {
+    public field: string;
+    constructor(field: string, msg?: string) {
         super(msg);
+        this.field = field;
 
         // restore prototype chain
         const actualProto = new.target.prototype;
@@ -370,58 +379,7 @@ export function serializeDateTime(value: Date): string {
     return value.toISOString();
 }
 
-export function serializeDate(value: Date): string {
-    if (isNaN(value.getTime())) {
-        throw new RangeError('Invalid time value');
-    }
-    const year = ('000' + value.getFullYear()).slice(-4);
-    const month = ('0' + (value.getMonth() + 1)).slice(-2);
-    const day = ('0' + value.getDate()).slice(-2);
-    return `${year}-${month}-${day}`;
-}
 
-
-export function parseDate(value: Date | string): Date {
-    if (value instanceof Date) {
-        return value;
-    }
-    // `new Date("2026-08-05")` would parse as UTC midnight: a different day west of UTC.
-    // Local midnight is the stated day everywhere. setFullYear avoids the 1900 offset the
-    // multi-argument constructor applies to years 0-99.
-    const fullDate = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(value));
-    if (fullDate) {
-        const year = Number(fullDate[1]);
-        const month = Number(fullDate[2]) - 1;
-        const day = Number(fullDate[3]);
-        const date = new Date(0);
-        date.setFullYear(year, month, day);
-        date.setHours(0, 0, 0, 0);
-        // Out-of-range components (or a day the local zone skipped) silently roll over,
-        // which would hand back a date the server never sent.
-        if (date.getFullYear() !== year || date.getMonth() !== month || date.getDate() !== day) {
-            return new Date(NaN);
-        }
-        return date;
-    }
-    return new Date(value);
-}
-
-export function parseDateTime(value: any): Date {
-    return new Date(value);
-}
-
-export function mapValues(data: any, fn: (item: any) => any) {
-    const result: { [key: string]: any } = {};
-    for (const key of Object.keys(data)) {
-        result[key] = fn(data[key]);
-    }
-    return result;
-}
-
-// Pass-through serializer for `any`-typed properties in form data. See #1877.
-export function anyToJSON(value: any): any {
-    return value;
-}
 
 export function canConsumeForm(consumes: Consume[]): boolean {
     for (const consume of consumes) {
@@ -473,7 +431,12 @@ export interface ResponseTransformer<T> {
 }
 
 export class JSONApiResponse<T> {
-    constructor(public raw: Response, private transformer: ResponseTransformer<T> = (jsonValue: any) => jsonValue) {}
+    public raw: Response;
+    private transformer: ResponseTransformer<T>;
+    constructor(raw: Response, transformer: ResponseTransformer<T> = (jsonValue: any) => jsonValue) {
+        this.raw = raw;
+        this.transformer = transformer;
+    }
 
     async value(): Promise<T> {
         return this.transformer(await this.raw.json());
@@ -481,7 +444,8 @@ export class JSONApiResponse<T> {
 }
 
 export class VoidApiResponse {
-    constructor(public raw: Response) {}
+    public raw: Response;
+    constructor(raw: Response) { this.raw = raw; }
 
     async value(): Promise<void> {
         return undefined;
@@ -496,7 +460,8 @@ export class VoidApiResponse {
 export type HttpFile = Blob & { readonly name: string };
 
 export class BlobApiResponse {
-    constructor(public raw: Response) {}
+    public raw: Response;
+    constructor(raw: Response) { this.raw = raw; }
 
     /**
      * The body named after the Content-Disposition header, so that a download keeps the name the
@@ -564,7 +529,8 @@ function basename(name: string | undefined): string | undefined {
 }
 
 export class TextApiResponse {
-    constructor(public raw: Response) {}
+    public raw: Response;
+    constructor(raw: Response) { this.raw = raw; }
 
     async value(): Promise<string> {
         return await this.raw.text();

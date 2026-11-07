@@ -13,41 +13,14 @@
  */
 
 import * as runtime from '../runtime.js';
-import {
-    type AcceptedOperation,
-    AcceptedOperationFromJSON,
-    AcceptedOperationToJSON,
-} from '../models/AcceptedOperation.js';
-import {
-    type ApiError,
-    ApiErrorFromJSON,
-    ApiErrorToJSON,
-} from '../models/ApiError.js';
-import {
-    type BlockRequest,
-    BlockRequestFromJSON,
-    BlockRequestToJSON,
-} from '../models/BlockRequest.js';
-import {
-    type PrivateReviewCase,
-    PrivateReviewCaseFromJSON,
-    PrivateReviewCaseToJSON,
-} from '../models/PrivateReviewCase.js';
-import {
-    type ReviewCaseRequest,
-    ReviewCaseRequestFromJSON,
-    ReviewCaseRequestToJSON,
-} from '../models/ReviewCaseRequest.js';
-import {
-    type ReviewDecisionRequest,
-    ReviewDecisionRequestFromJSON,
-    ReviewDecisionRequestToJSON,
-} from '../models/ReviewDecisionRequest.js';
-import {
-    type ReviewResponseRequest,
-    ReviewResponseRequestFromJSON,
-    ReviewResponseRequestToJSON,
-} from '../models/ReviewResponseRequest.js';
+import type {
+    AcceptedOperation,
+    BlockRequest,
+    PrivateReviewCase,
+    ReviewCaseRequest,
+    ReviewDecisionRequest,
+    ReviewResponseRequest,
+} from '../models/index.js';
 
 export interface AppealReviewCaseRequest {
     /**
@@ -183,7 +156,7 @@ export class ReviewApi extends runtime.BaseAPI {
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-            body: ReviewResponseRequestToJSON(requestParameters['reviewResponseRequest']),
+            body: requestParameters['reviewResponseRequest'],
         };
     }
 
@@ -194,7 +167,7 @@ export class ReviewApi extends runtime.BaseAPI {
         const requestOptions = await this.appealReviewCaseRequestOpts(requestParameters);
         const response = await this.request(requestOptions, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => AcceptedOperationFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response);
     }
 
     /**
@@ -241,7 +214,7 @@ export class ReviewApi extends runtime.BaseAPI {
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-            body: BlockRequestToJSON(requestParameters['blockRequest']),
+            body: requestParameters['blockRequest'],
         };
     }
 
@@ -252,7 +225,7 @@ export class ReviewApi extends runtime.BaseAPI {
         const requestOptions = await this.createBlockRequestOpts(requestParameters);
         const response = await this.request(requestOptions, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => AcceptedOperationFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response);
     }
 
     /**
@@ -299,7 +272,7 @@ export class ReviewApi extends runtime.BaseAPI {
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-            body: ReviewCaseRequestToJSON(requestParameters['reviewCaseRequest']),
+            body: requestParameters['reviewCaseRequest'],
         };
     }
 
@@ -310,7 +283,7 @@ export class ReviewApi extends runtime.BaseAPI {
         const requestOptions = await this.createReviewCaseRequestOpts(requestParameters);
         const response = await this.request(requestOptions, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => AcceptedOperationFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response);
     }
 
     /**
@@ -365,7 +338,7 @@ export class ReviewApi extends runtime.BaseAPI {
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-            body: ReviewDecisionRequestToJSON(requestParameters['reviewDecisionRequest']),
+            body: requestParameters['reviewDecisionRequest'],
         };
     }
 
@@ -376,7 +349,7 @@ export class ReviewApi extends runtime.BaseAPI {
         const requestOptions = await this.decideReviewCaseRequestOpts(requestParameters);
         const response = await this.request(requestOptions, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => AcceptedOperationFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response);
     }
 
     /**
@@ -476,7 +449,7 @@ export class ReviewApi extends runtime.BaseAPI {
         const requestOptions = await this.getReviewCaseRequestOpts(requestParameters);
         const response = await this.request(requestOptions, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => PrivateReviewCaseFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response);
     }
 
     /**
@@ -531,7 +504,7 @@ export class ReviewApi extends runtime.BaseAPI {
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-            body: ReviewResponseRequestToJSON(requestParameters['reviewResponseRequest']),
+            body: requestParameters['reviewResponseRequest'],
         };
     }
 
@@ -542,7 +515,7 @@ export class ReviewApi extends runtime.BaseAPI {
         const requestOptions = await this.respondToReviewCaseRequestOpts(requestParameters);
         const response = await this.request(requestOptions, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => AcceptedOperationFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response);
     }
 
     /**
