@@ -1,10 +1,10 @@
 # 二者照合の平文oracleと証明実装ゲート
 
-この文書は[二者照合契約](../specs/001-private-dating/contracts/matching.md)の合成辞書 `synthetic-1` に対する実装メモである。現時点で動くのは[平文oracle](oracle.ts)と[fixture試験](oracle.test.ts)だけ。暗号化通信、Noir回路、証明鍵、登録ルートへの拘束、実ユーザーのマッチングは未実装であり、T004・段階Bの合格を意味しない。
+この文書は[二者照合契約](../specs/001-private-dating/contracts/matching.md)の合成辞書 `synthetic-1` に対する実装メモである。[平文oracle](oracle.ts)、[fixture試験](oracle.test.ts)、[合成登録回路](register/src/main.nr)のNargo checkと4件の実行試験は動く。暗号化通信、照合回路、証明鍵、登録ルートのブラウザー実装、実ユーザーのマッチングは未実装であり、T004・段階Bの合格を意味しない。
 
 ## 固定するツールチェーンと群
 
-- Noir compilerは正式release `v1.0.0`を候補とし、`noirup --version 1.0.0`で固定する。[Noir公式release](https://github.com/noir-lang/noir/releases/tag/v1.0.0)は2026-10-29公開。[公式手順](https://www.noir-lang.org/docs/getting_started_manually)はBarretenbergの`bb`で証明・検証する。`bbup -nv 1.0.0`で[bbup公式の互換対応](https://github.com/AztecProtocol/aztec-packages/blob/next/barretenberg/bbup/README.md)から版を解決し、実測した`bb --version`をここに固定するまではVK版を確定しない。
+- Noir compilerは正式release `v1.0.0`。[Noir公式release](https://github.com/noir-lang/noir/releases/tag/v1.0.0)は2026-10-29公開。macOS arm64の公式配布物をrelease digestとSHA-256で照合し、`nargo --version`が`1.0.0`と実測した。[公式手順](https://www.noir-lang.org/docs/getting_started_manually)はBarretenbergの`bb`で証明・検証するが、2026-11-07時点の[bbup公式互換表](https://github.com/AztecProtocol/aztec-packages/blob/next/barretenberg/bbup/bb-versions.json)にはNoir `1.0.0`の行がない。`bb --version`と実証明/検証が通るまではVK版を確定しない。
 - 回路fieldはBN254 Fr、暗号群はそのfield上のGrumpkinを候補とする。[Noir標準のembedded curve API](https://www.noir-lang.org/docs/libraries/standard_library/cryptographic_primitives/embedded_curve_ops)がこの組を提供する。群スカラーはNoir `Field`と同一視しない。暗号乱数・秘密鍵・Bの非零マスクはOSの暗号用乱数から生成する128-bit非零整数とし、`EmbeddedCurveScalar::new(lo, 0)`へ正準に写す。`q > 2^128 > H=8`を実装時に確認する。`Field`上の非零だけでは群スカラーの条件にならない。
 - 公開点は正準の`(x,y)`、無限遠点は公開鍵・暗号文の入力として拒否する。Aが実際に生成した全288暗号文と一時公開鍵に対する証明を検証してからBが演算する。曲線・部分群・スカラー範囲はNoir/Barretenberg実行系の実試験でも確認する。暗号用乱数は同一セッション・座標で再使用しない。
 
@@ -31,6 +31,6 @@
 
 登録ルートは属性、希望mask、趣味ビット列を**項目別乱数**と辞書版・所有主体・登録版に拘束する。照合の公開入力には登録ルート、資格の発行ID/世代/版、検索リース世代、辞書版、A/Bの役割、両者の一時公開鍵、順序付き暗号文digestを含める。各段階の証明は同じセッションのドメイン付きtranscriptに拘束し、別セッション・役割反転・旧版で再利用できないようにする。
 
-BN254 Fr/Grumpkinと128-bit非零スカラーは上記の実装候補に絞ったが、**回路での点・スカラー正準性、部分群、復号、実証明は未検証**。`q > H`と非零スカラーの範囲検査が必要で、field上の非零だけで代用できない。実回路と正負例が通り、`bb`版と生成VKのdigestを記録するまでT004や鍵の版を完成扱いにしない。平文oracleの一致だけでは秘匿性・悪意ある参加者への安全性・性能は証明できない。
+BN254 Fr/Grumpkinと128-bit非零スカラーは上記の実装候補に絞ったが、**回路での点・スカラー正準性、部分群、復号、実証明は未検証**。`q > H`と非零スカラーの範囲検査が必要で、field上の非零だけで代用できない。実照合回路の正負例が通り、`bb`版と生成VKのdigestを記録するまでT004や鍵の版を完成扱いにしない。平文oracleと登録回路の一致だけでは秘匿性・悪意ある参加者への安全性・性能は証明できない。
 
 通信やログで公開してよいのは、資格/登録の公開識別子、暗号文、証明、最終1ビットのみ。中間の条件別真偽、共通趣味数、秘密入力は出さない。反復と限定希望からの推測可能性は[契約の制約](../specs/001-private-dating/contracts/matching.md#制約)として残る。
