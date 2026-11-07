@@ -521,6 +521,37 @@ describe("private review API", () => {
         ((await appealClosed.json()) as { state: string }).state,
         "closed",
       );
+      const voteEventsResponse = await fetch(
+        `${origin}/__review-events?id=${voteCaseId}`,
+      );
+      assert.equal(voteEventsResponse.status, 200);
+      const voteEvents = (await voteEventsResponse.json()) as {
+        events: { revision: number; kind: string; state: string }[];
+      };
+      assert.deepEqual(
+        voteEvents.events.map((event) => event.revision),
+        [1, 2, 3, 4, 5],
+      );
+      assert.deepEqual(
+        voteEvents.events.slice(-2).map((event) => event.kind),
+        ["decision", "decision"],
+      );
+      assert.equal(voteEvents.events.at(-1)?.state, "decided");
+      assert.doesNotMatch(
+        JSON.stringify(voteEvents),
+        /Synthetic notice|synthetic-solicitation|fixtureId/,
+      );
+      const appealEventsResponse = await fetch(
+        `${origin}/__review-events?id=${appealCaseId}`,
+      );
+      const appealEvents = (await appealEventsResponse.json()) as {
+        events: { revision: number; state: string }[];
+      };
+      assert.deepEqual(
+        appealEvents.events.map((event) => event.revision),
+        [1, 2, 3, 4, 5, 6, 7, 8, 9],
+      );
+      assert.equal(appealEvents.events.at(-1)?.state, "closed");
     } finally {
       if (!hasExited) {
         child.kill("SIGTERM");
