@@ -200,7 +200,7 @@ These boundaries describe the deployed participation verifier and the proposed m
 | Letter | Current behavior and limit |
 | --- | --- |
 | **C — Censorship resistant** | Public ENS/Arkiv verification works without our Hono backend. The Vercel page, Sepolia/Arkiv RPCs and issuer-controlled parent name remain dependencies; RPC failure is shown as unavailable. |
-| **O — Open source** | This parent repository is [MIT licensed](LICENSE) and can be built with the commands above. The team confirms permission to include the separately authored AIBot in the submission; its exact license name and independently reproducible parent integration still need confirmation. |
+| **O — Open source** | This parent repository is [MIT licensed](LICENSE) and can be built with the commands above. The team confirms permission to include the separately authored AIBot in the submission and reports MIT as its license. The AIBot repository still needs a published license notice and independently reproducible parent integration. |
 | **P — Private** | RPC providers see the selected public ENS name and network metadata; public names, addresses and transaction timing remain linkable. Private-match inputs staying on devices is still a design goal; the standalone AIBot sends separately consented Persona/conversation data to its AI provider. |
 | **S — Secure** | Issuer EIP-712 signatures and scoped ENSv2 permissions protect the current public credential path. The issuer, parent-name controller, wallet keys and RPCs remain trust assumptions; private matching, deposits and review recovery lack end-to-end proof. |
 
@@ -283,7 +283,7 @@ the standalone AIBot, which is a separate repository and is not evidence of pare
 
 **TODO before submission:** verify event start and starter-material eligibility against the team
 registration; document which human reviewed and authored each submitted component; record the
-AIBot author's exact license name (the team confirmed submission permission); identify the exact
+AIBot author's MIT license notice in that repository (the team confirmed submission permission and the license name); identify the exact
 AI-assisted files/assets and include any project-specific prompts required by the event rules.
 The public parent code is [MIT licensed](LICENSE); this does not establish rights to the submodule.
 
