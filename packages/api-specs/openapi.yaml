@@ -822,10 +822,11 @@ components:
     PrivateReviewCase:
       type: object
       additionalProperties: false
-      required: [caseId, policyVersion, state, revision, openedAt]
+      required: [caseId, policyVersion, prohibitedAct, state, revision, openedAt]
       properties:
         caseId: { type: string, minLength: 1, maxLength: 128 }
         policyVersion: { type: integer, minimum: 1 }
+        prohibitedAct: { type: string, minLength: 1 }
         state: { type: string, enum: [received, reviewing, decided, appealed, closed] }
         revision: { type: integer, minimum: 1 }
         openedAt: { type: string, format: date-time }
