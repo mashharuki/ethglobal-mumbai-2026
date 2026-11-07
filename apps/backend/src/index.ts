@@ -58,6 +58,7 @@ async function readJsonBody(c: AppContext): Promise<unknown> {
 
 app.use("*", async (c, next) => {
   await next();
+  c.header("Cache-Control", "no-store");
   c.header("X-Content-Type-Options", "nosniff");
   c.header("X-Frame-Options", "DENY");
   c.header("Referrer-Policy", "no-referrer");
