@@ -38,6 +38,7 @@ type ChallengeRow = {
 
 type SessionRow = { token_hash: string; expires_at: number };
 type OperationRow = { body: string };
+type SimulationHandoffRow = { expires_at: number };
 type ReviewRow = { body: string };
 class ReviewWriteConflict extends Error {}
 type RetainedRow = {
@@ -147,6 +148,9 @@ export class AuthStore extends DurableObject<CloudflareBindings> {
     );
     this.ctx.storage.sql.exec(
       "CREATE TABLE IF NOT EXISTS review_operations (operation_id TEXT PRIMARY KEY, case_id TEXT NOT NULL, fingerprint TEXT NOT NULL)",
+    );
+    this.ctx.storage.sql.exec(
+      "CREATE TABLE IF NOT EXISTS simulation_handoffs (operation_id TEXT PRIMARY KEY, expires_at INTEGER NOT NULL)",
     );
     this.ctx.storage.sql.exec(
       "CREATE TABLE IF NOT EXISTS retained_measures (case_id TEXT PRIMARY KEY, stable_subject_id TEXT NOT NULL, policy_version INTEGER NOT NULL, suspended_until INTEGER NOT NULL)",
@@ -281,6 +285,29 @@ export class AuthStore extends DurableObject<CloudflareBindings> {
       operation.operationId,
       JSON.stringify(operation),
     );
+  }
+
+  getOrCreateSimulationExpiry(
+    operationId: string,
+    nowSeconds: number,
+    newExpiry: number,
+  ): number | null {
+    this.ctx.storage.sql.exec(
+      "DELETE FROM simulation_handoffs WHERE expires_at <= ?",
+      nowSeconds - 86_400,
+    );
+    this.ctx.storage.sql.exec(
+      "INSERT OR IGNORE INTO simulation_handoffs (operation_id, expires_at) VALUES (?, ?)",
+      operationId,
+      newExpiry,
+    );
+    const row = this.ctx.storage.sql
+      .exec<SimulationHandoffRow>(
+        "SELECT expires_at FROM simulation_handoffs WHERE operation_id = ?",
+        operationId,
+      )
+      .toArray()[0];
+    return row && row.expires_at > nowSeconds ? row.expires_at : null;
   }
 
   getReviewCase(caseId: string): ReviewCase | null {

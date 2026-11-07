@@ -13,6 +13,11 @@ import {
   getAuthStore,
 } from "./auth/session.ts";
 import { reviewRoutes } from "./participation/review-routes.ts";
+import {
+  createSimulationAssertion,
+  getMatchingIdentitySecret,
+  getSimulationAssertionExpiry,
+} from "./simulation/identity.ts";
 
 type AppContext = Context<{ Bindings: CloudflareBindings }>;
 type ApiErrorCode =
@@ -144,6 +149,33 @@ app.get("/v1/operations/:id", async (c) => {
   const operation = await store.getPrivateOperation(operationId.data);
   if (!operation) return sendError(c, 404, "NOT_FOUND");
   return c.json(operation, 200);
+});
+
+app.post("/v1/simulation/identity", async (c) => {
+  if (!getRequestOrigin(c)) return sendError(c, 422, "INVALID_INPUT");
+  const operationId = operationIdSchema.safeParse(
+    c.req.header("X-Operation-Id"),
+  );
+  if (!operationId.success) return sendError(c, 422, "INVALID_INPUT");
+  const subject = await getAuthenticatedAddress(
+    c.env,
+    getCookie(c, "st_session"),
+  );
+  if (!subject) return sendError(c, 401, "UNAUTHENTICATED");
+  const secret = getMatchingIdentitySecret(c.env);
+  if (!secret || secret.length < 32) return sendError(c, 503, "UNAVAILABLE");
+  const nowSeconds = Math.floor(Date.now() / 1000);
+  const expiry = await getAuthStore(c.env, subject).getOrCreateSimulationExpiry(
+    operationId.data,
+    nowSeconds,
+    getSimulationAssertionExpiry(nowSeconds),
+  );
+  if (!expiry) return sendError(c, 409, "CONFLICT");
+  const assertion = await createSimulationAssertion(subject, secret, expiry);
+  return c.json({
+    assertion,
+    expiresAt: new Date(expiry * 1000).toISOString(),
+  });
 });
 
 app.route("/v1", reviewRoutes);

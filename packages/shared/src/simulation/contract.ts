@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 const simulationIdSchema = z.string().min(1).max(128);
-const playerSubjectSchema = z.string().min(1).max(128);
+const playerSubjectSchema = z.string().min(1).max(100);
 
 export const simulationIdentityClaimsSchema = z.strictObject({
   sub: playerSubjectSchema,
